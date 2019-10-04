@@ -1,0 +1,2 @@
+^C:\USERS\JAKUB\DESKTOP\MLASKAL\FRAMEWORK\PRIVATE-SRC\DU12L.LEX
+flex -Cf -b -p -p -odu12l.cpp "C:\Users\jakub\Desktop\mlaskal\framework\private-src\du12l.lex"

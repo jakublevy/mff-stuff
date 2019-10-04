@@ -1,0 +1,18 @@
+﻿  abstract_ic.cpp
+  duerr.cpp
+  dusememptyerrtab.cpp
+  dutables.cpp
+  flat_icblock.cpp
+  gen_aifactory.cpp
+  gen_icfactory.cpp
+  gen_icinstrtab.cpp
+  gen_instr_decode.cpp
+  gen_machines.cpp
+  gen_mops.cpp
+  icexcept.cpp
+  icm_machine.cpp
+  ic_instr.cpp
+  labeled_icblock.cpp
+  uid_gen.cpp
+  Generating Code...
+  mlaskallib.vcxproj -> C:\Users\jakub\Desktop\mlaskal\framework\build.vc141\mlaskallib.x64.Debug\mlaskallib.lib
