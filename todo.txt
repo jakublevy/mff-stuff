@@ -1,4 +1,13 @@
-Potom views
+Views
+	- Hraci na hostovani
+	- Hraci vlastneni
+	- Hraci s proslym hostovani
+	- Hraci podle kategorii/pohlavi
+	- Hraci podle poctu odehranych zapasu
+	- Hraci podle poctu kolikrat byl nahradnik
+	- Hraci, kteri jsou zaroven rozhodcim
+
+	
 
 
 declare @id int;
