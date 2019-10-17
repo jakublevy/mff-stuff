@@ -1,8 +1,5 @@
-Views
-	- Hraci podle kategorii/pohlavi
-
-(Kategorie s poctem odehranych zapasu)
-(Kluby s poctem evidovanych hracu)
+Indexy??
+	Ale nejdriv je treba se neco naucit + sql query optimization
 
 
 utkani
