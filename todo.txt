@@ -1,5 +1,58 @@
-Indexy??
-	Ale nejdriv je treba se neco naucit + sql query optimization
+declare @od date;
+	declare @do date;
+	declare @reg_id nvarchar(7);
+	declare @kontrakt_id nvarchar(15);
+	declare @id nvarchar(15);
+	declare POINTER_VH cursor for select Kontrakt_Id, Od, Do, Hráč_Reg_Id from inserted;
+	open POINTER_VH;
+
+	fetch next from POINTER_VH into @id, @od, @do, @reg_id;
+	while @@FETCH_STATUS = 0
+	begin																					      --neprázdný průnik
+		select top 1 @kontrakt_id = Kontrakt_Id from Hostování where Hráč_Reg_Id = @reg_id and @id <> Kontrakt_Id and Od <= @do and Do >= @od
+		if @kontrakt_id is not null
+		begin
+			raiserror('Dvě hostování mají neprázdný průnik', 15, 15)
+			rollback;
+		end
+
+
+		set @kontrakt_id = null;
+		fetch next from POINTER_VH into @id, @od, @do, @reg_id;
+	end
+	close POINTER_VH;
+	deallocate POINTER_VH;
+
+
+
+
+Predelat nasledujici procedury
+	- Smaž_Nevyužité_Kontakty
+	- Smaž_Nevyžité_Adresy
+	- Přidej_Utkání
+	- Koupit_Hráče
+	- Hráči_Podle_Kategorie
+
+Predelat triggery
+	- prvni asi hotovy, checknout, smazat blbosti
+
+
+with h as (
+		select Kontrakt_Id,Od,Do from inserted 
+		union all
+		select Kontrakt_Id,Od,Do from Hostování
+	)
+	select * from h h1
+	cross apply (
+		select * from h h2
+		where h1.Kontrakt_Id <> h2.Kontrakt_Id
+	) h2
+	where h1.Od <= h2.Do and h1.Do >= h2.Od
+
+
+
+Funkce
+	- OK vsechny
 
 
 utkani
