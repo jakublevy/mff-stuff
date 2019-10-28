@@ -1,3 +1,39 @@
+TODO: pripravit projekt do odezvdavaci podoby
+
+co neni pokryto stats
+	datum narozeni u hrace
+	varbinary smlouva file
+	predvolba u telefonniho cisla
+Server si je nikdy nevytvoril u pri auto_create = true. Avsak, kdyby je potreboval, tak auto_create je furt na true, tak si je muze vytvorit.
+
+
+Pridat statistiky:
+	Hostování (cena za sezónu, hráč_reg_id)
+	
+	
+Hráč neměl ani před migrováním statistiky na column D_Nar.
+
+Statistiky jsou nejake duplicitni na tabulkce Hrac_Soupiska
+
+
+Ml_Kategorie chybi
+	- delka zapasu
+	- duplicitni statistika
+	
+Utkani pridat statistiku
+	- goly my
+	- goly souper
+	- goly my polocas
+	- goly souper polocas
+
+
+
+TODO:
+	- vytvoreni a zruseni statistik
+	- pripravit projekt na odesilaci formu
+		- dodelat komentare, dokumentaci
+		- testovaci data, ...
+
 Dle me jsou indexy, kde maji byt.
 Views jsou optimalizovane stejne jako funkce, procedury a triggery.
 Snad nikde neni zadny bug nebo nejaka inefficiency.
@@ -12,15 +48,16 @@ Jinak je skoro na case sepisovat nejakou "dokumentaci" a migrovat databazi do od
 Kde neni index, protoze neni treba
 	hostovani index na clenstvi
 		nevybiram nazev klubu u hostovani hrace ve view
-	utkani souper
-		nemam zadny join ani dotaz typu: chci vsechny zapasy proti machovu
 
 proste nejak ocheckovat
-	- triggery, funkce a procedury jestli nedelaji nejake silene scany,
-      ze kterych by se kopecky posral
+	- triggery, stored procedury
 
 Funkce
 	- OK vsechny
+	- OK kontrolovano 2x
+	
+Procedury
+	- OK
 
 
 utkani
