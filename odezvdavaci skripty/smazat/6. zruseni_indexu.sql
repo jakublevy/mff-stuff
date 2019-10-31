@@ -1,4 +1,9 @@
-﻿USE Levý_Fotbal 
+﻿/*
+Autor: Jakub Levý
+Vytvořeno pro DBA @ MFF ZS 19/20
+*/
+
+USE Levý_Fotbal 
 GO
 
 drop INDEX IX_Hostování_Členství_Id ON dbo.Hostování 

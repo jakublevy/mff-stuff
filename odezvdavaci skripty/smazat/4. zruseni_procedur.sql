@@ -1,4 +1,9 @@
-﻿USE Levý_Fotbal 
+﻿/*
+Autor: Jakub Levý
+Vytvořeno pro DBA @ MFF ZS 19/20
+*/
+
+USE Levý_Fotbal 
 GO
 
 drop procedure dbo.Hostování_Mateřský_Klub

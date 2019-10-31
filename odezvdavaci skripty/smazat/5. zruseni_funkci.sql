@@ -1,8 +1,14 @@
-﻿USE Levý_Fotbal 
+﻿/*
+Autor: Jakub Levý
+Vytvořeno pro DBA @ MFF ZS 19/20
+*/
+
+USE Levý_Fotbal 
 GO
 
 drop FUNCTION dbo.Soubor_Existuje
 drop assembly CLR
+
 drop function dbo.Aktuální_Sezóna
 drop function dbo.Doma_Venku
 drop function dbo.Ml_Kategorie_Formátované

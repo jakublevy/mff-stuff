@@ -1,10 +1,13 @@
-USE [Levý_Fotbal] 
-GO
-
 /*
+Autor: Jakub Levý
+Vytvořeno pro DBA @ MFF ZS 19/20
+
 Statistiky, které pokud bychom je nevytvořili my, a měli povolené 'Auto Create Statistics' tak si je MSSQL sám vytvoři.
 Hodí se query optimizeru, pro dotazy, které jsou obsaženy ve funkcích, procedůrách a triggerech.
 */
+
+USE Levý_Fotbal 
+GO
 
 create statistics STAT_Adresa_Ulice on Adresa(Ulice) with fullscan
 create statistics STAT_Adresa_Č_p on Adresa(Č_p) with fullscan

@@ -1,3 +1,8 @@
+/*
+Autor: Jakub Levý
+Vytvořeno pro DBA @ MFF ZS 19/20
+*/
+
 USE [Levý_Fotbal] 
 GO
 

@@ -1,6 +1,30 @@
 TODO:
 	- testovací data a skript, který ukáže celkovou funkcionalitu DB
-	- Popis a komentáře
+	- Přemejšlím nad procedurami udělej_rozhodcim, udelej_hracem, ...
+		- liftnou existují kontakt a danou roli, pokud uz roli ma neudelaji nic
+		- Uvidíme jestli pro ně bude význam v předváděcím skriptu
+
+
+
+Zmeny v DB od skriptu:
+	- Computed columns jsou not null
+	- změna CK_Kontakt_Jméno_Přijmení
+	- 2 sloupce jsou sparse viz níže
+	- constraints u adresy
+	- Celkově takový ty constraints na ověření vstupu, nově požaduji i na konci abecední znak
+
+U adresy a kontaktu je generated column always not null, ale DB to neví
+Stejné u sezóny!
+
+Kandidáti na sparse column:
+	- Hostování(Smlouva) - je sám nullovatelný v tabulce
+		- Udělám sparse
+	- Kontakt(Email), Kontakt(Tel_Id)
+		- ponechám, předpokládám, že obvykle vím email i telefon
+	- Soupiska(Zapsal_Id)
+		- ponechám, pouze ve výjimečných případech nevím kdo zapsal soupisku
+	- Tel(Předvolba)
+		- Udělám sparse
 
 co neni pokryto stats
 	datum narozeni u hrace
