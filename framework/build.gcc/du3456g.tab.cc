@@ -37,7 +37,7 @@
 
 
 
-#include "du3456g.hpp"
+#include "du3456g.tab.hh"
 
 
 // Unqualified %code blocks.
@@ -60,7 +60,7 @@
     using namespace mlc;
 
 
-#line 64 "du3456g.cpp"
+#line 64 "du3456g.tab.cc"
 
 
 #ifndef YY_
@@ -151,7 +151,7 @@
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 namespace yy {
-#line 155 "du3456g.cpp"
+#line 155 "du3456g.tab.cc"
 
 
   /* Return YYSTR after stripping away unnecessary quotes and
@@ -689,7 +689,7 @@ namespace yy {
           switch (yyn)
             {
 
-#line 693 "du3456g.cpp"
+#line 693 "du3456g.tab.cc"
 
             default:
               break;
@@ -1231,7 +1231,7 @@ namespace yy {
 
 
 } // yy
-#line 1235 "du3456g.cpp"
+#line 1235 "du3456g.tab.cc"
 
 #line 341 "../private-src/du3456g.y"
 

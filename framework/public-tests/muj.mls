@@ -1,1 +1,25 @@
-r := 312341243213442314231123243142432434321.2413231412241321432143432134;
+program ahoj;
+
+type
+    zaznam = record
+        n1, n2 : integer;
+    end;
+
+    zaznam2 = record
+        b : real;
+        c : real;
+        d : zaznam;
+    end;
+
+var
+    k : Integer;
+    r : zaznam;
+    r2 : zaznam2;
+
+procedure f(a : Integer; b : real);
+begin
+end;
+
+begin
+    r2.d.n1 := 10;
+end.

@@ -32,7 +32,7 @@
 
 
 /**
- ** \file ahoj.txt
+ ** \file du3456g.tab.hh
  ** Define the yy::parser class.
  */
 
@@ -41,10 +41,10 @@
 // Undocumented macros, especially those whose name start with YY_,
 // are private implementation details.  Do not rely on them.
 
-#ifndef YY_YY_AHOJ_TXT_INCLUDED
-# define YY_YY_AHOJ_TXT_INCLUDED
+#ifndef YY_YY_DU3456G_TAB_HH_INCLUDED
+# define YY_YY_DU3456G_TAB_HH_INCLUDED
 // //                    "%code requires" blocks.
-#line 15 "../../private-src/du3456g.y"
+#line 15 "../private-src/du3456g.y"
 
 	// this code is emitted to du3456g.hpp
 
@@ -60,7 +60,7 @@
 #define YY_NULL	0
 #define YY_NULLPTR	0
 
-#line 64 "ahoj.txt"
+#line 64 "du3456g.tab.hh"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -175,7 +175,7 @@
 #endif
 
 namespace yy {
-#line 179 "ahoj.txt"
+#line 179 "du3456g.tab.hh"
 
 
 
@@ -783,13 +783,13 @@ switch (yytype)
       symbol_type (int tok, location_type l)
         : super_type(token_type (tok), std::move (l))
       {
-        YYASSERT (tok == token::DUTOK_EOF || tok == token::DUTOK_PROGRAM || tok == token::DUTOK_LABEL || tok == token::DUTOK_CONST || tok == token::DUTOK_TYPE || tok == token::DUTOK_VAR || tok == token::DUTOK_BEGIN || tok == token::DUTOK_END || tok == token::DUTOK_PROCEDURE || tok == token::DUTOK_FUNCTION || tok == token::DUTOK_ARRAY || tok == token::DUTOK_OF || tok == token::DUTOK_GOTO || tok == token::DUTOK_IF || tok == token::DUTOK_THEN || tok == token::DUTOK_ELSE || tok == token::DUTOK_WHILE || tok == token::DUTOK_DO || tok == token::DUTOK_REPEAT || tok == token::DUTOK_UNTIL || tok == token::DUTOK_FOR || tok == token::DUTOK_OR || tok == token::DUTOK_NOT || tok == token::DUTOK_RECORD || tok == token::DUTOK_SEMICOLON || tok == token::DUTOK_DOT || tok == token::DUTOK_COMMA || tok == token::DUTOK_EQ || tok == token::DUTOK_COLON || tok == token::DUTOK_LPAR || tok == token::DUTOK_RPAR || tok == token::DUTOK_DOTDOT || tok == token::DUTOK_LSBRA || tok == token::DUTOK_RSBRA || tok == token::DUTOK_ASSIGN || tok == 300 || tok == 301 || tok == 302);
+        YYASSERT (tok == token::DUTOK_EOF || tok == token::DUTOK_PROGRAM || tok == token::DUTOK_LABEL || tok == token::DUTOK_CONST || tok == token::DUTOK_TYPE || tok == token::DUTOK_VAR || tok == token::DUTOK_BEGIN || tok == token::DUTOK_END || tok == token::DUTOK_PROCEDURE || tok == token::DUTOK_FUNCTION || tok == token::DUTOK_ARRAY || tok == token::DUTOK_OF || tok == token::DUTOK_GOTO || tok == token::DUTOK_IF || tok == token::DUTOK_THEN || tok == token::DUTOK_ELSE || tok == token::DUTOK_WHILE || tok == token::DUTOK_DO || tok == token::DUTOK_REPEAT || tok == token::DUTOK_UNTIL || tok == token::DUTOK_FOR || tok == token::DUTOK_OR || tok == token::DUTOK_NOT || tok == token::DUTOK_RECORD || tok == token::DUTOK_SEMICOLON || tok == token::DUTOK_DOT || tok == token::DUTOK_COMMA || tok == token::DUTOK_EQ || tok == token::DUTOK_COLON || tok == token::DUTOK_LPAR || tok == token::DUTOK_RPAR || tok == token::DUTOK_DOTDOT || tok == token::DUTOK_LSBRA || tok == token::DUTOK_RSBRA || tok == token::DUTOK_ASSIGN);
       }
 #else
       symbol_type (int tok, const location_type& l)
         : super_type(token_type (tok), l)
       {
-        YYASSERT (tok == token::DUTOK_EOF || tok == token::DUTOK_PROGRAM || tok == token::DUTOK_LABEL || tok == token::DUTOK_CONST || tok == token::DUTOK_TYPE || tok == token::DUTOK_VAR || tok == token::DUTOK_BEGIN || tok == token::DUTOK_END || tok == token::DUTOK_PROCEDURE || tok == token::DUTOK_FUNCTION || tok == token::DUTOK_ARRAY || tok == token::DUTOK_OF || tok == token::DUTOK_GOTO || tok == token::DUTOK_IF || tok == token::DUTOK_THEN || tok == token::DUTOK_ELSE || tok == token::DUTOK_WHILE || tok == token::DUTOK_DO || tok == token::DUTOK_REPEAT || tok == token::DUTOK_UNTIL || tok == token::DUTOK_FOR || tok == token::DUTOK_OR || tok == token::DUTOK_NOT || tok == token::DUTOK_RECORD || tok == token::DUTOK_SEMICOLON || tok == token::DUTOK_DOT || tok == token::DUTOK_COMMA || tok == token::DUTOK_EQ || tok == token::DUTOK_COLON || tok == token::DUTOK_LPAR || tok == token::DUTOK_RPAR || tok == token::DUTOK_DOTDOT || tok == token::DUTOK_LSBRA || tok == token::DUTOK_RSBRA || tok == token::DUTOK_ASSIGN || tok == 300 || tok == 301 || tok == 302);
+        YYASSERT (tok == token::DUTOK_EOF || tok == token::DUTOK_PROGRAM || tok == token::DUTOK_LABEL || tok == token::DUTOK_CONST || tok == token::DUTOK_TYPE || tok == token::DUTOK_VAR || tok == token::DUTOK_BEGIN || tok == token::DUTOK_END || tok == token::DUTOK_PROCEDURE || tok == token::DUTOK_FUNCTION || tok == token::DUTOK_ARRAY || tok == token::DUTOK_OF || tok == token::DUTOK_GOTO || tok == token::DUTOK_IF || tok == token::DUTOK_THEN || tok == token::DUTOK_ELSE || tok == token::DUTOK_WHILE || tok == token::DUTOK_DO || tok == token::DUTOK_REPEAT || tok == token::DUTOK_UNTIL || tok == token::DUTOK_FOR || tok == token::DUTOK_OR || tok == token::DUTOK_NOT || tok == token::DUTOK_RECORD || tok == token::DUTOK_SEMICOLON || tok == token::DUTOK_DOT || tok == token::DUTOK_COMMA || tok == token::DUTOK_EQ || tok == token::DUTOK_COLON || tok == token::DUTOK_LPAR || tok == token::DUTOK_RPAR || tok == token::DUTOK_DOTDOT || tok == token::DUTOK_LSBRA || tok == token::DUTOK_RSBRA || tok == token::DUTOK_ASSIGN);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -1607,7 +1607,7 @@ switch (yytype)
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short yypact_ninf_;
+    static const signed char yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -1632,7 +1632,7 @@ switch (yytype)
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const short yytable_[];
+  static const unsigned char yytable_[];
 
   static const short yycheck_[];
 
@@ -1884,12 +1884,12 @@ switch (yytype)
     enum
     {
       yyeof_ = 0,
-      yylast_ = 223,     ///< Last index in yytable_.
-      yynnts_ = 66,  ///< Number of nonterminal symbols.
+      yylast_ = 213,     ///< Last index in yytable_.
+      yynnts_ = 54,  ///< Number of nonterminal symbols.
       yyfinal_ = 4, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 48  ///< Number of tokens.
+      yyntokens_ = 45  ///< Number of tokens.
     };
 
 
@@ -1937,10 +1937,9 @@ switch (yytype)
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
     };
-    const unsigned user_token_number_max_ = 302;
+    const unsigned user_token_number_max_ = 299;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int> (t) <= yyeof_)
@@ -2162,16 +2161,16 @@ switch (yytype)
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,   302
+     295,   296,   297,   298,   299
     };
     return token_type (yytoken_number_[type]);
   }
 
 } // yy
-#line 2172 "ahoj.txt"
+#line 2171 "du3456g.tab.hh"
 
 
 
 
 
-#endif // !YY_YY_AHOJ_TXT_INCLUDED
+#endif // !YY_YY_DU3456G_TAB_HH_INCLUDED

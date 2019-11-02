@@ -1,0 +1,2391 @@
+Terminals unused in grammar
+
+    ARRAY
+    OF
+    DOTDOT
+    LSBRA
+    RSBRA
+
+
+Grammar
+
+    0 $accept: mlaskal "end of file"
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON block_p DOT
+
+    2 block_common: block_p1_opt block_p2_opt block_p3_opt block_p4_opt
+
+    3 body: BEGIN statement_list_opt END
+
+    4 block_p: block_common block_p5_opt body
+
+    5 block: block_common body
+
+    6 block_p1_opt: %empty
+    7             | LABEL uint_list_1 SEMICOLON
+
+    8 block_p2_opt: %empty
+    9             | CONST block_p2_list
+
+   10 block_p2_list: IDENTIFIER EQ constant SEMICOLON block_p2_next
+
+   11 block_p2_next: %empty
+   12              | IDENTIFIER EQ constant SEMICOLON block_p2_next
+
+   13 block_p3_opt: %empty
+   14             | TYPE block_p3_list
+
+   15 block_p3_list: IDENTIFIER EQ type SEMICOLON block_p3_next
+
+   16 block_p3_next: %empty
+   17              | IDENTIFIER EQ type SEMICOLON block_p3_next
+
+   18 block_p4_opt: %empty
+   19             | VAR block_p4_list
+
+   20 block_p4_list: identifier_list_1 COLON type SEMICOLON block_p4_next
+
+   21 block_p4_next: %empty
+   22              | identifier_list_1 COLON type SEMICOLON block_p4_next
+
+   23 block_p5_opt: %empty
+   24             | block_p5_list
+
+   25 block_p5_list: procedure_header block SEMICOLON block_p5_next
+   26              | function_header block SEMICOLON block_p5_next
+
+   27 block_p5_next: %empty
+   28              | procedure_header block SEMICOLON block_p5_next
+   29              | function_header block SEMICOLON block_p5_next
+
+   30 uint_list_1: UINT uint_next
+
+   31 uint_next: %empty
+   32          | COMMA UINT uint_next
+
+   33 constant: unsigned_constant
+   34         | OPER_SIGNADD UINT
+   35         | OPER_SIGNADD REAL
+
+   36 unsigned_constant: UINT
+   37                  | REAL
+   38                  | STRING
+
+   39 pm_opt: %empty
+   40       | OPER_SIGNADD
+
+   41 boolean_expression: expression
+
+   42 ordinal_expression: expression
+
+   43 expression_cmp: EQ
+   44               | OPER_REL
+
+   45 expression: simple_expression expression_next
+
+   46 expression_next: %empty
+   47                | expression_cmp simple_expression
+
+   48 simple_expression: pm_opt term simple_expression_next
+
+   49 simple_expression_bin_op: OPER_SIGNADD
+   50                         | OR
+
+   51 simple_expression_next: %empty
+   52                       | simple_expression_bin_op term simple_expression_next
+
+   53 term: factor term_next
+
+   54 term_next: %empty
+   55          | OPER_MUL factor term_next
+
+   56 factor: unsigned_constant
+   57       | variable
+   58       | IDENTIFIER factor_parameters_opt
+   59       | LPAR expression RPAR
+   60       | NOT factor
+
+   61 factor_parameters_opt: %empty
+   62                      | LPAR real_parameters RPAR
+
+   63 real_parameters: expression real_parameters_next
+
+   64 real_parameters_next: %empty
+   65                     | COMMA expression real_parameters_next
+
+   66 variable: variable DOT IDENTIFIER
+   67         | IDENTIFIER DOT IDENTIFIER
+
+   68 statement: UINT COLON stmt_1
+   69          | stmt_1
+   70          | IDENTIFIER factor_parameters_opt
+   71          | GOTO UINT
+   72          | BEGIN statement_list_opt END
+   73          | IF boolean_expression THEN statement ELSE statement
+   74          | IF boolean_expression THEN statement
+   75          | WHILE boolean_expression DO statement
+   76          | REPEAT statement_list_opt UNTIL boolean_expression
+   77          | FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement
+
+   78 statement_list_opt: %empty
+   79                   | statements
+
+   80 statements: statement SEMICOLON statements
+   81           | statement semicolon_string_opt
+
+   82 semicolon_string_opt: %empty
+   83                     | SEMICOLON
+
+   84 stmt_1: variable ASSIGN expression
+   85       | IDENTIFIER ASSIGN expression
+
+   86 identifier_list_1: IDENTIFIER identifier_next
+
+   87 identifier_next: %empty
+   88                | COMMA IDENTIFIER identifier_next
+
+   89 field_list: field_list SEMICOLON identifier_list_1 COLON type
+   90           | identifier_list_1 COLON type
+
+   91 structured_type_3: RECORD field_list SEMICOLON END
+   92                  | RECORD field_list END
+   93                  | RECORD END
+
+   94 type: IDENTIFIER
+   95     | structured_type_3
+
+   96 procedure_header: PROCEDURE IDENTIFIER method_parameters_opt SEMICOLON
+
+   97 function_header: FUNCTION IDENTIFIER method_parameters_opt COLON IDENTIFIER SEMICOLON
+
+   98 method_parameters_opt: %empty
+   99                      | LPAR formal_parameters RPAR
+
+  100 formal_parameters: formal_parameters SEMICOLON var_string_opt identifier_list_1 COLON IDENTIFIER
+  101                  | var_string_opt identifier_list_1 COLON IDENTIFIER
+
+  102 var_string_opt: %empty
+  103               | VAR
+
+
+Terminals, with rules where they appear
+
+    "end of file" (0) 0
+    error (256)
+    PROGRAM (258) 1
+    LABEL (259) 7
+    CONST (260) 9
+    TYPE (261) 14
+    VAR (262) 19 103
+    BEGIN (263) 3 72
+    END (264) 3 72 91 92 93
+    PROCEDURE (265) 96
+    FUNCTION (266) 97
+    ARRAY (267)
+    OF (268)
+    GOTO (269) 71
+    IF (270) 73 74
+    THEN (271) 73 74
+    ELSE (272) 73
+    WHILE (273) 75
+    DO (274) 75 77
+    REPEAT (275) 76
+    UNTIL (276) 76
+    FOR (277) 77
+    OR (278) 50
+    NOT (279) 60
+    RECORD (280) 91 92 93
+    IDENTIFIER <mlc::ls_id_index> (281) 1 10 12 15 17 58 66 67 70 77 85 86 88 94 96 97 100 101
+    UINT <mlc::ls_int_index> (282) 30 32 34 36 68 71
+    REAL <mlc::ls_real_index> (283) 35 37
+    STRING <mlc::ls_str_index> (284) 38
+    SEMICOLON (285) 1 7 10 12 15 17 20 22 25 26 28 29 80 83 89 91 96 97 100
+    DOT (286) 1 66 67
+    COMMA (287) 32 65 88
+    EQ (288) 10 12 15 17 43
+    COLON (289) 20 22 68 89 90 97 100 101
+    LPAR (290) 59 62 99
+    RPAR (291) 59 62 99
+    DOTDOT (292)
+    LSBRA (293)
+    RSBRA (294)
+    ASSIGN (295) 77 84 85
+    OPER_REL <mlc::DUTOKGE_OPER_REL> (296) 44
+    OPER_SIGNADD <mlc::DUTOKGE_OPER_SIGNADD> (297) 34 35 40 49
+    OPER_MUL <mlc::DUTOKGE_OPER_MUL> (298) 55
+    FOR_DIRECTION <mlc::DUTOKGE_FOR_DIRECTION> (299) 77
+
+
+Nonterminals, with rules where they appear
+
+    $accept (45)
+        on left: 0
+    mlaskal (46)
+        on left: 1
+        on right: 0
+    block_common (47)
+        on left: 2
+        on right: 4 5
+    body (48)
+        on left: 3
+        on right: 4 5
+    block_p (49)
+        on left: 4
+        on right: 1
+    block (50)
+        on left: 5
+        on right: 25 26 28 29
+    block_p1_opt (51)
+        on left: 6 7
+        on right: 2
+    block_p2_opt (52)
+        on left: 8 9
+        on right: 2
+    block_p2_list (53)
+        on left: 10
+        on right: 9
+    block_p2_next (54)
+        on left: 11 12
+        on right: 10 12
+    block_p3_opt (55)
+        on left: 13 14
+        on right: 2
+    block_p3_list (56)
+        on left: 15
+        on right: 14
+    block_p3_next (57)
+        on left: 16 17
+        on right: 15 17
+    block_p4_opt (58)
+        on left: 18 19
+        on right: 2
+    block_p4_list (59)
+        on left: 20
+        on right: 19
+    block_p4_next (60)
+        on left: 21 22
+        on right: 20 22
+    block_p5_opt (61)
+        on left: 23 24
+        on right: 4
+    block_p5_list (62)
+        on left: 25 26
+        on right: 24
+    block_p5_next (63)
+        on left: 27 28 29
+        on right: 25 26 28 29
+    uint_list_1 (64)
+        on left: 30
+        on right: 7
+    uint_next (65)
+        on left: 31 32
+        on right: 30 32
+    constant (66)
+        on left: 33 34 35
+        on right: 10 12
+    unsigned_constant (67)
+        on left: 36 37 38
+        on right: 33 56
+    pm_opt (68)
+        on left: 39 40
+        on right: 48
+    boolean_expression (69)
+        on left: 41
+        on right: 73 74 75 76
+    ordinal_expression (70)
+        on left: 42
+        on right: 77
+    expression_cmp (71)
+        on left: 43 44
+        on right: 47
+    expression (72)
+        on left: 45
+        on right: 41 42 59 63 65 84 85
+    expression_next (73)
+        on left: 46 47
+        on right: 45
+    simple_expression (74)
+        on left: 48
+        on right: 45 47
+    simple_expression_bin_op (75)
+        on left: 49 50
+        on right: 52
+    simple_expression_next (76)
+        on left: 51 52
+        on right: 48 52
+    term (77)
+        on left: 53
+        on right: 48 52
+    term_next (78)
+        on left: 54 55
+        on right: 53 55
+    factor (79)
+        on left: 56 57 58 59 60
+        on right: 53 55 60
+    factor_parameters_opt (80)
+        on left: 61 62
+        on right: 58 70
+    real_parameters (81)
+        on left: 63
+        on right: 62
+    real_parameters_next (82)
+        on left: 64 65
+        on right: 63 65
+    variable (83)
+        on left: 66 67
+        on right: 57 66 84
+    statement (84)
+        on left: 68 69 70 71 72 73 74 75 76 77
+        on right: 73 74 75 77 80 81
+    statement_list_opt (85)
+        on left: 78 79
+        on right: 3 72 76
+    statements (86)
+        on left: 80 81
+        on right: 79 80
+    semicolon_string_opt (87)
+        on left: 82 83
+        on right: 81
+    stmt_1 (88)
+        on left: 84 85
+        on right: 68 69
+    identifier_list_1 (89)
+        on left: 86
+        on right: 20 22 89 90 100 101
+    identifier_next (90)
+        on left: 87 88
+        on right: 86 88
+    field_list (91)
+        on left: 89 90
+        on right: 89 91 92
+    structured_type_3 (92)
+        on left: 91 92 93
+        on right: 95
+    type (93)
+        on left: 94 95
+        on right: 15 17 20 22 89 90
+    procedure_header (94)
+        on left: 96
+        on right: 25 28
+    function_header (95)
+        on left: 97
+        on right: 26 29
+    method_parameters_opt (96)
+        on left: 98 99
+        on right: 96 97
+    formal_parameters (97)
+        on left: 100 101
+        on right: 99 100
+    var_string_opt (98)
+        on left: 102 103
+        on right: 100 101
+
+
+State 0
+
+    0 $accept: . mlaskal "end of file"
+
+    PROGRAM  shift, and go to state 1
+
+    mlaskal  go to state 2
+
+
+State 1
+
+    1 mlaskal: PROGRAM . IDENTIFIER SEMICOLON block_p DOT
+
+    IDENTIFIER  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: mlaskal . "end of file"
+
+    "end of file"  shift, and go to state 4
+
+
+State 3
+
+    1 mlaskal: PROGRAM IDENTIFIER . SEMICOLON block_p DOT
+
+    SEMICOLON  shift, and go to state 5
+
+
+State 4
+
+    0 $accept: mlaskal "end of file" .
+
+    $default  accept
+
+
+State 5
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON . block_p DOT
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 6 (block_p1_opt)
+
+    block_common  go to state 7
+    block_p       go to state 8
+    block_p1_opt  go to state 9
+
+
+State 6
+
+    7 block_p1_opt: LABEL . uint_list_1 SEMICOLON
+
+    UINT  shift, and go to state 10
+
+    uint_list_1  go to state 11
+
+
+State 7
+
+    4 block_p: block_common . block_p5_opt body
+
+    PROCEDURE  shift, and go to state 12
+    FUNCTION   shift, and go to state 13
+
+    $default  reduce using rule 23 (block_p5_opt)
+
+    block_p5_opt      go to state 14
+    block_p5_list     go to state 15
+    procedure_header  go to state 16
+    function_header   go to state 17
+
+
+State 8
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON block_p . DOT
+
+    DOT  shift, and go to state 18
+
+
+State 9
+
+    2 block_common: block_p1_opt . block_p2_opt block_p3_opt block_p4_opt
+
+    CONST  shift, and go to state 19
+
+    $default  reduce using rule 8 (block_p2_opt)
+
+    block_p2_opt  go to state 20
+
+
+State 10
+
+   30 uint_list_1: UINT . uint_next
+
+    COMMA  shift, and go to state 21
+
+    $default  reduce using rule 31 (uint_next)
+
+    uint_next  go to state 22
+
+
+State 11
+
+    7 block_p1_opt: LABEL uint_list_1 . SEMICOLON
+
+    SEMICOLON  shift, and go to state 23
+
+
+State 12
+
+   96 procedure_header: PROCEDURE . IDENTIFIER method_parameters_opt SEMICOLON
+
+    IDENTIFIER  shift, and go to state 24
+
+
+State 13
+
+   97 function_header: FUNCTION . IDENTIFIER method_parameters_opt COLON IDENTIFIER SEMICOLON
+
+    IDENTIFIER  shift, and go to state 25
+
+
+State 14
+
+    4 block_p: block_common block_p5_opt . body
+
+    BEGIN  shift, and go to state 26
+
+    body  go to state 27
+
+
+State 15
+
+   24 block_p5_opt: block_p5_list .
+
+    $default  reduce using rule 24 (block_p5_opt)
+
+
+State 16
+
+   25 block_p5_list: procedure_header . block SEMICOLON block_p5_next
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 6 (block_p1_opt)
+
+    block_common  go to state 28
+    block         go to state 29
+    block_p1_opt  go to state 9
+
+
+State 17
+
+   26 block_p5_list: function_header . block SEMICOLON block_p5_next
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 6 (block_p1_opt)
+
+    block_common  go to state 28
+    block         go to state 30
+    block_p1_opt  go to state 9
+
+
+State 18
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON block_p DOT .
+
+    $default  reduce using rule 1 (mlaskal)
+
+
+State 19
+
+    9 block_p2_opt: CONST . block_p2_list
+
+    IDENTIFIER  shift, and go to state 31
+
+    block_p2_list  go to state 32
+
+
+State 20
+
+    2 block_common: block_p1_opt block_p2_opt . block_p3_opt block_p4_opt
+
+    TYPE  shift, and go to state 33
+
+    $default  reduce using rule 13 (block_p3_opt)
+
+    block_p3_opt  go to state 34
+
+
+State 21
+
+   32 uint_next: COMMA . UINT uint_next
+
+    UINT  shift, and go to state 35
+
+
+State 22
+
+   30 uint_list_1: UINT uint_next .
+
+    $default  reduce using rule 30 (uint_list_1)
+
+
+State 23
+
+    7 block_p1_opt: LABEL uint_list_1 SEMICOLON .
+
+    $default  reduce using rule 7 (block_p1_opt)
+
+
+State 24
+
+   96 procedure_header: PROCEDURE IDENTIFIER . method_parameters_opt SEMICOLON
+
+    LPAR  shift, and go to state 36
+
+    $default  reduce using rule 98 (method_parameters_opt)
+
+    method_parameters_opt  go to state 37
+
+
+State 25
+
+   97 function_header: FUNCTION IDENTIFIER . method_parameters_opt COLON IDENTIFIER SEMICOLON
+
+    LPAR  shift, and go to state 36
+
+    $default  reduce using rule 98 (method_parameters_opt)
+
+    method_parameters_opt  go to state 38
+
+
+State 26
+
+    3 body: BEGIN . statement_list_opt END
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    $default  reduce using rule 78 (statement_list_opt)
+
+    variable            go to state 47
+    statement           go to state 48
+    statement_list_opt  go to state 49
+    statements          go to state 50
+    stmt_1              go to state 51
+
+
+State 27
+
+    4 block_p: block_common block_p5_opt body .
+
+    $default  reduce using rule 4 (block_p)
+
+
+State 28
+
+    5 block: block_common . body
+
+    BEGIN  shift, and go to state 26
+
+    body  go to state 52
+
+
+State 29
+
+   25 block_p5_list: procedure_header block . SEMICOLON block_p5_next
+
+    SEMICOLON  shift, and go to state 53
+
+
+State 30
+
+   26 block_p5_list: function_header block . SEMICOLON block_p5_next
+
+    SEMICOLON  shift, and go to state 54
+
+
+State 31
+
+   10 block_p2_list: IDENTIFIER . EQ constant SEMICOLON block_p2_next
+
+    EQ  shift, and go to state 55
+
+
+State 32
+
+    9 block_p2_opt: CONST block_p2_list .
+
+    $default  reduce using rule 9 (block_p2_opt)
+
+
+State 33
+
+   14 block_p3_opt: TYPE . block_p3_list
+
+    IDENTIFIER  shift, and go to state 56
+
+    block_p3_list  go to state 57
+
+
+State 34
+
+    2 block_common: block_p1_opt block_p2_opt block_p3_opt . block_p4_opt
+
+    VAR  shift, and go to state 58
+
+    $default  reduce using rule 18 (block_p4_opt)
+
+    block_p4_opt  go to state 59
+
+
+State 35
+
+   32 uint_next: COMMA UINT . uint_next
+
+    COMMA  shift, and go to state 21
+
+    $default  reduce using rule 31 (uint_next)
+
+    uint_next  go to state 60
+
+
+State 36
+
+   99 method_parameters_opt: LPAR . formal_parameters RPAR
+
+    VAR  shift, and go to state 61
+
+    $default  reduce using rule 102 (var_string_opt)
+
+    formal_parameters  go to state 62
+    var_string_opt     go to state 63
+
+
+State 37
+
+   96 procedure_header: PROCEDURE IDENTIFIER method_parameters_opt . SEMICOLON
+
+    SEMICOLON  shift, and go to state 64
+
+
+State 38
+
+   97 function_header: FUNCTION IDENTIFIER method_parameters_opt . COLON IDENTIFIER SEMICOLON
+
+    COLON  shift, and go to state 65
+
+
+State 39
+
+   72 statement: BEGIN . statement_list_opt END
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    $default  reduce using rule 78 (statement_list_opt)
+
+    variable            go to state 47
+    statement           go to state 48
+    statement_list_opt  go to state 66
+    statements          go to state 50
+    stmt_1              go to state 51
+
+
+State 40
+
+   71 statement: GOTO . UINT
+
+    UINT  shift, and go to state 67
+
+
+State 41
+
+   73 statement: IF . boolean_expression THEN statement ELSE statement
+   74          | IF . boolean_expression THEN statement
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt              go to state 69
+    boolean_expression  go to state 70
+    expression          go to state 71
+    simple_expression   go to state 72
+
+
+State 42
+
+   75 statement: WHILE . boolean_expression DO statement
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt              go to state 69
+    boolean_expression  go to state 73
+    expression          go to state 71
+    simple_expression   go to state 72
+
+
+State 43
+
+   76 statement: REPEAT . statement_list_opt UNTIL boolean_expression
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    $default  reduce using rule 78 (statement_list_opt)
+
+    variable            go to state 47
+    statement           go to state 48
+    statement_list_opt  go to state 74
+    statements          go to state 50
+    stmt_1              go to state 51
+
+
+State 44
+
+   77 statement: FOR . IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement
+
+    IDENTIFIER  shift, and go to state 75
+
+
+State 45
+
+   67 variable: IDENTIFIER . DOT IDENTIFIER
+   70 statement: IDENTIFIER . factor_parameters_opt
+   85 stmt_1: IDENTIFIER . ASSIGN expression
+
+    DOT     shift, and go to state 76
+    LPAR    shift, and go to state 77
+    ASSIGN  shift, and go to state 78
+
+    $default  reduce using rule 61 (factor_parameters_opt)
+
+    factor_parameters_opt  go to state 79
+
+
+State 46
+
+   68 statement: UINT . COLON stmt_1
+
+    COLON  shift, and go to state 80
+
+
+State 47
+
+   66 variable: variable . DOT IDENTIFIER
+   84 stmt_1: variable . ASSIGN expression
+
+    DOT     shift, and go to state 81
+    ASSIGN  shift, and go to state 82
+
+
+State 48
+
+   80 statements: statement . SEMICOLON statements
+   81           | statement . semicolon_string_opt
+
+    SEMICOLON  shift, and go to state 83
+
+    $default  reduce using rule 82 (semicolon_string_opt)
+
+    semicolon_string_opt  go to state 84
+
+
+State 49
+
+    3 body: BEGIN statement_list_opt . END
+
+    END  shift, and go to state 85
+
+
+State 50
+
+   79 statement_list_opt: statements .
+
+    $default  reduce using rule 79 (statement_list_opt)
+
+
+State 51
+
+   69 statement: stmt_1 .
+
+    $default  reduce using rule 69 (statement)
+
+
+State 52
+
+    5 block: block_common body .
+
+    $default  reduce using rule 5 (block)
+
+
+State 53
+
+   25 block_p5_list: procedure_header block SEMICOLON . block_p5_next
+
+    PROCEDURE  shift, and go to state 12
+    FUNCTION   shift, and go to state 13
+
+    $default  reduce using rule 27 (block_p5_next)
+
+    block_p5_next     go to state 86
+    procedure_header  go to state 87
+    function_header   go to state 88
+
+
+State 54
+
+   26 block_p5_list: function_header block SEMICOLON . block_p5_next
+
+    PROCEDURE  shift, and go to state 12
+    FUNCTION   shift, and go to state 13
+
+    $default  reduce using rule 27 (block_p5_next)
+
+    block_p5_next     go to state 89
+    procedure_header  go to state 87
+    function_header   go to state 88
+
+
+State 55
+
+   10 block_p2_list: IDENTIFIER EQ . constant SEMICOLON block_p2_next
+
+    UINT          shift, and go to state 90
+    REAL          shift, and go to state 91
+    STRING        shift, and go to state 92
+    OPER_SIGNADD  shift, and go to state 93
+
+    constant           go to state 94
+    unsigned_constant  go to state 95
+
+
+State 56
+
+   15 block_p3_list: IDENTIFIER . EQ type SEMICOLON block_p3_next
+
+    EQ  shift, and go to state 96
+
+
+State 57
+
+   14 block_p3_opt: TYPE block_p3_list .
+
+    $default  reduce using rule 14 (block_p3_opt)
+
+
+State 58
+
+   19 block_p4_opt: VAR . block_p4_list
+
+    IDENTIFIER  shift, and go to state 97
+
+    block_p4_list      go to state 98
+    identifier_list_1  go to state 99
+
+
+State 59
+
+    2 block_common: block_p1_opt block_p2_opt block_p3_opt block_p4_opt .
+
+    $default  reduce using rule 2 (block_common)
+
+
+State 60
+
+   32 uint_next: COMMA UINT uint_next .
+
+    $default  reduce using rule 32 (uint_next)
+
+
+State 61
+
+  103 var_string_opt: VAR .
+
+    $default  reduce using rule 103 (var_string_opt)
+
+
+State 62
+
+   99 method_parameters_opt: LPAR formal_parameters . RPAR
+  100 formal_parameters: formal_parameters . SEMICOLON var_string_opt identifier_list_1 COLON IDENTIFIER
+
+    SEMICOLON  shift, and go to state 100
+    RPAR       shift, and go to state 101
+
+
+State 63
+
+  101 formal_parameters: var_string_opt . identifier_list_1 COLON IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 97
+
+    identifier_list_1  go to state 102
+
+
+State 64
+
+   96 procedure_header: PROCEDURE IDENTIFIER method_parameters_opt SEMICOLON .
+
+    $default  reduce using rule 96 (procedure_header)
+
+
+State 65
+
+   97 function_header: FUNCTION IDENTIFIER method_parameters_opt COLON . IDENTIFIER SEMICOLON
+
+    IDENTIFIER  shift, and go to state 103
+
+
+State 66
+
+   72 statement: BEGIN statement_list_opt . END
+
+    END  shift, and go to state 104
+
+
+State 67
+
+   71 statement: GOTO UINT .
+
+    $default  reduce using rule 71 (statement)
+
+
+State 68
+
+   40 pm_opt: OPER_SIGNADD .
+
+    $default  reduce using rule 40 (pm_opt)
+
+
+State 69
+
+   48 simple_expression: pm_opt . term simple_expression_next
+
+    NOT         shift, and go to state 105
+    IDENTIFIER  shift, and go to state 106
+    UINT        shift, and go to state 90
+    REAL        shift, and go to state 91
+    STRING      shift, and go to state 92
+    LPAR        shift, and go to state 107
+
+    unsigned_constant  go to state 108
+    term               go to state 109
+    factor             go to state 110
+    variable           go to state 111
+
+
+State 70
+
+   73 statement: IF boolean_expression . THEN statement ELSE statement
+   74          | IF boolean_expression . THEN statement
+
+    THEN  shift, and go to state 112
+
+
+State 71
+
+   41 boolean_expression: expression .
+
+    $default  reduce using rule 41 (boolean_expression)
+
+
+State 72
+
+   45 expression: simple_expression . expression_next
+
+    EQ        shift, and go to state 113
+    OPER_REL  shift, and go to state 114
+
+    $default  reduce using rule 46 (expression_next)
+
+    expression_cmp   go to state 115
+    expression_next  go to state 116
+
+
+State 73
+
+   75 statement: WHILE boolean_expression . DO statement
+
+    DO  shift, and go to state 117
+
+
+State 74
+
+   76 statement: REPEAT statement_list_opt . UNTIL boolean_expression
+
+    UNTIL  shift, and go to state 118
+
+
+State 75
+
+   77 statement: FOR IDENTIFIER . ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement
+
+    ASSIGN  shift, and go to state 119
+
+
+State 76
+
+   67 variable: IDENTIFIER DOT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 120
+
+
+State 77
+
+   62 factor_parameters_opt: LPAR . real_parameters RPAR
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    expression         go to state 121
+    simple_expression  go to state 72
+    real_parameters    go to state 122
+
+
+State 78
+
+   85 stmt_1: IDENTIFIER ASSIGN . expression
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    expression         go to state 123
+    simple_expression  go to state 72
+
+
+State 79
+
+   70 statement: IDENTIFIER factor_parameters_opt .
+
+    $default  reduce using rule 70 (statement)
+
+
+State 80
+
+   68 statement: UINT COLON . stmt_1
+
+    IDENTIFIER  shift, and go to state 124
+
+    variable  go to state 47
+    stmt_1    go to state 125
+
+
+State 81
+
+   66 variable: variable DOT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 126
+
+
+State 82
+
+   84 stmt_1: variable ASSIGN . expression
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    expression         go to state 127
+    simple_expression  go to state 72
+
+
+State 83
+
+   80 statements: statement SEMICOLON . statements
+   83 semicolon_string_opt: SEMICOLON .
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    $default  reduce using rule 83 (semicolon_string_opt)
+
+    variable    go to state 47
+    statement   go to state 48
+    statements  go to state 128
+    stmt_1      go to state 51
+
+
+State 84
+
+   81 statements: statement semicolon_string_opt .
+
+    $default  reduce using rule 81 (statements)
+
+
+State 85
+
+    3 body: BEGIN statement_list_opt END .
+
+    $default  reduce using rule 3 (body)
+
+
+State 86
+
+   25 block_p5_list: procedure_header block SEMICOLON block_p5_next .
+
+    $default  reduce using rule 25 (block_p5_list)
+
+
+State 87
+
+   28 block_p5_next: procedure_header . block SEMICOLON block_p5_next
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 6 (block_p1_opt)
+
+    block_common  go to state 28
+    block         go to state 129
+    block_p1_opt  go to state 9
+
+
+State 88
+
+   29 block_p5_next: function_header . block SEMICOLON block_p5_next
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 6 (block_p1_opt)
+
+    block_common  go to state 28
+    block         go to state 130
+    block_p1_opt  go to state 9
+
+
+State 89
+
+   26 block_p5_list: function_header block SEMICOLON block_p5_next .
+
+    $default  reduce using rule 26 (block_p5_list)
+
+
+State 90
+
+   36 unsigned_constant: UINT .
+
+    $default  reduce using rule 36 (unsigned_constant)
+
+
+State 91
+
+   37 unsigned_constant: REAL .
+
+    $default  reduce using rule 37 (unsigned_constant)
+
+
+State 92
+
+   38 unsigned_constant: STRING .
+
+    $default  reduce using rule 38 (unsigned_constant)
+
+
+State 93
+
+   34 constant: OPER_SIGNADD . UINT
+   35         | OPER_SIGNADD . REAL
+
+    UINT  shift, and go to state 131
+    REAL  shift, and go to state 132
+
+
+State 94
+
+   10 block_p2_list: IDENTIFIER EQ constant . SEMICOLON block_p2_next
+
+    SEMICOLON  shift, and go to state 133
+
+
+State 95
+
+   33 constant: unsigned_constant .
+
+    $default  reduce using rule 33 (constant)
+
+
+State 96
+
+   15 block_p3_list: IDENTIFIER EQ . type SEMICOLON block_p3_next
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 137
+
+
+State 97
+
+   86 identifier_list_1: IDENTIFIER . identifier_next
+
+    COMMA  shift, and go to state 138
+
+    $default  reduce using rule 87 (identifier_next)
+
+    identifier_next  go to state 139
+
+
+State 98
+
+   19 block_p4_opt: VAR block_p4_list .
+
+    $default  reduce using rule 19 (block_p4_opt)
+
+
+State 99
+
+   20 block_p4_list: identifier_list_1 . COLON type SEMICOLON block_p4_next
+
+    COLON  shift, and go to state 140
+
+
+State 100
+
+  100 formal_parameters: formal_parameters SEMICOLON . var_string_opt identifier_list_1 COLON IDENTIFIER
+
+    VAR  shift, and go to state 61
+
+    $default  reduce using rule 102 (var_string_opt)
+
+    var_string_opt  go to state 141
+
+
+State 101
+
+   99 method_parameters_opt: LPAR formal_parameters RPAR .
+
+    $default  reduce using rule 99 (method_parameters_opt)
+
+
+State 102
+
+  101 formal_parameters: var_string_opt identifier_list_1 . COLON IDENTIFIER
+
+    COLON  shift, and go to state 142
+
+
+State 103
+
+   97 function_header: FUNCTION IDENTIFIER method_parameters_opt COLON IDENTIFIER . SEMICOLON
+
+    SEMICOLON  shift, and go to state 143
+
+
+State 104
+
+   72 statement: BEGIN statement_list_opt END .
+
+    $default  reduce using rule 72 (statement)
+
+
+State 105
+
+   60 factor: NOT . factor
+
+    NOT         shift, and go to state 105
+    IDENTIFIER  shift, and go to state 106
+    UINT        shift, and go to state 90
+    REAL        shift, and go to state 91
+    STRING      shift, and go to state 92
+    LPAR        shift, and go to state 107
+
+    unsigned_constant  go to state 108
+    factor             go to state 144
+    variable           go to state 111
+
+
+State 106
+
+   58 factor: IDENTIFIER . factor_parameters_opt
+   67 variable: IDENTIFIER . DOT IDENTIFIER
+
+    DOT   shift, and go to state 76
+    LPAR  shift, and go to state 77
+
+    $default  reduce using rule 61 (factor_parameters_opt)
+
+    factor_parameters_opt  go to state 145
+
+
+State 107
+
+   59 factor: LPAR . expression RPAR
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    expression         go to state 146
+    simple_expression  go to state 72
+
+
+State 108
+
+   56 factor: unsigned_constant .
+
+    $default  reduce using rule 56 (factor)
+
+
+State 109
+
+   48 simple_expression: pm_opt term . simple_expression_next
+
+    OR            shift, and go to state 147
+    OPER_SIGNADD  shift, and go to state 148
+
+    $default  reduce using rule 51 (simple_expression_next)
+
+    simple_expression_bin_op  go to state 149
+    simple_expression_next    go to state 150
+
+
+State 110
+
+   53 term: factor . term_next
+
+    OPER_MUL  shift, and go to state 151
+
+    $default  reduce using rule 54 (term_next)
+
+    term_next  go to state 152
+
+
+State 111
+
+   57 factor: variable .
+   66 variable: variable . DOT IDENTIFIER
+
+    DOT  shift, and go to state 81
+
+    $default  reduce using rule 57 (factor)
+
+
+State 112
+
+   73 statement: IF boolean_expression THEN . statement ELSE statement
+   74          | IF boolean_expression THEN . statement
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    variable   go to state 47
+    statement  go to state 153
+    stmt_1     go to state 51
+
+
+State 113
+
+   43 expression_cmp: EQ .
+
+    $default  reduce using rule 43 (expression_cmp)
+
+
+State 114
+
+   44 expression_cmp: OPER_REL .
+
+    $default  reduce using rule 44 (expression_cmp)
+
+
+State 115
+
+   47 expression_next: expression_cmp . simple_expression
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    simple_expression  go to state 154
+
+
+State 116
+
+   45 expression: simple_expression expression_next .
+
+    $default  reduce using rule 45 (expression)
+
+
+State 117
+
+   75 statement: WHILE boolean_expression DO . statement
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    variable   go to state 47
+    statement  go to state 155
+    stmt_1     go to state 51
+
+
+State 118
+
+   76 statement: REPEAT statement_list_opt UNTIL . boolean_expression
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt              go to state 69
+    boolean_expression  go to state 156
+    expression          go to state 71
+    simple_expression   go to state 72
+
+
+State 119
+
+   77 statement: FOR IDENTIFIER ASSIGN . ordinal_expression FOR_DIRECTION ordinal_expression DO statement
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt              go to state 69
+    ordinal_expression  go to state 157
+    expression          go to state 158
+    simple_expression   go to state 72
+
+
+State 120
+
+   67 variable: IDENTIFIER DOT IDENTIFIER .
+
+    $default  reduce using rule 67 (variable)
+
+
+State 121
+
+   63 real_parameters: expression . real_parameters_next
+
+    COMMA  shift, and go to state 159
+
+    $default  reduce using rule 64 (real_parameters_next)
+
+    real_parameters_next  go to state 160
+
+
+State 122
+
+   62 factor_parameters_opt: LPAR real_parameters . RPAR
+
+    RPAR  shift, and go to state 161
+
+
+State 123
+
+   85 stmt_1: IDENTIFIER ASSIGN expression .
+
+    $default  reduce using rule 85 (stmt_1)
+
+
+State 124
+
+   67 variable: IDENTIFIER . DOT IDENTIFIER
+   85 stmt_1: IDENTIFIER . ASSIGN expression
+
+    DOT     shift, and go to state 76
+    ASSIGN  shift, and go to state 78
+
+
+State 125
+
+   68 statement: UINT COLON stmt_1 .
+
+    $default  reduce using rule 68 (statement)
+
+
+State 126
+
+   66 variable: variable DOT IDENTIFIER .
+
+    $default  reduce using rule 66 (variable)
+
+
+State 127
+
+   84 stmt_1: variable ASSIGN expression .
+
+    $default  reduce using rule 84 (stmt_1)
+
+
+State 128
+
+   80 statements: statement SEMICOLON statements .
+
+    $default  reduce using rule 80 (statements)
+
+
+State 129
+
+   28 block_p5_next: procedure_header block . SEMICOLON block_p5_next
+
+    SEMICOLON  shift, and go to state 162
+
+
+State 130
+
+   29 block_p5_next: function_header block . SEMICOLON block_p5_next
+
+    SEMICOLON  shift, and go to state 163
+
+
+State 131
+
+   34 constant: OPER_SIGNADD UINT .
+
+    $default  reduce using rule 34 (constant)
+
+
+State 132
+
+   35 constant: OPER_SIGNADD REAL .
+
+    $default  reduce using rule 35 (constant)
+
+
+State 133
+
+   10 block_p2_list: IDENTIFIER EQ constant SEMICOLON . block_p2_next
+
+    IDENTIFIER  shift, and go to state 164
+
+    $default  reduce using rule 11 (block_p2_next)
+
+    block_p2_next  go to state 165
+
+
+State 134
+
+   91 structured_type_3: RECORD . field_list SEMICOLON END
+   92                  | RECORD . field_list END
+   93                  | RECORD . END
+
+    END         shift, and go to state 166
+    IDENTIFIER  shift, and go to state 97
+
+    identifier_list_1  go to state 167
+    field_list         go to state 168
+
+
+State 135
+
+   94 type: IDENTIFIER .
+
+    $default  reduce using rule 94 (type)
+
+
+State 136
+
+   95 type: structured_type_3 .
+
+    $default  reduce using rule 95 (type)
+
+
+State 137
+
+   15 block_p3_list: IDENTIFIER EQ type . SEMICOLON block_p3_next
+
+    SEMICOLON  shift, and go to state 169
+
+
+State 138
+
+   88 identifier_next: COMMA . IDENTIFIER identifier_next
+
+    IDENTIFIER  shift, and go to state 170
+
+
+State 139
+
+   86 identifier_list_1: IDENTIFIER identifier_next .
+
+    $default  reduce using rule 86 (identifier_list_1)
+
+
+State 140
+
+   20 block_p4_list: identifier_list_1 COLON . type SEMICOLON block_p4_next
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 171
+
+
+State 141
+
+  100 formal_parameters: formal_parameters SEMICOLON var_string_opt . identifier_list_1 COLON IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 97
+
+    identifier_list_1  go to state 172
+
+
+State 142
+
+  101 formal_parameters: var_string_opt identifier_list_1 COLON . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 173
+
+
+State 143
+
+   97 function_header: FUNCTION IDENTIFIER method_parameters_opt COLON IDENTIFIER SEMICOLON .
+
+    $default  reduce using rule 97 (function_header)
+
+
+State 144
+
+   60 factor: NOT factor .
+
+    $default  reduce using rule 60 (factor)
+
+
+State 145
+
+   58 factor: IDENTIFIER factor_parameters_opt .
+
+    $default  reduce using rule 58 (factor)
+
+
+State 146
+
+   59 factor: LPAR expression . RPAR
+
+    RPAR  shift, and go to state 174
+
+
+State 147
+
+   50 simple_expression_bin_op: OR .
+
+    $default  reduce using rule 50 (simple_expression_bin_op)
+
+
+State 148
+
+   49 simple_expression_bin_op: OPER_SIGNADD .
+
+    $default  reduce using rule 49 (simple_expression_bin_op)
+
+
+State 149
+
+   52 simple_expression_next: simple_expression_bin_op . term simple_expression_next
+
+    NOT         shift, and go to state 105
+    IDENTIFIER  shift, and go to state 106
+    UINT        shift, and go to state 90
+    REAL        shift, and go to state 91
+    STRING      shift, and go to state 92
+    LPAR        shift, and go to state 107
+
+    unsigned_constant  go to state 108
+    term               go to state 175
+    factor             go to state 110
+    variable           go to state 111
+
+
+State 150
+
+   48 simple_expression: pm_opt term simple_expression_next .
+
+    $default  reduce using rule 48 (simple_expression)
+
+
+State 151
+
+   55 term_next: OPER_MUL . factor term_next
+
+    NOT         shift, and go to state 105
+    IDENTIFIER  shift, and go to state 106
+    UINT        shift, and go to state 90
+    REAL        shift, and go to state 91
+    STRING      shift, and go to state 92
+    LPAR        shift, and go to state 107
+
+    unsigned_constant  go to state 108
+    factor             go to state 176
+    variable           go to state 111
+
+
+State 152
+
+   53 term: factor term_next .
+
+    $default  reduce using rule 53 (term)
+
+
+State 153
+
+   73 statement: IF boolean_expression THEN statement . ELSE statement
+   74          | IF boolean_expression THEN statement .
+
+    ELSE  shift, and go to state 177
+
+    $default  reduce using rule 74 (statement)
+
+
+State 154
+
+   47 expression_next: expression_cmp simple_expression .
+
+    $default  reduce using rule 47 (expression_next)
+
+
+State 155
+
+   75 statement: WHILE boolean_expression DO statement .
+
+    $default  reduce using rule 75 (statement)
+
+
+State 156
+
+   76 statement: REPEAT statement_list_opt UNTIL boolean_expression .
+
+    $default  reduce using rule 76 (statement)
+
+
+State 157
+
+   77 statement: FOR IDENTIFIER ASSIGN ordinal_expression . FOR_DIRECTION ordinal_expression DO statement
+
+    FOR_DIRECTION  shift, and go to state 178
+
+
+State 158
+
+   42 ordinal_expression: expression .
+
+    $default  reduce using rule 42 (ordinal_expression)
+
+
+State 159
+
+   65 real_parameters_next: COMMA . expression real_parameters_next
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt             go to state 69
+    expression         go to state 179
+    simple_expression  go to state 72
+
+
+State 160
+
+   63 real_parameters: expression real_parameters_next .
+
+    $default  reduce using rule 63 (real_parameters)
+
+
+State 161
+
+   62 factor_parameters_opt: LPAR real_parameters RPAR .
+
+    $default  reduce using rule 62 (factor_parameters_opt)
+
+
+State 162
+
+   28 block_p5_next: procedure_header block SEMICOLON . block_p5_next
+
+    PROCEDURE  shift, and go to state 12
+    FUNCTION   shift, and go to state 13
+
+    $default  reduce using rule 27 (block_p5_next)
+
+    block_p5_next     go to state 180
+    procedure_header  go to state 87
+    function_header   go to state 88
+
+
+State 163
+
+   29 block_p5_next: function_header block SEMICOLON . block_p5_next
+
+    PROCEDURE  shift, and go to state 12
+    FUNCTION   shift, and go to state 13
+
+    $default  reduce using rule 27 (block_p5_next)
+
+    block_p5_next     go to state 181
+    procedure_header  go to state 87
+    function_header   go to state 88
+
+
+State 164
+
+   12 block_p2_next: IDENTIFIER . EQ constant SEMICOLON block_p2_next
+
+    EQ  shift, and go to state 182
+
+
+State 165
+
+   10 block_p2_list: IDENTIFIER EQ constant SEMICOLON block_p2_next .
+
+    $default  reduce using rule 10 (block_p2_list)
+
+
+State 166
+
+   93 structured_type_3: RECORD END .
+
+    $default  reduce using rule 93 (structured_type_3)
+
+
+State 167
+
+   90 field_list: identifier_list_1 . COLON type
+
+    COLON  shift, and go to state 183
+
+
+State 168
+
+   89 field_list: field_list . SEMICOLON identifier_list_1 COLON type
+   91 structured_type_3: RECORD field_list . SEMICOLON END
+   92                  | RECORD field_list . END
+
+    END        shift, and go to state 184
+    SEMICOLON  shift, and go to state 185
+
+
+State 169
+
+   15 block_p3_list: IDENTIFIER EQ type SEMICOLON . block_p3_next
+
+    IDENTIFIER  shift, and go to state 186
+
+    $default  reduce using rule 16 (block_p3_next)
+
+    block_p3_next  go to state 187
+
+
+State 170
+
+   88 identifier_next: COMMA IDENTIFIER . identifier_next
+
+    COMMA  shift, and go to state 138
+
+    $default  reduce using rule 87 (identifier_next)
+
+    identifier_next  go to state 188
+
+
+State 171
+
+   20 block_p4_list: identifier_list_1 COLON type . SEMICOLON block_p4_next
+
+    SEMICOLON  shift, and go to state 189
+
+
+State 172
+
+  100 formal_parameters: formal_parameters SEMICOLON var_string_opt identifier_list_1 . COLON IDENTIFIER
+
+    COLON  shift, and go to state 190
+
+
+State 173
+
+  101 formal_parameters: var_string_opt identifier_list_1 COLON IDENTIFIER .
+
+    $default  reduce using rule 101 (formal_parameters)
+
+
+State 174
+
+   59 factor: LPAR expression RPAR .
+
+    $default  reduce using rule 59 (factor)
+
+
+State 175
+
+   52 simple_expression_next: simple_expression_bin_op term . simple_expression_next
+
+    OR            shift, and go to state 147
+    OPER_SIGNADD  shift, and go to state 148
+
+    $default  reduce using rule 51 (simple_expression_next)
+
+    simple_expression_bin_op  go to state 149
+    simple_expression_next    go to state 191
+
+
+State 176
+
+   55 term_next: OPER_MUL factor . term_next
+
+    OPER_MUL  shift, and go to state 151
+
+    $default  reduce using rule 54 (term_next)
+
+    term_next  go to state 192
+
+
+State 177
+
+   73 statement: IF boolean_expression THEN statement ELSE . statement
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    variable   go to state 47
+    statement  go to state 193
+    stmt_1     go to state 51
+
+
+State 178
+
+   77 statement: FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION . ordinal_expression DO statement
+
+    OPER_SIGNADD  shift, and go to state 68
+
+    $default  reduce using rule 39 (pm_opt)
+
+    pm_opt              go to state 69
+    ordinal_expression  go to state 194
+    expression          go to state 158
+    simple_expression   go to state 72
+
+
+State 179
+
+   65 real_parameters_next: COMMA expression . real_parameters_next
+
+    COMMA  shift, and go to state 159
+
+    $default  reduce using rule 64 (real_parameters_next)
+
+    real_parameters_next  go to state 195
+
+
+State 180
+
+   28 block_p5_next: procedure_header block SEMICOLON block_p5_next .
+
+    $default  reduce using rule 28 (block_p5_next)
+
+
+State 181
+
+   29 block_p5_next: function_header block SEMICOLON block_p5_next .
+
+    $default  reduce using rule 29 (block_p5_next)
+
+
+State 182
+
+   12 block_p2_next: IDENTIFIER EQ . constant SEMICOLON block_p2_next
+
+    UINT          shift, and go to state 90
+    REAL          shift, and go to state 91
+    STRING        shift, and go to state 92
+    OPER_SIGNADD  shift, and go to state 93
+
+    constant           go to state 196
+    unsigned_constant  go to state 95
+
+
+State 183
+
+   90 field_list: identifier_list_1 COLON . type
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 197
+
+
+State 184
+
+   92 structured_type_3: RECORD field_list END .
+
+    $default  reduce using rule 92 (structured_type_3)
+
+
+State 185
+
+   89 field_list: field_list SEMICOLON . identifier_list_1 COLON type
+   91 structured_type_3: RECORD field_list SEMICOLON . END
+
+    END         shift, and go to state 198
+    IDENTIFIER  shift, and go to state 97
+
+    identifier_list_1  go to state 199
+
+
+State 186
+
+   17 block_p3_next: IDENTIFIER . EQ type SEMICOLON block_p3_next
+
+    EQ  shift, and go to state 200
+
+
+State 187
+
+   15 block_p3_list: IDENTIFIER EQ type SEMICOLON block_p3_next .
+
+    $default  reduce using rule 15 (block_p3_list)
+
+
+State 188
+
+   88 identifier_next: COMMA IDENTIFIER identifier_next .
+
+    $default  reduce using rule 88 (identifier_next)
+
+
+State 189
+
+   20 block_p4_list: identifier_list_1 COLON type SEMICOLON . block_p4_next
+
+    IDENTIFIER  shift, and go to state 97
+
+    $default  reduce using rule 21 (block_p4_next)
+
+    block_p4_next      go to state 201
+    identifier_list_1  go to state 202
+
+
+State 190
+
+  100 formal_parameters: formal_parameters SEMICOLON var_string_opt identifier_list_1 COLON . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 203
+
+
+State 191
+
+   52 simple_expression_next: simple_expression_bin_op term simple_expression_next .
+
+    $default  reduce using rule 52 (simple_expression_next)
+
+
+State 192
+
+   55 term_next: OPER_MUL factor term_next .
+
+    $default  reduce using rule 55 (term_next)
+
+
+State 193
+
+   73 statement: IF boolean_expression THEN statement ELSE statement .
+
+    $default  reduce using rule 73 (statement)
+
+
+State 194
+
+   77 statement: FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression . DO statement
+
+    DO  shift, and go to state 204
+
+
+State 195
+
+   65 real_parameters_next: COMMA expression real_parameters_next .
+
+    $default  reduce using rule 65 (real_parameters_next)
+
+
+State 196
+
+   12 block_p2_next: IDENTIFIER EQ constant . SEMICOLON block_p2_next
+
+    SEMICOLON  shift, and go to state 205
+
+
+State 197
+
+   90 field_list: identifier_list_1 COLON type .
+
+    $default  reduce using rule 90 (field_list)
+
+
+State 198
+
+   91 structured_type_3: RECORD field_list SEMICOLON END .
+
+    $default  reduce using rule 91 (structured_type_3)
+
+
+State 199
+
+   89 field_list: field_list SEMICOLON identifier_list_1 . COLON type
+
+    COLON  shift, and go to state 206
+
+
+State 200
+
+   17 block_p3_next: IDENTIFIER EQ . type SEMICOLON block_p3_next
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 207
+
+
+State 201
+
+   20 block_p4_list: identifier_list_1 COLON type SEMICOLON block_p4_next .
+
+    $default  reduce using rule 20 (block_p4_list)
+
+
+State 202
+
+   22 block_p4_next: identifier_list_1 . COLON type SEMICOLON block_p4_next
+
+    COLON  shift, and go to state 208
+
+
+State 203
+
+  100 formal_parameters: formal_parameters SEMICOLON var_string_opt identifier_list_1 COLON IDENTIFIER .
+
+    $default  reduce using rule 100 (formal_parameters)
+
+
+State 204
+
+   77 statement: FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO . statement
+
+    BEGIN       shift, and go to state 39
+    GOTO        shift, and go to state 40
+    IF          shift, and go to state 41
+    WHILE       shift, and go to state 42
+    REPEAT      shift, and go to state 43
+    FOR         shift, and go to state 44
+    IDENTIFIER  shift, and go to state 45
+    UINT        shift, and go to state 46
+
+    variable   go to state 47
+    statement  go to state 209
+    stmt_1     go to state 51
+
+
+State 205
+
+   12 block_p2_next: IDENTIFIER EQ constant SEMICOLON . block_p2_next
+
+    IDENTIFIER  shift, and go to state 164
+
+    $default  reduce using rule 11 (block_p2_next)
+
+    block_p2_next  go to state 210
+
+
+State 206
+
+   89 field_list: field_list SEMICOLON identifier_list_1 COLON . type
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 211
+
+
+State 207
+
+   17 block_p3_next: IDENTIFIER EQ type . SEMICOLON block_p3_next
+
+    SEMICOLON  shift, and go to state 212
+
+
+State 208
+
+   22 block_p4_next: identifier_list_1 COLON . type SEMICOLON block_p4_next
+
+    RECORD      shift, and go to state 134
+    IDENTIFIER  shift, and go to state 135
+
+    structured_type_3  go to state 136
+    type               go to state 213
+
+
+State 209
+
+   77 statement: FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement .
+
+    $default  reduce using rule 77 (statement)
+
+
+State 210
+
+   12 block_p2_next: IDENTIFIER EQ constant SEMICOLON block_p2_next .
+
+    $default  reduce using rule 12 (block_p2_next)
+
+
+State 211
+
+   89 field_list: field_list SEMICOLON identifier_list_1 COLON type .
+
+    $default  reduce using rule 89 (field_list)
+
+
+State 212
+
+   17 block_p3_next: IDENTIFIER EQ type SEMICOLON . block_p3_next
+
+    IDENTIFIER  shift, and go to state 186
+
+    $default  reduce using rule 16 (block_p3_next)
+
+    block_p3_next  go to state 214
+
+
+State 213
+
+   22 block_p4_next: identifier_list_1 COLON type . SEMICOLON block_p4_next
+
+    SEMICOLON  shift, and go to state 215
+
+
+State 214
+
+   17 block_p3_next: IDENTIFIER EQ type SEMICOLON block_p3_next .
+
+    $default  reduce using rule 17 (block_p3_next)
+
+
+State 215
+
+   22 block_p4_next: identifier_list_1 COLON type SEMICOLON . block_p4_next
+
+    IDENTIFIER  shift, and go to state 97
+
+    $default  reduce using rule 21 (block_p4_next)
+
+    block_p4_next      go to state 216
+    identifier_list_1  go to state 202
+
+
+State 216
+
+   22 block_p4_next: identifier_list_1 COLON type SEMICOLON block_p4_next .
+
+    $default  reduce using rule 22 (block_p4_next)

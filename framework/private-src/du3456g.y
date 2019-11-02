@@ -106,8 +106,8 @@
 
 
 /* dangling else */
-// %precedence THEN
-// %precedence ELSE
+%precedence THEN
+%precedence ELSE
 
 %%
 
@@ -118,18 +118,18 @@ mlaskal: PROGRAM
 		 DOT
 ;
 
-block_common: block_p1_opt
-		 	  block_p2_opt
-		 	  block_p3_opt
-		 	  block_p4_opt
+block_common: block_p1_opt /* label block */
+		 	  block_p2_opt /* const block */
+		 	  block_p3_opt /* type block */
+		 	  block_p4_opt /* var block */
 ;
 body: BEGIN
-      statement_list
+      statement_list_opt
 	  END
 ;
 
 block_p: block_common
-		 block_p5_opt
+		 block_p5_opt /* procedures and functions */
 		 body
 ;
 
@@ -171,12 +171,12 @@ block_p4_next: %empty
 block_p5_opt: %empty
 			| block_p5_list
 ;
-block_p5_list: procedure_header SEMICOLON block SEMICOLON block_p5_next
-			 | function_header SEMICOLON block SEMICOLON block_p5_next
+block_p5_list: procedure_header block SEMICOLON block_p5_next
+			 | function_header block SEMICOLON block_p5_next
 ;
 block_p5_next: %empty
-			 | procedure_header SEMICOLON block SEMICOLON block_p5_next
-			 | function_header SEMICOLON block SEMICOLON block_p5_next
+			 | procedure_header block SEMICOLON block_p5_next
+			 | function_header block SEMICOLON block_p5_next
 ;
 
 uint_list_1: UINT
@@ -186,50 +186,22 @@ uint_next: %empty
 		 | COMMA UINT uint_next
 ;
 
-//all types of identifiers follows
-constant_identifier: IDENTIFIER
-;
-integer_constant_identifier: IDENTIFIER
-;
-function_identifier: IDENTIFIER
-;
-variable_identifier: IDENTIFIER
-;
-field_identifier: IDENTIFIER
-;
-procedure_identifier: IDENTIFIER
-;
-ordinal_type_variable_identifier: IDENTIFIER
-;
-structured_type_identifier: IDENTIFIER
-;
-type_identifier: IDENTIFIER
-;
-ordinal_type_identifier: IDENTIFIER
-;
-scalar_type_identifier: IDENTIFIER
-;
-
 constant: unsigned_constant
 	    | OPER_SIGNADD UINT
 		| OPER_SIGNADD REAL
 ;
 
-unsigned_constant: constant_identifier
-				 | UINT
+ 				//constant_identifier
+unsigned_constant: UINT
 				 | REAL
-				 | "'" STRING "'"
+				 | STRING
 ;
 
 pm_opt: %empty
 	  | OPER_SIGNADD
 ;
 
-ordinal_identifier: pm_opt integer_constant_identifier
-				  | pm_opt UINT
-;
-
-//TODO
+//expressions
 boolean_expression: expression
 ;
 ordinal_expression: expression
@@ -239,8 +211,11 @@ expression_cmp: EQ
 			  | OPER_REL
 ;
 
-expression: simple_expression
-		  | simple_expression expression_cmp simple_expression
+expression: simple_expression expression_next
+;
+
+expression_next: %empty
+    		   | expression_cmp simple_expression
 ;
 
 simple_expression: pm_opt
@@ -248,7 +223,7 @@ simple_expression: pm_opt
 				   simple_expression_next
 ;
 simple_expression_bin_op: OPER_SIGNADD
-				     | OR
+				        | OR
 ;
 simple_expression_next: %empty
 					  | simple_expression_bin_op
@@ -260,67 +235,68 @@ term: factor
 	  term_next
 ;
 
-term_bin_op: "*" 
-   		   | "/"
-		   | OPER_MUL
-;
-
 term_next: %empty
-		 | term_bin_op
+		 | OPER_MUL
 		   factor
 		   term_next
 ;
 
 factor: unsigned_constant
 	  | variable
-	  | function_identifier factor_parameters_opt
-	  | LSBRA expression RSBRA
+
+   //function_identifier
+	  | IDENTIFIER factor_parameters_opt
+	  | LPAR expression RPAR
 	  | NOT factor
 ;
 
 factor_parameters_opt: %empty
-					 | LSBRA real_parameters RSBRA
+					 | LPAR real_parameters RPAR
 ;
 
 real_parameters: expression real_parameters_next
-			   | variable real_parameters_next
 ;
 
 real_parameters_next: %empty
 			        | COMMA expression real_parameters_next
-					| COMMA variable real_parameters_next
 ;
 
-variable: variable_identifier
-		| record_variable DOT field_identifier
+variable: variable DOT IDENTIFIER
+		| IDENTIFIER DOT IDENTIFIER
 ;
 
-//TODO
-record_variable: variable
-;
 
-statement: %empty
-	     | UINT COLON stmt_1
+statement: UINT COLON stmt_1
 		 | stmt_1
-	     | procedure_identifier factor_parameters_opt
+
+		   //procedure_identifier
+	     | IDENTIFIER factor_parameters_opt
 	  	 | GOTO UINT 
-		 | BEGIN statement_list END
+		 | BEGIN statement_list_opt END
 		 | IF boolean_expression THEN statement ELSE statement
 		 | IF boolean_expression THEN statement 
 		 | WHILE boolean_expression DO statement
-		 | REPEAT statement_list UNTIL boolean_expression
-		 | FOR ordinal_type_variable_identifier ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement
+		 | REPEAT statement_list_opt UNTIL boolean_expression
+
+		  //ordinal_type_variable_identifier
+		 | FOR IDENTIFIER ASSIGN ordinal_expression FOR_DIRECTION ordinal_expression DO statement
 ;
 
-statement_list: statement
-			    statement_next
+statement_list_opt: %empty
+ 			      | statements
 ;
-statement_next: %empty
-			  | statement statement_next
+
+statements: statement SEMICOLON statements
+	      | statement semicolon_string_opt
+;
+
+semicolon_string_opt: %empty
+                    | SEMICOLON
 ;
 
 stmt_1: variable ASSIGN expression
-	  | function_identifier ASSIGN expression
+	//function_identifier
+	  | IDENTIFIER ASSIGN expression
 ;
 
 identifier_list_1: IDENTIFIER
@@ -332,41 +308,36 @@ identifier_next: %empty
 				 identifier_next
 ;
 
-field_list: identifier_list_1 COLON type field_list_next
-;
-field_list_next: %empty
-			   | SEMICOLON identifier_list_1 COLON type field_list_next
+field_list: field_list SEMICOLON identifier_list_1 COLON type 
+		  | identifier_list_1 COLON type 
 ;
 
-structured_type: structured_type_identifier
-			   | structured_type_3
-;
 structured_type_3: RECORD field_list SEMICOLON END
 				 | RECORD field_list END
 				 | RECORD END
 ;
 
-type: ordinal_type_identifier
-    | type_identifier
-	| structured_type
+type: IDENTIFIER
+	| structured_type_3
 ;
 
-procedure_header: PROCEDURE IDENTIFIER method_parameters_opt
+procedure_header: PROCEDURE IDENTIFIER method_parameters_opt SEMICOLON
 ;
-function_header: FUNCTION IDENTIFIER method_parameters_opt COLON scalar_type_identifier
+																//scalar_type_identifier
+function_header: FUNCTION IDENTIFIER method_parameters_opt COLON IDENTIFIER SEMICOLON
 ;
-method_parameters: VAR identifier_list_1 COLON type_identifier method_parameters_next
-				 | identifier_list_1 COLON type_identifier method_parameters_next
-;
-method_parameters_next: %empty
-					  | SEMICOLON VAR identifier_list_1 COLON type_identifier method_parameters_next
-					  | SEMICOLON identifier_list_1 COLON type_identifier method_parameters_next
-;
+
 method_parameters_opt: %empty
-					 | method_parameters
+				     | LPAR formal_parameters RPAR
+;
+												   //both type_identifier
+formal_parameters: formal_parameters SEMICOLON var_string_opt identifier_list_1 COLON IDENTIFIER 
+			     | var_string_opt identifier_list_1 COLON IDENTIFIER
 ;
 
-
+var_string_opt: %empty
+			  | VAR
+;
 %%
 
 
