@@ -232,7 +232,7 @@ INCLUDE_OPTS = \
 
 FLEX_COMMAND = flex -Cf -b -p -p -o$*.cpp $<
 
-BISON_COMMAND = bison --report=all -d -o$*.cpp $<
+BISON_COMMAND = bison -v --report=all -d -o$*.cpp $<
 
 COMPILE_COMMAND = g++ -c -std=c++17 $(INCLUDE_OPTS) -o$@ $<
 
