@@ -1,0 +1,164 @@
+TODO:
+	- testovací data a skript, který ukáže celkovou funkcionalitu DB
+	- Přemejšlím nad procedurami udělej_rozhodcim, udelej_hracem, ...
+		- liftnou existují kontakt a danou roli, pokud uz roli ma neudelaji nic
+		- Uvidíme jestli pro ně bude význam v předváděcím skriptu
+
+
+
+Zmeny v DB od skriptu:
+	- Computed columns jsou not null
+	- změna CK_Kontakt_Jméno_Přijmení
+	- 2 sloupce jsou sparse viz níže
+	- constraints u adresy
+	- Celkově takový ty constraints na ověření vstupu, nově požaduji i na konci abecední znak
+
+U adresy a kontaktu je generated column always not null, ale DB to neví
+Stejné u sezóny!
+
+Kandidáti na sparse column:
+	- Hostování(Smlouva) - je sám nullovatelný v tabulce
+		- Udělám sparse
+	- Kontakt(Email), Kontakt(Tel_Id)
+		- ponechám, předpokládám, že obvykle vím email i telefon
+	- Soupiska(Zapsal_Id)
+		- ponechám, pouze ve výjimečných případech nevím kdo zapsal soupisku
+	- Tel(Předvolba)
+		- Udělám sparse
+
+co neni pokryto stats
+	datum narozeni u hrace
+	varbinary smlouva file
+	predvolba u telefonniho cisla
+Server si je nikdy nevytvoril u pri auto_create = true. Avsak, kdyby je potreboval, tak auto_create je furt na true, tak si je muze vytvorit.
+
+
+Pridat statistiky:
+	Hostování (cena za sezónu, hráč_reg_id)
+	
+	
+Hráč neměl ani před migrováním statistiky na column D_Nar.
+
+Statistiky jsou nejake duplicitni na tabulkce Hrac_Soupiska
+
+
+Ml_Kategorie chybi
+	- delka zapasu
+	- duplicitni statistika
+	
+Utkani pridat statistiku
+	- goly my
+	- goly souper
+	- goly my polocas
+	- goly souper polocas
+
+
+
+TODO:
+	- vytvoreni a zruseni statistik
+	- pripravit projekt na odesilaci formu
+		- dodelat komentare, dokumentaci
+		- testovaci data, ...
+
+Dle me jsou indexy, kde maji byt.
+Views jsou optimalizovane stejne jako funkce, procedury a triggery.
+Snad nikde neni zadny bug nebo nejaka inefficiency.
+
+Chtelo by to nejak decetne to projet a vyzkouset.
+
+Dále by bylo treba projit si detailne Kopeckeho pozadavky, jestli je splnuji a na neco jsem nezapomnel. 
+
+Jinak je skoro na case sepisovat nejakou "dokumentaci" a migrovat databazi do odevzdavaci podoby.
+
+
+Kde neni index, protoze neni treba
+	hostovani index na clenstvi
+		nevybiram nazev klubu u hostovani hrace ve view
+
+proste nejak ocheckovat
+	- triggery, stored procedury
+
+Funkce
+	- OK vsechny
+	- OK kontrolovano 2x
+	
+Procedury
+	- OK
+
+
+utkani
+	Skore
+	Souper Nazev klubu
+	Doma / Venku
+	Adresa Konani
+	Ml. kategorie formatovane
+	sezona start
+	sezona konec
+	standardni informace o rozhodcim (jmeno, prijmeni, email, telefon)
+	soupiska (x/y kde x je pocet hracu v zakladu a y je pocet hracu na stridani)
+	
+
+
+	
+
+
+declare @id int;
+exec Přidej_Utkání 5, 3, 2, 2, 1, 1002, 'Starší přípravka', @goly_my_polocas = 2, @goly_souper_polocas = 2, @ml_kategorie_muzi = 0, @utkani_id = @id output;
+print @id;
+
+
+declare @s date;
+exec Aktuální_Sezóna @ss output;
+print @s;
+
+
+Pridavani zapasu je nejake zkuvervene
+	sezona nethrowuje
+
+Přidání zápasu
+	- zjistit pohlaví mládežnické skupiny 
+	- implicitně použít sezónu, která aktuálně je - done
+
+Mladší dorost
+Mladší dorostenky
+Mladší žáci
+Mladší žákyně
+Muži
+Starší dorost
+Starší dorostenky
+Starší žáci
+Starší žákyně
+Ženy
+
+create Ml_Kategorie_Pohlaví
+
+Hráč_Soupiska
+0375453	1002	2	False
+0512714	1002	1	False
+0547328	1002	3	False
+0593646	1002	4	False
+1668407	1002	5	False
+2128924	1002	6	False
+3667817	1002	7	False
+4327669	1002	8	False
+4337353	1002	9	False
+4371618	1002	10	False
+5684462	1002	11	False
+6248474	1002	12	True
+6316624	1002	13	True
+6323551	1002	14	True
+7879593	1002	15	True
+8038302	1002	16	True
+8155190	1002	17	True
+8763292	1002	18	True
+
+Utkání
+1	5	3	NULL	NULL	2	2	Starší přípravka	True	2015-11-11	2	1002
+
+
+
+kontakt muze byt vyuzit
+	- hrac
+	- klub
+	- soupiska
+	- rozhodci
