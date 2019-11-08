@@ -8,7 +8,6 @@ module TokenParser(TokenParser
                  , module SlepysLexer
                  , module Parser) where
 
-import Control.Monad.Fail
 import SlepysLexer
 import Parser
 

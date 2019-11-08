@@ -2,6 +2,7 @@ module SlepysParser(parseTokens
                   , Slepys
                   , Expr(..)
                   , Id
+                  , LineNum
                   , Method(..)
                   , MethodHeader(..)
                   , Statement(..)
@@ -24,17 +25,17 @@ data Expr = IntConst Integer
           | Greater Expr Expr
           | LessOrEqual Expr Expr
           | GreaterOrEqual Expr Expr
-    deriving (Show) --todo: remove
+    deriving Show --debug purpose
 
 data Method = Method { header :: MethodHeader
                      , body :: [Statement]
                      }
-            deriving (Show) --todo: remove
+            deriving Show --debug purpose
 
 data MethodHeader = MethodHeader { identifier :: Id 
                                  , parameters :: [Id]
                                  }
-                    deriving (Show) -- todo: remove
+                    deriving Show --debug purpose
 
 data Statement = Expr Expr
                | While Expr [Statement]
@@ -42,7 +43,7 @@ data Statement = Expr Expr
                | MethodDef Method
                | Assignment Id Expr
                | Skip 
-            deriving (Show) -- todo: remove
+            deriving Show --debug purpose
 
 type Slepys = [Statement]
 
@@ -73,7 +74,6 @@ blockBody = do
             stms <- some statement 
             IndentOut <- lexem
             return stms
-        -- <|> (: []) <$> statement
         <|> stmtsSemicolonTerm
 
 

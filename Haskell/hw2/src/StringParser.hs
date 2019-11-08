@@ -52,8 +52,7 @@ char :: Char -> StringParser Char
 char c = sat (==c)
 
 string :: String -> StringParser String
-string [] = pure []
-string (x : xs) = (:) <$> char x <*> string xs
+string = foldr (\x -> (<*>) ((:) <$> char x)) (pure [])
 
 nat :: StringParser Integer
 nat = fmap read (some digit)

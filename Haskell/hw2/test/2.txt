@@ -1,0 +1,5 @@
+def a:
+def ():
+123asd = asd321 + + - 321
+else: pass
+if < a: xxx

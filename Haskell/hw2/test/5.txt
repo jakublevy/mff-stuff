@@ -1,15 +1,10 @@
 def a(rec):
   def f():
     rec()
-  f;
+  f
 
 def fix(f):
   def fomega(x): f(x(x))
   fomega(fomega)
 
 fix(a)()
-
-if i == j:
-   while i < 10: print("ahoj"); print("ahoj2");
-   f;
-neco;

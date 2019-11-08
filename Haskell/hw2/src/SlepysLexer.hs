@@ -2,31 +2,6 @@ module SlepysLexer(Lexem(..)
                     , LineNum
                     , Indent
                     , Token
-                --  , plus
-                --  , minus
-                --  , mult
-                --  , division
-                --  , assign
-                --  , comma
-                --  , colon
-                --  , lPar
-                --  , rPar
-                --  , def
-                --  , if_
-                --  , else_
-                --  , eq
-                --  , lt 
-                --  , le
-                --  , gt
-                --  , ge
-                --  , semicolon
-                --  , pass
-                --  , identifier
-                --  , integer
-                --  , str
-                --  , whitespace
-                --  , newline
-                --  , token
                  , tokens
 ) where
 import StringParser
@@ -185,7 +160,7 @@ addCtx (Newline n : Whitespace m : ts) acc l i | m == head i = addCtx ts ((l, Ne
                                                    | m > head i = addCtx ts ((l+n, IndentIn) : (l, Newline n) : acc) (l+n) (m:i)
                                                    | m < head i = case m `elemIndex` i of
                                                                       Just k -> addCtx ts (replicate k (l+n, IndentOut) ++ (l, Newline n ) : acc) (l+n) (drop k i)
-                                                                      Nothing -> Left $ "Incorrect attempt to IndentOut on line " ++ show (l+n)
+                                                                      Nothing -> Left $ "On line " ++ show (l+n) ++ " incorrect attempt to IndentOut"
 
 addCtx (Whitespace m : ts) acc l i = addCtx ts acc l i
 addCtx (Newline n : ts) acc l i | i == [0]    = addCtx ts ((l, Newline n) : acc) (l+n) [0]
