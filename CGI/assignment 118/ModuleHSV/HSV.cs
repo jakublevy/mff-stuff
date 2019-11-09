@@ -1,15 +1,9 @@
 ﻿using System.Drawing;
 using MathSupport;
-using Raster;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using _117raster.ModuleHSV;
-using Modules;
 
 namespace Utilities
 {

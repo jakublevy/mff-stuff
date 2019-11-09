@@ -6,10 +6,10 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Threading.Tasks;
-using _117raster.PelikanHSV;
+using Modules;
 using Utilities;
 
-namespace Modules
+namespace JakubLevy
 {
   public class Param
   {

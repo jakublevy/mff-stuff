@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using Utilities;
+using JakubLevy;
+using Modules;
 
-namespace Modules
+namespace _117raster
 {
   public class ModuleGlobalHistogram : DefaultRasterModule
   {

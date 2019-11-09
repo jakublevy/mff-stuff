@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using _117raster;
+using Modules;
 using Raster;
 using Utilities;
 
-namespace Modules
+namespace JakubLevy
 {
   public class ModuleFullColor : DefaultRasterModule
   {
