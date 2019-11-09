@@ -1,7 +1,7 @@
 module SlepysSemantic(semanticAnalysis) where
 
 import SymbolTable
-import State
+import Control.Monad.State
 import Common
 import SlepysParser
 import SlepysPrettifier
@@ -14,7 +14,7 @@ data Context = Ctx { symbols :: SymbolTable
 type ErrorMsg = String
 
 nullCtx :: Context 
-nullCtx = Ctx {symbols = [], locationDesc = []}
+nullCtx = Ctx {symbols = nullSymblTbl, locationDesc = []}
 
 semanticAnalysis :: Slepys -> String
 semanticAnalysis slepys = intercalate "\n" . indentList (2*defaultIndent) $ evalState (stmtsAnalysis slepys) nullCtx
@@ -25,8 +25,26 @@ addSymbl id = do
               let newSymblTbl = addSymbol (symbols ctx) id
               put $ ctx { symbols = newSymblTbl }
 
-addSymbls :: [Id] -> State Context ()
-addSymbls = foldr (\id _ -> addSymbl id) (pure ())
+addSymblHidingErr :: Id -> State Context [ErrorMsg]
+addSymblHidingErr (l, n) = do
+                    ctx <- get
+                    let ll = getSymbolLineUnchecked (symbols ctx) n
+                    let err = "Warning: On line " ++ show l ++ " hiding outer identifier " ++ surround '\'' n ++ " defined on line " ++ show ll
+                    addSymbl (l, n)
+                    addErrorCtx err
+
+addParamsHidingChck :: [Id] -> State Context [ErrorMsg]
+addParamsHidingChck [] = pure []
+addParamsHidingChck ((l,n) : ids) = do
+                                    ctx <- get
+                                    let d = isDefined (symbols ctx) n
+                                    if d then do
+                                      err <- addSymblHidingErr (l, n)
+                                      errs <- addParamsHidingChck ids
+                                      return $ err ++ errs
+                                    else do
+                                      addSymbl (l, n)
+                                      addParamsHidingChck ids
 
 scopeIn :: State Context ()
 scopeIn = do
@@ -77,9 +95,7 @@ stmtAnalysis (Assignment (l, n) e) = do
                                         let d2 = isDefinedInCurScope (symbols ctx) n 
                                         if not d2 then do
                                             let ll = getSymbolLineUnchecked (symbols ctx) n
-                                            let err = "Warning: On line " ++ show l ++ " hiding outer identifier " ++ surround '\'' n ++ " first declared on line " ++ show ll
-                                            addSymbl (l, n)
-                                            lhsErrs <- addErrorCtx err
+                                            lhsErrs <- addSymblHidingErr (l, n)
                                             removeLastCtx
                                             return $ lhsErrs ++ rhsErrs
                                         else do
@@ -93,15 +109,15 @@ stmtAnalysis (MethodDef m) = do
                              return $ headerErrs ++ bodyErrs
 
 stmtAnalysis (While e stmts) = do
-                               lhsErrs <- exprAnalysis e
                                addNewCtx $ "found inside: " ++ surround '\'' ("while " ++ deleteSurrounding (prettifyOneStmt (Expr e)))
+                               lhsErrs <- exprAnalysis e
                                bodyErrs <- blockBodyAnalysis stmts
                                removeLastCtx
                                return $ lhsErrs ++ bodyErrs
 
 stmtAnalysis (If e stmts1 stmts2) = do
-                              lhsErrs <- exprAnalysis e
                               addNewCtx $ "found inside: " ++ surround '\'' ("if " ++ deleteSurrounding (prettifyOneStmt (Expr e)))
+                              lhsErrs <- exprAnalysis e
                               bodyErrs <- blockBodyAnalysis stmts1
                               removeLastCtx
                               addNewCtx $ "found inside: " ++ surround '\'' "else"
@@ -135,26 +151,17 @@ methodBodyAnalysis params stmts = do
                                   let dupl = dupliciteIdentifiers params
                                   duplErrs <- duplErrors dupl
                                   scopeIn
-                                  addSymbls params
+                                  hidingErrs <- addParamsHidingChck params
                                   bodyErrs <- stmtsAnalysis stmts
                                   scopeOut
-                                  return $ duplErrs ++ bodyErrs
+                                  return $ duplErrs ++ hidingErrs ++ bodyErrs
 
 
 blockBodyAnalysis :: [Statement] -> State Context [ErrorMsg]
-blockBodyAnalysis stmts = do
-                          scopeIn
-                          bodyErrs <- stmtsAnalysis stmts
-                          scopeOut
-                          return bodyErrs
-
+blockBodyAnalysis stmts = scopeIn >> stmtsAnalysis stmts >>= \bodyErrs -> scopeOut >> return bodyErrs
 
 stmtsAnalysis :: [Statement] -> State Context [ErrorMsg]
-stmtsAnalysis [] = pure []
-stmtsAnalysis (s : rest) = do
-                           sErr <- stmtAnalysis s
-                           restErrs <- stmtsAnalysis rest
-                           return $ sErr ++ restErrs
+stmtsAnalysis = foldr (\s -> (<*>) ((++) <$> stmtAnalysis s)) (pure [])
 
 methodHeaderAnalysis :: MethodHeader -> State Context [ErrorMsg]
 methodHeaderAnalysis mh = do
@@ -162,7 +169,7 @@ methodHeaderAnalysis mh = do
                           let (l,n) = identifier mh
                           let d = isDefinedInCurScope (symbols ctx) n
                           if d then do
-                            let err = "Error: On line " ++ show l ++ " redefinition of method identified by " ++ surround '\'' n
+                            let err = "Error: On line " ++ show l ++ " redefinition of identifier " ++ surround '\'' n
                             errs <- addErrorCtx err
                             addNewCtx $ "found in method: " ++ prettifyOneMh mh 
                             addSymbl (l, n)
@@ -170,10 +177,7 @@ methodHeaderAnalysis mh = do
                           else do
                             let d2 = isDefined (symbols ctx) n
                             if d2 then do
-                                let ll = getSymbolLineUnchecked (symbols ctx) n
-                                let err = "Warning: On line " ++ show l ++ " hiding outer method " ++ surround '\'' n ++ " defined on line " ++ show ll
-                                addSymbl (l, n)
-                                errs <- addErrorCtx err
+                                errs <- addSymblHidingErr (l, n)
                                 addNewCtx $ "found inside method: " ++ prettifyOneMh mh 
                                 return errs
                             else do
@@ -205,19 +209,14 @@ exprAnalysis (Greater e1 e2) = exprsAnalysis[e1, e2]
 exprAnalysis (LessOrEqual e1 e2) = exprsAnalysis[e1, e2]
 exprAnalysis (GreaterOrEqual e1 e2) = exprsAnalysis[e1, e2]
 
-exprAnalysis (Call (l, n) ess) = exprsAnalysis $ concat ess
+exprAnalysis (Call id ess) = (++) <$> exprAnalysis (Id id) <*> exprsAnalysis (concat ess)
                     
 -- IntConst case
 -- StringConst case
 exprAnalysis _ = pure []
 
 exprsAnalysis :: [Expr] -> State Context [ErrorMsg]
-exprsAnalysis [] = pure []
-exprsAnalysis (e : es) = do 
-                        err <- exprAnalysis e
-                        errs <- exprsAnalysis es
-                        return $ err ++ errs
-
+exprsAnalysis = foldr (\e -> (<*>) ((++) <$> exprAnalysis e)) (pure [])
 
 rTrim :: String -> String
 rTrim = takeWhile (\x -> x /= ';' && x /= '{' &&  x /= ':')

@@ -1,0 +1,11 @@
+i = read()
+h = read()
+
+while i<j:
+   print(i)  ;;i=i+1   ;;
+   h = 3
+   def h(i,k):
+      print(i+k);
+   
+   
+print(i+j);;

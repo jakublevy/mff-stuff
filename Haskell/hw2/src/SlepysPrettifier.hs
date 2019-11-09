@@ -1,7 +1,7 @@
 module SlepysPrettifier(prettify, prettifyStatement, prettifyMethodHeader) where
 
 import SlepysParser
-import State
+import Control.Monad.State
 import Common
 import Data.List(intercalate)
 
@@ -26,9 +26,7 @@ prettifyIfWhile kw e stmts = do
                              return $ kwInd ++ ePretty ++ ": {\n" ++ sPretty ++ closeBracket
 
 prettifyStatement :: Statement -> State Indent String
-prettifyStatement (Expr e) = do 
-                             ePretty <- gets indentedPrint <*> prettifyExpr e
-                             return $ ePretty ++ ";"
+prettifyStatement (Expr e) = (gets indentedPrint <*> prettifyExpr e) >>= \ePretty -> return $ ePretty ++ ";"
 
 prettifyStatement (While e stmts) = prettifyIfWhile "while" e stmts
 prettifyStatement (If e stmts []) = prettifyIfWhile "if" e stmts
@@ -40,7 +38,7 @@ prettifyStatement (If e stmts1 stmts2) = do
                                        indentOut
                                        else_ <- gets indentedPrint <*> pure "else"
                                        closeBracket <- gets indentedPrint <*> pure "}"
-                                       return $ if_ ++ else_ ++ ": {\n" ++ elseSPretty ++ closeBracket
+                                       return $ if_ ++ "\n" ++ else_ ++ ": {\n" ++ elseSPretty ++ closeBracket
                             
 prettifyStatement (Assignment id e) = do
                                       idPretty <- gets indentedPrint <*> prettifyExpr (Id id)
@@ -76,9 +74,7 @@ prettifyExpr (IntConst n) = pure (show n)
 prettifyExpr (StringConst s) = pure (surround '"' s)
 prettifyExpr (Id (_, n)) = pure n
 
-prettifyExpr (Call (i, n) ess) = do 
-                                 essPretty <- prettifyCallsParams ess
-                                 return $ n ++ essPretty
+prettifyExpr (Call (i, n) ess) = prettifyCallsParams ess >>= \essPretty -> return $ n ++ essPretty
     where
         prettifyExprs :: [Expr] -> State Indent [String]
         prettifyExprs [] = pure []

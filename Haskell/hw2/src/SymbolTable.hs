@@ -4,7 +4,8 @@ module SymbolTable(getSymbolLineUnchecked
                  , addSymbol
                  , newScope
                  , endOfScope
-                 , SymbolTable) where
+                 , SymbolTable
+                 , nullSymblTbl) where
 
 import SlepysParser
 import Data.List(findIndex)
@@ -13,6 +14,9 @@ data Symbol = Ident Id | ScopeIn
     deriving Eq 
 
 type SymbolTable = [Symbol]
+
+nullSymblTbl :: SymbolTable
+nullSymblTbl = [Ident (0, "print"), Ident (0, "read")]
 
 getSymbolLineUnchecked :: SymbolTable -> String -> LineNum
 getSymbolLineUnchecked tbl n = case getSymbol tbl n of

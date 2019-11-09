@@ -1,0 +1,6 @@
+def f():
+   def g():
+      def h(x, y):
+         x * x + y * y
+      1
+   h(1,2) * h(2,3)

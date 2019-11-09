@@ -1,0 +1,22 @@
+Statement je ukončen koncem řádky nebo středníkem.
+Za : v def. funkce / if / while je buďto newline + indent nebo libovolné inline statementy oddělené středníkem.
+Mezi inline statement nepatří def. funkce, if ani while   
+
+   Validní kód:
+      print(1+1);
+      print(1+2);;;;
+      def f(x,y): print(x+y); print(x-y)
+      def f(): pass
+
+   Nevalidní kód:
+      def f(x,y): print(x) print(y)
+
+      def f(x,y): if x < y: print(x)
+
+      def f(a,b,c): a
+                    b
+                    c 
+
+     def f():
+
+V sémantické analýze jsou implementované i nějaké warningy (hiding outer identifier, redefinition of method).

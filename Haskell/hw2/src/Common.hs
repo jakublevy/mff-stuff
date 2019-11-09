@@ -19,7 +19,6 @@ indentedPrint i s = makeIndent i ++ s
 surround :: Char -> String -> String
 surround c s | c == '('  = '(' : s ++ ")"
              | otherwise = c : s ++ [c]
- 
 
 deleteSurrounding :: String -> String
 deleteSurrounding = init . tail

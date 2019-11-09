@@ -1,0 +1,7 @@
+def f(x,y,z): pass;;;;;;;pass;;print("ahoj");
+
+if read() < read():
+   def f():pass
+   def f():x;;x;;;
+   
+   print("ahoj")

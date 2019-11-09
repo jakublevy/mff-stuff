@@ -82,7 +82,6 @@ pass = do
        Pass <- lexem
        return Skip
 
-
 method :: TokenParser Statement
 method = do
          h <- methodHeader
@@ -279,10 +278,7 @@ trailingNewline = do
                   return $ Newline n
 
 slepys :: TokenParser Slepys
-slepys = do 
-         prog <- many statement
-         many trailingNewline
-         return prog
+slepys = many statement >>= \prog -> many trailingNewline >> return prog
 
 parseTokens :: [Token] -> Either String Slepys
 parseTokens tok = case parse slepys tok of

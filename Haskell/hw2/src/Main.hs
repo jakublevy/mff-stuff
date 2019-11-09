@@ -6,18 +6,19 @@ import SlepysPrettifier(prettify)
 import SlepysSemantic
 import Common
 
-import Data.IORef
 import System.Environment(getArgs)
 import System.Exit
 import System.Directory(doesFileExist)
 import System.IO
-import System.IO.Unsafe(unsafePerformIO)
 import System.FilePath(replaceExtension)
 import Control.Monad(unless)
+import Control.Monad.State
 
-exitCode :: IORef Int
-{-# NOINLINE exitCode #-}
-exitCode = unsafePerformIO (newIORef 0)
+io :: (MonadTrans t, Monad m) => m a -> t m a
+io = lift
+
+setExitCode :: Int -> StateT Int IO ()
+setExitCode = put
 
 main :: IO ()
 main = do
@@ -26,42 +27,49 @@ main = do
         printHelp
         exitSuccess
      else if not $ null args then do
-        sequence_ $ foldr (\f a -> if length a == 1 then processFile f : a
-                                                    else processFile f : putStr "\n" : a
-                          ) [pure ()] args
-        eCode <- readIORef exitCode
+        eCode <- processFiles args
         putStrLn $ "\nExit code: " ++ show eCode
         if eCode == 0 then
            exitSuccess
         else
            exitWith $ ExitFailure eCode
       else 
-         putStrLn "Use slepys-formater[.exe] {-h | -help | --help} to show help"
+         putStrLn "Use slepys-format[.exe] {-h | -help | --help} to show help"
 
-processFile :: FilePath -> IO ()
+processFiles :: [FilePath] -> IO Int
+processFiles args = do
+                    run <- sequenceA $ foldr (\f a -> if null a then runStateT (processFile f) 0 : a
+                                                                else runStateT (processFile f) 0 : newline : a) [] args
+                    return $ snd $ last run
+
+newline :: IO ((), Int)
+newline = ((), dummy) <$ putStr "\n"
+   where dummy = 0
+
+processFile :: FilePath -> StateT Int IO ()
 processFile fileN = do
-                    putStrLn fileN
-                    fileExists <- doesFileExist fileN
+                    io $ putStrLn fileN
+                    fileExists <- io $ doesFileExist fileN
                     if fileExists then do
-                       h <- openFile fileN ReadMode 
-                       buf <- hGetContents h
+                       h <- io $ openFile fileN ReadMode 
+                       buf <- io $ hGetContents h
                        ast <- createAst buf
-                       hClose h
+                       io $ hClose h
                        unless (null ast) $ do
-                          outputPretty fileN ast
+                          io $ outputPretty fileN ast
                      --   abstract syntax tree debug output
-                     --   print ast 
+                     --   io $ print ast 
                           let sem = semanticAnalysis ast -- semantic analysis output
                           if not $ "Error" `isContainedIn` sem then do
-                             defaultIndentOut "Semantic Analysis: OK"
-                             putStrLn sem
+                             io $ defaultIndentOut "Semantic Analysis: OK"
+                             io $ putStrLn sem
                           else do
-                             writeIORef exitCode 40
-                             defaultIndentOut "Semantic Analysis: ERROR"
-                             putStrLn sem
+                             setExitCode 40 
+                             io $ defaultIndentOut "Semantic Analysis: ERROR"
+                             io $ putStrLn sem
                     else do
-                       defaultIndentOut "ERROR: does not appear to be existing file"
-                       writeIORef exitCode 10
+                       io $ defaultIndentOut "ERROR: does not appear to be existing file"
+                       setExitCode 10
                        return ()
 
 outputPretty :: FilePath -> Slepys -> IO ()
@@ -74,26 +82,26 @@ outputPretty origFileN ast = do
          
 
 
-createAst :: String -> IO Slepys
+createAst :: String -> StateT Int IO Slepys
 createAst buf = case tokens buf of
                      Right tok -> do
-                                  defaultIndentOut "Lexical Analysis: OK"
+                                  io $ defaultIndentOut "Lexical Analysis: OK"
                               --  lexical analysis debug output
-                              --  putStrLn (intercalate "\n" (map show tok))
+                              --  io $ putStrLn (intercalate "\n" (map show tok))
                                   parsing tok
                      Left msg -> do 
-                                 defaultIndentOut $ "Lexical Analysis: ERROR - " ++ msg
-                                 writeIORef exitCode 20
+                                 io $ defaultIndentOut $ "Lexical Analysis: ERROR - " ++ msg
+                                 setExitCode 20
                                  return []
                     
-parsing :: [Token] -> IO Slepys
+parsing :: [Token] -> StateT Int IO Slepys
 parsing ts = case parseTokens ts of
                   Right ast -> do
-                               defaultIndentOut "Parsing: OK"
+                               io $ defaultIndentOut "Parsing: OK"
                                return ast
                   Left msg -> do
-                              defaultIndentOut $ "Parsing: ERROR - " ++ msg
-                              writeIORef exitCode 30
+                              io $ defaultIndentOut $ "Parsing: ERROR - " ++ msg
+                              setExitCode 30
                               return []
 
 
@@ -107,5 +115,5 @@ printHelp = putStrLn $ "Usage: " ++ file ++ " <FILE_PATH> [..n]"
                  ++ "\n            20 - Lexical Analysis failed"
                  ++ "\n            30 - Parsing failed"
                  ++ "\n            40 - Semantic Analysis found errors"
-    where file = "slepys-formater[.exe]"
+    where file = "slepys-format[.exe]"
             

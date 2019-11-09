@@ -1,0 +1,10 @@
+i = read()
+j = read()
+
+if i < j:
+  k = 20
+  i = 1;
+  j = 1
+
+print(k);
+print = 3;
