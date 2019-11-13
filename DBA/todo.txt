@@ -1,3 +1,7 @@
+Pokud možno nepředělávat a nepřidávat už nic. Jenom napsat testovací data a skript, který ukáže funkcionality.
+
+
+---------------------
 TODO:
 	- testovací data a skript, který ukáže celkovou funkcionalitu DB
 	- Přemejšlím nad procedurami udělej_rozhodcim, udelej_hracem, ...

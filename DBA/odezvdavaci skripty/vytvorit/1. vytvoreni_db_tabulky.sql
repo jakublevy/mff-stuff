@@ -131,6 +131,9 @@ CK_* jsou opět jednoduché kontroly vstupních dat.
 
 CK_Adresa_Č_p
 	- Buďto číslice nebo třeba i '18/20a'
+
+UQ_Adresa_Řádek
+	- Čtvreřice (Ulice, Č_p, Město, Psč) musí být unikátní (nemůžeme mít 2x vloženou stejnou adresu v DB) 
 */
 CREATE TABLE dbo.Adresa (
 	Id INT IDENTITY(1,1) NOT NULL
@@ -143,7 +146,8 @@ CREATE TABLE dbo.Adresa (
   ,	CONSTRAINT CK_Adresa_Č_p CHECK ((ISNUMERIC(Č_p)=(1) OR Č_p LIKE '%_/_%'))
   ,	CONSTRAINT CK_Adresa_Město CHECK (Město LIKE '[A-Ž]%[a-ž]')
   , CONSTRAINT CK_Adresa_Psč CHECK (Psč LIKE '[1-9][0-9][0-9][0-9][0-9]')
-  , CONSTRAINT CK_Adresa_Ulice CHECK (Ulice LIKE '[A-Ž]%[a-ž]')
+  , CONSTRAINT CK_Adresa_Ulice CHECK (Ulice LIKE '[A-Ž0-9]%[a-ž]')
+  , CONSTRAINT UQ_Adresa_Řádek UNIQUE NONCLUSTERED (Ulice, Č_p, Město, Psč)
 ) 
 GO
 

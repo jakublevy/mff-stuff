@@ -84,7 +84,7 @@ GO
 
 --Přidá novovou adresu do databáze
 create procedure dbo.Přidej_Adresu(@ulice nvarchar(30), @c_p nvarchar(10), @mesto nvarchar(30)
-								 , @psc nvarchar(5), @adresa_id int output)
+								 , @psc nvarchar(5), @adresa_id int = null output)
 as
 begin
 	insert into Adresa (Ulice, Č_p, Město, Psč) values (@ulice, @c_p, @mesto, @psc)
@@ -132,7 +132,7 @@ GO
 -- declare @id_franty int
 -- exec Přidej_Kontakt 'František', 'Vomáčka', 'frantisek.vomacka@email.cz', '775382906', @kontakt_id = @id_franty
 CREATE procedure dbo.Přidej_Kontakt(@jmeno nvarchar(30), @prijmeni nvarchar(30), @email nvarchar(50) = null
-								  , @tel_cislo nvarchar(9) = null, @predvolba nvarchar(4) = null, @kontakt_id int output)
+								  , @tel_cislo nvarchar(9) = null, @predvolba nvarchar(4) = null, @kontakt_id int = null output)
 as
 begin
 	if @tel_cislo is not null
@@ -188,7 +188,7 @@ create procedure dbo.Přidej_Klub(@nazev nvarchar(50)
 						       , @ulice nvarchar(30), @c_p nvarchar(10), @mesto nvarchar(30), @psc nvarchar(5)
 							   , @jmeno nvarchar(30) = null, @prijmeni nvarchar(30) = null, @email nvarchar(50) = null
 							   , @tel_cislo nvarchar(9) = null, @predvolba nvarchar(4) = null
-							   , @klub_id int output)
+							   , @klub_id int = null output)
 as
 begin
 	declare @tel_id int
@@ -215,7 +215,7 @@ GO
 
 --Přidá nový kontakt a udělá z něho rozhodčího
 CREATE procedure dbo.Přidej_Rozhodčího(@jmeno nvarchar(30), @prijmeni nvarchar(30), @email nvarchar(50) = null
-									 , @tel_cislo nvarchar(9) = null, @predvolba nvarchar(4) = null, @rozhodci_id int output)
+									 , @tel_cislo nvarchar(9) = null, @predvolba nvarchar(4) = null, @rozhodci_id int = null output)
 as
 begin
 	declare @tel_id int
@@ -249,7 +249,7 @@ GO
 CREATE procedure dbo.Přidej_Utkání(@goly_my int, @goly_souper int, @souper_id int, @misto_konani_id int
 							     , @rozhodci_id int, @soupiska_id int, @ml_kategorie_nazev nvarchar(20)
 							     , @ml_kategorie_muzi bit = null, @sezona_start date = null, @goly_my_polocas int = null
-							     , @goly_souper_polocas int = null, @utkani_id int output)
+							     , @goly_souper_polocas int = null, @utkani_id int = null output)
 as
 begin
 	if @ml_kategorie_muzi is null 
@@ -401,7 +401,7 @@ GO
 
 --Vytvoří novou prázdnou soupisku, kterou zapsala osoba @zapsal_kontakt_id
 --Id nové soupisky se vrací v druhém parametru
-CREATE procedure dbo.Vytvoř_Prázdnou_Soupisku(@zapsal_kontakt_id int = null, @soupiska_id int output)
+CREATE procedure dbo.Vytvoř_Prázdnou_Soupisku(@zapsal_kontakt_id int = null, @soupiska_id int = null output)
 as
 begin
 	insert into Soupiska (Zapsal_Id) values (@zapsal_kontakt_id)
