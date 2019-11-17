@@ -100,6 +100,15 @@ begin
 		raiserror('Existuje utkání, které tuto soupisku obsahuje, není možné ji znevalidnit', 15, 15)
 		ROLLBACK
 	end
+
+	select COUNT(hs.Soupiska_Id) from deleted hs 
+	join Utkání ON Utkání.Soupiska_Id = hs.Soupiska_Id
+	where hs.Soupiska_Id NOT IN (select Soupiska_Id from Hráč_Soupiska)
+	if @@ROWCOUNT > 0
+	begin
+		raiserror('Existuje utkání, které tuto soupisku obsahuje, není možné ji znevalidnit', 15, 15)
+		ROLLBACK
+	end
 end
 GO
 
@@ -203,13 +212,35 @@ begin
 		rollback
 	end
 
-	--Kontrola zda-li na adrese, kde se utkání koná sídlí nějaký klub
+	--Kontrola, zda-li na adrese, kde se utkání koná sídlí nějaký klub
 	select u.Místo_Konání_Id from inserted u
 	where dbo.Sídlí_Klub(u.Místo_Konání_Id) = 0
 
 	if @@ROWCOUNT > 0
 	begin
 		raiserror('Utkání se nemůže odehrát na adrese, kde nesídlí žádný klub', 15, 15)
+		rollback
+	end
+	
+	--Kontrola, zda-li hráči na soupisce mají validní hostování v sezóně utkání
+	declare @hracu_pocet int
+	select @hracu_pocet = COUNT(hs.Hráč_Reg_Id) from inserted u 
+	join Hráč_Soupiska hs ON hs.Soupiska_Id = u.Soupiska_Id
+
+	declare @validni_host_pocet int
+	select @validni_host_pocet = COUNT(distinct hs.Hráč_Reg_Id) from inserted u
+	join Hráč_Soupiska hs ON hs.Soupiska_Id = u.Soupiska_Id
+	join Sezóna s on s.Start = u.Sezóna_Start	--hostování musí mít neprázdný průnik se sezónou, aby hráč mohl nastoupit na utkání v dané sezóně na základě hostování
+	join Hostování h on h.Hráč_Reg_Id = hs.Hráč_Reg_Id and (s.Start <= h.Do) and (s.Konec >= h.Od)
+	
+	declare @bez_hostovani_pocet int
+	select @bez_hostovani_pocet = COUNT(hs.Hráč_Reg_Id) from inserted u
+	join Hráč_Soupiska hs ON hs.Soupiska_Id = u.Soupiska_Id
+	where hs.Hráč_Reg_Id not in (select Hráč_Reg_Id from Hostování)
+
+	if @hracu_pocet <> @validni_host_pocet + @bez_hostovani_pocet
+	begin
+		raiserror('Hráč na soupisce nemá platné hostování v době utkání', 15, 15)
 		rollback
 	end
 end

@@ -91,6 +91,7 @@ Využit
 
 CK_Kontakt_Email
 	- jednoduché "ověření" emailu
+	- Czech_CS_AS považuje ch za jedno písmenko (neprošlo by první podmínkou)
 
 CK_Kontakt_Email_Tel_Id_Req
 	- vyžadujeme znalost tel. čísla nebo emailu (nebo obou) o každém kontaktu.
@@ -109,7 +110,7 @@ CREATE TABLE dbo.Kontakt (
   ,	Tel_Id INT NULL
 --, Využit AS nullif(dbo.Je_Kontakt_Využit(Id), 0) přidáno níže, až po definici funkce
   , CONSTRAINT PK_Kontakt PRIMARY KEY CLUSTERED (Id) 
-  , CONSTRAINT CK_Kontakt_Email CHECK ((Email LIKE '%_@__%.__%'))
+  , CONSTRAINT CK_Kontakt_Email CHECK ((Email LIKE '%_@__%.__%' or Email LIKE '%_@__%.ch'))
   , CONSTRAINT CK_Kontakt_Email_Tel_Id_Req CHECK ((Email IS NOT NULL OR Tel_Id IS NOT NULL))
   , CONSTRAINT CK_Kontakt_Jméno_Přijmení CHECK ((Jméno LIKE '[A-Ž][a-ž]%[a-ž]' AND Příjmení LIKE '[A-Ž]%[a-ž]'))
   , CONSTRAINT FK_Kontakt_Tel FOREIGN KEY(Tel_Id) REFERENCES dbo.Tel (Id)

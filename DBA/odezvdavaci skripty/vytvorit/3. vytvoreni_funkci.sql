@@ -122,7 +122,6 @@ begin
 	declare @ret int
 
 	select @ret = COUNT(Hráč_Reg_Id) from dbo.Hráč_Soupiska
-	join dbo.Utkání on Utkání.Soupiska_Id = Hráč_Soupiska.Soupiska_Id
 	where Hráč_Reg_Id = @reg_id
 
 	return @ret
@@ -139,7 +138,6 @@ begin
 	declare @ret int
 
 	select @ret = COUNT(Hráč_Reg_Id) from dbo.Hráč_Soupiska
-	join dbo.Utkání on Utkání.Soupiska_Id = Hráč_Soupiska.Soupiska_Id
 	where Hráč_Reg_Id = @reg_id and Náhradník = 1
 
 	return @ret
@@ -155,7 +153,6 @@ begin
 	declare @ret int
 
 	select @ret = COUNT(Hráč_Reg_Id) from dbo.Hráč_Soupiska
-	join dbo.Utkání on Utkání.Soupiska_Id = Hráč_Soupiska.Soupiska_Id
 	where Hráč_Reg_Id = @reg_id and Náhradník = 0
 
 	return @ret
@@ -394,16 +391,33 @@ GO
 
 
 --Vrátí pěkné formátované skóre v textovém řetězci
+--První číslice značí góly domácích, druhá góly hostujících
 --Př. výstupu: '3 : 2 (0 : 2)'
-CREATE function dbo.Skóre(@goly_my int, @goly_souper int, @goly_my_polocas int = null, @goly_souper_polocas int = null)
+CREATE function dbo.Skóre(@misto nvarchar(5), @goly_my int, @goly_souper int, @goly_my_polocas int = null, @goly_souper_polocas int = null)
 returns nvarchar(20)
 with schemabinding
 as
 begin
-	if @goly_my_polocas is null or @goly_souper_polocas is null
-		return cast(@goly_my as nvarchar(2)) + ' : ' + cast(@goly_souper as nvarchar(2))
+	declare @goly_domaci int, @goly_domaci_polocas int, @goly_hostujici int, @goly_hostujici_polocas int
+	if @misto = 'Doma' 
+	begin
+		set @goly_domaci = @goly_my
+		set @goly_domaci_polocas = @goly_my_polocas
+		set @goly_hostujici = @goly_souper
+		set @goly_hostujici_polocas = @goly_souper_polocas
+	end
+	else
+	begin
+		set @goly_domaci = @goly_souper
+		set @goly_domaci_polocas = @goly_souper_polocas
+		set @goly_hostujici = @goly_my
+		set @goly_hostujici_polocas = @goly_my_polocas
+	end
+	
+	if @goly_domaci_polocas is null or @goly_hostujici_polocas is null
+		return cast(@goly_domaci as nvarchar(2)) + ' : ' + cast(@goly_hostujici as nvarchar(2))
 
-	return cast(@goly_my as nvarchar(2)) + ' : ' + cast(@goly_souper as nvarchar(2)) + ' (' + cast(@goly_my_polocas as nvarchar(2)) + ' : ' + cast(@goly_souper_polocas as nvarchar(2)) + ')' 
+	return cast(@goly_domaci as nvarchar(2)) + ' : ' + cast(@goly_hostujici as nvarchar(2)) + ' (' + cast(@goly_domaci_polocas as nvarchar(2)) + ' : ' + cast(@goly_hostujici_polocas as nvarchar(2)) + ')' 
 end
 GO
 

@@ -118,7 +118,7 @@ begin
 end
 GO
 
-CREATE procedure dbo.Přidej_Hráč_Na_Soupisku (@reg_id nvarchar(7), @soupiska_id int, @cislo_dresu int, @nahradnik bit)
+CREATE procedure dbo.Přidej_Hráče_Na_Soupisku (@reg_id nvarchar(7), @soupiska_id int, @cislo_dresu int, @nahradnik bit)
 as
 begin
 	insert into Hráč_Soupiska (Hráč_Reg_Id, Soupiska_Id, Číslo, Náhradník) 
@@ -379,23 +379,35 @@ GO
 --Vrátí všechna utkání, která se hrála proti soupěři se jménem klubu @souper_klub_nazev
 --Př. exec Utkání_Proti 'Lokomotiva Červený Kostelec'
 --Vyžaduje 1x clustered index scan, protože vrací celou tabulku
-CREATE procedure dbo.Utkání_Proti(@souper_klub_nazev nvarchar(50))
+--Vrátí všechna utkání, která se hrála proti soupěři se jménem klubu @souper_klub_nazev
+--Př. exec Utkání_Proti 'Lokomotiva Červený Kostelec'
+--Vyžaduje 1x clustered index scan, protože vrací celou tabulku
+create procedure [dbo].[Utkání_Proti](@souper_klub_nazev nvarchar(50))
 as
 begin
-	select  
-	   dbo.Skóre(u.Góly_My, u.Góly_Soupeř, u.Góly_My_Poločas, u.Góly_Soupeř_Poločas) as 'Skóre', 
-	   kl.Název as 'Soupeř', dbo.Doma_Venku(u.Místo_Konání_Id, u.Soupeř_Id) as 'Místo', a.Ulice, a.Č_p as 'Č. p.', a.Město, a.Psč,
-	   dbo.Ml_Kategorie_Formátované(u.Ml_Kategorie_Název, u.Ml_Kategorie_Muži) as 'Hráčská kat.', 
-	   dbo.Soupiska_Počet_Lidí(u.Soupiska_Id) as 'Počet na soupis.',
-	   s.Start as 'Sez. start', s.Konec as 'Sez. konec', k.Jméno as 'Jméno rozh.', k.Příjmení as 'Příjmení rozh.', 
-	   k.Email as 'Email rozh.', dbo.Tel_Číslo(k.Tel_Id) as 'Tel. č. rozh.'
-	from Klub kl 
-	join Utkání u on u.Soupeř_Id = kl.Id
-	join Adresa a on a.Id = u.Místo_Konání_Id
-	join Sezóna s on s.Start = u.Sezóna_Start
-	join Rozhodčí r on r.Id = u.Rozhodčí_Id
-	join Kontakt k on k.Id = r.Kontakt_Id
-	where kl.Název = @souper_klub_nazev
+select dbo.Skóre(u.Místo, u.Góly_My, u.Góly_Soupeř, u.Góly_My_Poločas, u.Góly_Soupeř_Poločas) as 'Skóre' 
+	 , Název as 'Soupeř', u.Místo, Ulice, Č_p as 'Č. p.', Město, Psč 
+	 , dbo.Ml_Kategorie_Formátované(u.Ml_Kategorie_Název, u.Ml_Kategorie_Muži) as 'Hráčská kat.' 
+	 , dbo.Soupiska_Počet_Lidí(u.Soupiska_Id) as 'Počet na soupis.'
+	 , Start as 'Sez. start', Konec as 'Sez. konec', Jméno as 'Jméno rozh.', Příjmení as 'Příjmení rozh.' 
+	 , Email as 'Email rozh.', dbo.Tel_Číslo(Tel_Id) as 'Tel. č. rozh.' from (select Místo_Konání_Id
+																				   , Góly_My
+																				   , Góly_My_Poločas
+																				   , Góly_Soupeř
+																				   , Góly_Soupeř_Poločas
+																			       , Sezóna_Start
+																				   , Rozhodčí_Id
+																				   , Ml_Kategorie_Název
+																				   , Ml_Kategorie_Muži
+																				   , Soupiska_Id
+																				   , Soupeř_Id
+																				   , dbo.Doma_Venku(Místo_Konání_Id, Soupeř_Id) as 'Místo' from Utkání) as u
+join Klub kl on u.Soupeř_Id = kl.Id
+join Adresa on Adresa.Id = u.Místo_Konání_Id
+join Sezóna on Sezóna.Start = u.Sezóna_Start
+join Rozhodčí on Rozhodčí.Id = u.Rozhodčí_Id
+join Kontakt on Kontakt.Id = Rozhodčí.Kontakt_Id
+where kl.Název = @souper_klub_nazev
 end
 GO
 
@@ -406,4 +418,13 @@ as
 begin
 	insert into Soupiska (Zapsal_Id) values (@zapsal_kontakt_id)
 	set @soupiska_id = SCOPE_IDENTITY()
+end
+go
+
+--Smaže všechny soupisky, na kterých není zapsán ani jeden hráč
+--Vyžaduje 1x clustered index scan
+create procedure dbo.Smaž_Prázdné_Soupisky
+as
+begin
+	delete from Soupiska where Id NOT IN (select Soupiska_Id from Hráč_Soupiska)
 end

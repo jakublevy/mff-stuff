@@ -20,6 +20,7 @@ drop view dbo.Hráči_Počet_Odehraných_Zápasů
 drop view dbo.Hráči_Číslo
 drop view dbo.Sezóna_Počet_Utkání
 drop view dbo.Klub_Adresa_Počet_Utkání
+drop view dbo.Rozhodčí_Místo_Počet_Odpískaných_Utkání
 drop view dbo.Rozhodčí_Počet_Odpískaných_Utkání
 drop view dbo.Ml_Kategorie_Počet_Odehraných_Zápasů
 drop view dbo.Kontakt_Zapisovatel_Počet_Zapsaných_Soupisek

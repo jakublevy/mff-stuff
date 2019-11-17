@@ -11,7 +11,7 @@ drop procedure dbo.Hráči_Podle_Kategorie
 drop procedure dbo.Koupit_Hráče
 drop procedure dbo.Přidej_Adresu
 drop procedure dbo.Přidej_Hostování
-drop procedure dbo.Přidej_Hráč_Na_Soupisku 
+drop procedure dbo.Přidej_Hráče_Na_Soupisku 
 drop procedure dbo.Přidej_Kontakt
 drop procedure dbo.Přidej_Hráče
 drop procedure dbo.Přidej_Klub

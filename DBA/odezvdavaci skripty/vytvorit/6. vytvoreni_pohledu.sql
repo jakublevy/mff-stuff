@@ -41,7 +41,7 @@ GO
 create view dbo.Soupiska_Kontakt_Zapisovatel
 as
 select Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.', Soupiska.Id as 'Id soupisky'
-	 , COUNT(Hráč_Soupiska.Hráč_Reg_Id) as 'Počet zapsaných' 
+	 , COUNT(Hráč_Soupiska.Hráč_Reg_Id) as 'Počet zapsaných hráčů' 
 from Soupiska
 left outer join Kontakt on Kontakt.Id = Soupiska.Zapsal_Id
 join Hráč_Soupiska on Hráč_Soupiska.Soupiska_Id = Soupiska.Id
@@ -108,7 +108,7 @@ select h2.Reg_Id AS 'Reg. č.', Jméno, Příjmení
 	 , dbo.Ml_Kategorie_Formátované(dbo.Urči_Ml_Kategorii(h2.Reg_Id), h2.Muž) as 'Hráčská kat.' 
 	 , Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. číslo' 
      , [Počet odehraných utkání], [Z toho náhradníkem] 
-	 , (([Počet odehraných utkání] - [Z toho náhradníkem]) / nullif([Počet odehraných utkání], 0)) * 100 as '% v základu' 
+	 , ((cast([Počet odehraných utkání] as float) - cast([Z toho náhradníkem] as float)) / nullif([Počet odehraných utkání], 0)) * 100 as '% v základu' 
 from (
 	select Reg_Id, dbo.Počet_Odehraných_Utkání(Reg_Id) as 'Počet odehraných utkání', 
 		   dbo.Počet_Odehraných_Utkání_Náhradník(Reg_Id) as 'Z toho náhradníkem' from Hráč 
@@ -138,15 +138,15 @@ GO
 --Klub s adresou a počtem odehraných utkání
 CREATE view dbo.Klub_Adresa_Počet_Utkání
 as
-select Klub.Název as 'Název klubu', Ulice, Č_p as 'Č. p.', Město, Psč, COUNT(Utkání.Místo_Konání_Id) as 'Počet odehraných utkání' 
+select Klub.Název as 'Název klubu', Ulice, Č_p as 'Č. p.', Město, Psč, COUNT(Utkání.Místo_Konání_Id) as 'Počet utkání na hřišti klubu' 
 from Adresa
 left outer join Utkání on Utkání.Místo_Konání_Id = Adresa.Id
 left outer join Klub on Klub.Adresa_Id = Adresa.Id
 group by Klub.Název, Ulice, Č_p, Město, Psč
 GO
 
---Jednotliví rozhodčí s počtem odpískaných utkání
-create view dbo.Rozhodčí_Počet_Odpískaných_Utkání
+--Jednotliví rozhodčí s klubem, kde odpískali zápas a počtem odpískaných utkání
+create view dbo.Rozhodčí_Místo_Počet_Odpískaných_Utkání
 as
 --NULL v sloupci Místo znamená, že na dané adrese, kde se utkání odehrávalo nesídlí žádný klub
 select Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.', Klub.Název as 'Místo' 
@@ -157,6 +157,17 @@ left outer join Utkání on Utkání.Rozhodčí_Id = Rozhodčí.Id
 left join Adresa on Adresa.Id = Utkání.Místo_Konání_Id
 left outer join Klub on Klub.Adresa_Id = Adresa.Id
 group by Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id), Klub.Název
+GO
+
+--Jednotliví rozhodčí s počtem odpískaných utkání
+create view dbo.Rozhodčí_Počet_Odpískaných_Utkání
+as
+select Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.'
+	  , COUNT(Utkání.Rozhodčí_Id) as 'Počet odpískaných utkání' 
+from Rozhodčí
+join Kontakt on Kontakt.Id = Rozhodčí.Kontakt_Id
+left outer join Utkání on Utkání.Rozhodčí_Id = Rozhodčí.Id
+group by Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id)
 GO
 
 --Jednotlivé hráčské kategorie s počtem odehraných utkání
@@ -173,7 +184,7 @@ create view dbo.Kontakt_Zapisovatel_Počet_Zapsaných_Soupisek
 as
 select Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.', COUNT(Soupiska.Zapsal_Id) as 'Počet zapsaných soupisek' 
 from Kontakt 
-left outer join Soupiska ON Soupiska.Zapsal_Id = Kontakt.Id
+join Soupiska ON Soupiska.Zapsal_Id = Kontakt.Id
 group by Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id)
 GO
 
@@ -202,16 +213,34 @@ GO
 --Kromě připojených tabulek podle id navíc obsahuje:
 	--Formátované skóre (dbo.Skóre)
 	--Doma/Venku (určeno z místa, kde se utkání odehrálo)
-CREATE view dbo.Zápas as
-select dbo.Skóre(Góly_My, Góly_Soupeř, Góly_My_Poločas, Góly_Soupeř_Poločas) as 'Skóre' 
-	 , Název as 'Soupeř', dbo.Doma_Venku(Místo_Konání_Id, Soupeř_Id) as 'Místo',Ulice, Č_p as 'Č. p.', Město, Psč 
-	 , dbo.Ml_Kategorie_Formátované(Ml_Kategorie_Název, Ml_Kategorie_Muži) as 'Hráčská kat.' 
-	 , dbo.Soupiska_Počet_Lidí(Soupiska_Id) as 'Počet na soupis.'
+create view [dbo].[Zápas] as
+select dbo.Skóre(u.Místo, u.Góly_My, u.Góly_Soupeř, u.Góly_My_Poločas, u.Góly_Soupeř_Poločas) as 'Skóre' 
+	 , Název as 'Soupeř', u.Místo, Ulice, Č_p as 'Č. p.', Město, Psč 
+	 , dbo.Ml_Kategorie_Formátované(u.Ml_Kategorie_Název, u.Ml_Kategorie_Muži) as 'Hráčská kat.' 
+	 , dbo.Soupiska_Počet_Lidí(u.Soupiska_Id) as 'Počet na soupis.'
 	 , Start as 'Sez. start', Konec as 'Sez. konec', Jméno as 'Jméno rozh.', Příjmení as 'Příjmení rozh.' 
-	 , Email as 'Email rozh.', dbo.Tel_Číslo(Tel_Id) as 'Tel. č. rozh.' from Utkání
-join Klub on Soupeř_Id = Klub.Id
-join Adresa on Adresa.Id = Utkání.Místo_Konání_Id
-join Sezóna on Sezóna.Start = Utkání.Sezóna_Start
-join Rozhodčí on Rozhodčí.Id = Utkání.Rozhodčí_Id
+	 , Email as 'Email rozh.', dbo.Tel_Číslo(Tel_Id) as 'Tel. č. rozh.' from (select Místo_Konání_Id
+																				   , Góly_My
+																				   , Góly_My_Poločas
+																				   , Góly_Soupeř
+																				   , Góly_Soupeř_Poločas
+																			       , Sezóna_Start
+																				   , Rozhodčí_Id
+																				   , Ml_Kategorie_Název
+																				   , Ml_Kategorie_Muži
+																				   , Soupiska_Id
+																				   , Soupeř_Id
+																				   , dbo.Doma_Venku(Místo_Konání_Id, Soupeř_Id) as 'Místo' from Utkání) as u
+join Klub on u.Soupeř_Id = Klub.Id
+join Adresa on Adresa.Id = u.Místo_Konání_Id
+join Sezóna on Sezóna.Start = u.Sezóna_Start
+join Rozhodčí on Rozhodčí.Id = u.Rozhodčí_Id
 join Kontakt on Kontakt.Id = Rozhodčí.Kontakt_Id
-GO
+
+
+--Všechny soupisky, na kterých není ani jeden hráč s informace o jejich zapisovateli
+create view Prázdné_Soupisky
+as
+select Soupiska.Id as 'Id soupisky', Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.' from Soupiska 
+left join Kontakt on Kontakt.Id = Zapsal_Id
+where Soupiska.Id NOT IN (select Soupiska_Id from Hráč_Soupiska)
