@@ -44,7 +44,7 @@ select Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. č.', Soupis
 	 , COUNT(Hráč_Soupiska.Hráč_Reg_Id) as 'Počet zapsaných hráčů' 
 from Soupiska
 left outer join Kontakt on Kontakt.Id = Soupiska.Zapsal_Id
-join Hráč_Soupiska on Hráč_Soupiska.Soupiska_Id = Soupiska.Id
+left join Hráč_Soupiska on Hráč_Soupiska.Soupiska_Id = Soupiska.Id
 group by Jméno, Příjmení, Email, dbo.Tel_Číslo(Tel_Id), Soupiska.Id
 GO
 
@@ -101,28 +101,28 @@ left join Tel on Tel.Id = Kontakt.Tel_Id
 join Rozhodčí on Rozhodčí.Kontakt_Id = Hráč.Kontakt_Id
 GO
 
---Hráči s počtem odehraných zápasů (porovnání kolikrát v základu a kolikrát jako náhradník)
-CREATE view dbo.Hráči_Počet_Odehraných_Zápasů
+--Hráči s počtem zápisů na soupisce (porovnání kolikrát v základu a kolikrát jako náhradník)
+CREATE view dbo.Hráči_Počet_Zápisů_Na_Soupisce
 as
 select h2.Reg_Id AS 'Reg. č.', Jméno, Příjmení 
 	 , dbo.Ml_Kategorie_Formátované(dbo.Urči_Ml_Kategorii(h2.Reg_Id), h2.Muž) as 'Hráčská kat.' 
 	 , Email, dbo.Tel_Číslo(Tel_Id) as 'Tel. číslo' 
-     , [Počet odehraných utkání], [Z toho náhradníkem] 
-	 , ((cast([Počet odehraných utkání] as float) - cast([Z toho náhradníkem] as float)) / nullif([Počet odehraných utkání], 0)) * 100 as '% v základu' 
+     , [Počet zápisů], [Z toho náhradníkem] 
+	 , ((cast([Počet zápisů] as float) - cast([Z toho náhradníkem] as float)) / nullif([Počet zápisů], 0)) * 100 as '% v základu' 
 from (
-	select Reg_Id, dbo.Počet_Odehraných_Utkání(Reg_Id) as 'Počet odehraných utkání', 
-		   dbo.Počet_Odehraných_Utkání_Náhradník(Reg_Id) as 'Z toho náhradníkem' from Hráč 
+	select Reg_Id, dbo.Počet_Zápisů_Na_Soupisce(Reg_Id) as 'Počet zápisů', 
+		   dbo.Počet_Zápisů_Na_Soupisce_Náhradník(Reg_Id) as 'Z toho náhradníkem' from Hráč 
 	) as h1
 join Hráč h2 on h2.Reg_Id = h1.Reg_Id
 join Kontakt on Kontakt.Id = h2.Kontakt_Id
 left join Tel on Tel.Id = Kontakt.Tel_Id
 GO
 
---Hráči s počtem odehraných zápasů v dresu s číslem...
+--Hráči s počtem existujících soupisek v dresu s číslem...
 CREATE view dbo.Hráči_Číslo
 as
 select [Reg. č.], Jméno, Příjmení, [Hráčská kat.], Email, [Tel. číslo] 
-	 , Číslo as 'Číslo dresu', COUNT(Hráč_Soupiska.Hráč_Reg_Id) as 'Počet nást.' from Hráči
+	 , Číslo as 'Číslo dresu', COUNT(Hráč_Soupiska.Hráč_Reg_Id) as 'Počet soupisek' from Hráči
 join Hráč_Soupiska on Hráč_Soupiska.Hráč_Reg_Id = [Reg. č.]
 group by [Reg. č.], Jméno, Příjmení, [Hráčská kat.], Email, [Tel. číslo], Číslo
 GO
@@ -195,7 +195,7 @@ select Klub.Název as 'Název klubu', Ulice, Č_p as 'Č. p.', Město, Psč, Jm�
 	 , Příjmení as 'Příjmení správce', Email as 'Email správce', dbo.Tel_Číslo(Tel_Id) as 'Tel. č. správce' 
 from Klub
 join Adresa on Adresa.Id = Klub.Adresa_Id
-join Kontakt on Kontakt.Id = Klub.Pověřená_Osoba_Id
+left join Kontakt on Kontakt.Id = Klub.Pověřená_Osoba_Id
 GO
 
 --Jednotliví hráči s informacemi o jejich hostování

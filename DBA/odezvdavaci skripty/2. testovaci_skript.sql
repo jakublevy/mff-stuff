@@ -383,12 +383,20 @@ exec Přidej_Klub 'FK Jaroměř', 'Dlouhá', '1055', 'Jaroměř', '58972' --čí
 select * from Adresa where Ulice = 'Tyršova' or Ulice = 'Pleskotova' or Ulice = 'Dlouhá'
 --V computed column Využita ihned vidíme, že adresa klubu FK Jaroměř je využita
 
+--Můžeme alternativně použít pohled a podívat se na nevyužité adresy
+select * from Nevyužité_Adresy
+--Adresa FK Jaroměře mezi nimi není
+
 --Vyčistíme adresy
 exec Smaž_Nevyužité_Adresy
 
 --A zkusíme znovu najít v DB naši trojci adres
 select * from Adresa where Ulice = 'Tyršova' or Ulice = 'Pleskotova' or Ulice = 'Dlouhá'
 --a zbyla tam jen jediná -- ta patřící klubu Jaroměře
+
+--Alternativně
+select * from Nevyužité_Adresy
+--Prázdno
 
 --Utkání_Proti
 --Podíváme se, na hřišti kterého klubu se odehrálo nejvíce utkání
@@ -546,17 +554,229 @@ exec Koupit_Hráče '9328417'
 --Kontrola
 select * from Hráči_Vlastnění where [Reg. č.] = '9328417'
 
---TODO:
-
 --Pohledy
 --Následují některé pohledy, které ještě nebyly předvedeny při předvedení ostatních částí DB
 
---Už byli ukázány
+--(Již byli ukázány)
 --Hráči_Hostování
 --Hráči_Na_Soupisce
 --Hráči
 --Klub_Adresa_Počet_Utkání
+--Nevyužité_Adresy
 --Nevyužité_Kontakty
 --Zápas
 --Hráči_Prošlé_Hostování
 --Hráči_Vlastnění
+
+--Hráči_Číslo
+--Hráči s číslem dresu a počtem soupisek s daným číslem
+select * from Hráči_Číslo
+
+--Podíváme se třeba na hráče 1094895
+select * from Hráči_Číslo where [Reg. č.] = '1094895'
+--Marek Hron je zapsán na jedné soupisce s číslem dresu 2 a na druhé soupisce s číslem dresu 15
+--Na žádné další soupisce není zapsán
+
+--Vytvoříme dvě nové soupisky, na jednu zapíšeme Marka Hrona s číslem dresu 2 a na druhou
+--ho zapíšeme s číslem dresu 77
+declare @s6 int, @s7 int
+exec Vytvoř_Prázdnou_Soupisku @soupiska_id = @s6 output
+exec Vytvoř_Prázdnou_Soupisku @soupiska_id = @s7 output
+exec Přidej_Hráče_Na_Soupisku '1094895', @s6, 2, @nahradnik = 0
+exec Přidej_Hráče_Na_Soupisku '1094895', @s7, 77, @nahradnik = 1
+
+--Podíváme se opět na Marka Hrona
+select * from Hráči_Číslo where [Reg. č.] = '1094895'
+--Tentokrát 2x s číslem 2, 1x s číslem 15 a 1x s číslem 77
+
+--Hráči_Platné_Hostování, Hráči_Prošlé_Hostování
+--Všichni hráči, kteří mají podle aktuálního času platné / prošlé hostování
+select * from Hráči_Platné_Hostování
+
+select * from Hráči_Prošlé_Hostování
+
+--Mělo by být prázdné
+select * from Hráči_Platné_Hostování where [Reg. č.] IN (select [Reg. č.] from Hráči_Prošlé_Hostování)
+
+--Mělo by být prázdné
+select * from Hráči_Prošlé_Hostování where [Reg. č.] IN (select [Reg. č.] from Hráči_Platné_Hostování)
+
+--Hráči_Počet_Zápisů_Na_Soupisce
+--Opět využijeme Marka Hrona
+select * from Hráči_Počet_Zápisů_Na_Soupisce where [Reg. č.] = '1094895'
+--Počet zápisů = x, Z toho náhradníkem = y
+
+--Přidáme ho na dvě soupisky, jednou do základu a jednou jako náhradníka
+declare @s8 int, @s9 int
+exec Vytvoř_Prázdnou_Soupisku @soupiska_id = @s8 output
+exec Vytvoř_Prázdnou_Soupisku @soupiska_id = @s9 output
+exec Přidej_Hráče_Na_Soupisku '1094895', @s8, @cislo_dresu = 11, @nahradnik = 0
+exec Přidej_Hráče_Na_Soupisku '1094895', @s9, @cislo_dresu = 17, @nahradnik = 1
+
+--Opět se podíváme, co nám vrátil pohled
+select * from Hráči_Počet_Zápisů_Na_Soupisce where [Reg. č.] = '1094895'
+--Počet zápisů = x+2, Z toho náhradníkem = y+1
+
+--Hráči_Zároveň_Rozhodčí
+--Vrátí hráče, kteří zároveň mohou být rozhodčím utkání
+--Z testovacích dat víme, že jediným hráčem, který má hotové zkoušky rozhodčího je Vladan Vomáčka
+select * from Hráči_Zároveň_Rozhodčí
+
+--Přidáme-li pouze nového hráče, pohled nám vrátí stejná data
+exec Přidej_Hráče '3894393', 'Jaromír', 'Novohradčanský', 'mužské', '1988-02-15', 'jarda@hradec.cz', '128394234'
+select * from Hráči_Zároveň_Rozhodčí
+
+--Přidáme-li novému hráči status rozhodčího přibyde do výpisu pohledu
+declare @k2_id int
+select @k2_id = Kontakt_Id from Hráč
+insert into Rozhodčí (Kontakt_Id) VALUES (@k2_id)
+select * from Hráči_Zároveň_Rozhodčí
+
+--Hráčské_Kategorie
+--Jednotlivé hráčské kategorie s délkou utkání
+select * from Hráčské_Kategorie
+--Využívá funkci, kterou jsme již viděli (dbo.Ml_Kategorie_Formátované)
+
+--Pro porovnání:
+--Původní tabulka
+select * from Ml_Kategorie
+
+--Klub_Adresa_Správce
+select * from Klub_Adresa_Správce
+
+--Mezi kluby ve výpisu nám chybí pouze případ, kdy by správce měl pouze email, nikoliv pouze tel. číslo
+--Přidáme si takový klub
+exec Přidej_Klub 'TJ Sokol Stárkov', 'Kohoutova', '3', 'Stárkov', '59433', 'Pavel', 'Mikuška', 'p.mikuska@outlook.cz'
+
+select * from Klub_Adresa_Správce
+--Stárkov se objevil mezi ostatními kluby
+
+--Kontakt_Zapisovatel_Počet_Zapsaných_Soupisek
+--Vrátí kontakty osob s počtem zapsaných soupisek
+--Kontakt se objeví ve výpisu pouze pokud zapsal alespoň 1 soupisku
+select * from Kontakt_Zapisovatel_Počet_Zapsaných_Soupisek
+
+--Přidáme nový kontakt, který vytvoří novou soupisku
+--a František Majer vytvoří novou soupisku
+declare @fn int, @fm int
+exec Přidej_Kontakt 'Filip', 'Nguyen', 'filip@slovan.liberec.cz', '928348329', @kontakt_id = @fn output
+select @fm = Id from Kontakt where Příjmení = 'Majer'
+exec Vytvoř_Prázdnou_Soupisku @fn
+exec Vytvoř_Prázdnou_Soupisku @fm
+
+--Podíváme se opět na výstup pohledu
+select * from Kontakt_Zapisovatel_Počet_Zapsaných_Soupisek
+--Filip Nguyen se nám ve výpisu objevil jakožto nový zapisovatel soupisek s jednou soupiskou
+--Františku Majerovi jedna soupiska přibyla
+
+--Ml_Kategorie_Počet_Odehraných_Zápasů
+--Jednotlivé kategorie s počtem odehraných utkání
+select * from Ml_Kategorie_Počet_Odehraných_Zápasů
+
+--Konkrétněji Starší dorost má momentálně odehráno x utkání
+select * from Ml_Kategorie_Počet_Odehraných_Zápasů where Název = 'Starší dorost'
+
+--Vybereme nějakou validní soupisku Staršího dorostu a vytvoříme nové utkání s touto soupiskou
+declare @soup int
+select top 1 @soup = [Id soupisky] from Hráči_Na_Soupisce
+where [Hráčská kat.] = 'Starší dorost'
+group by [Id soupisky]
+having COUNT(*) > 6
+declare @ohk int, @ohka int, @r int
+select @ohk = Id, @ohka = Adresa_Id from Klub where Název = 'Olympia Hradec Králové'
+select top 1 @r = Id from Rozhodčí
+exec Přidej_Utkání 0, 0, @ohk, @ohka, @r, @soup, 'Starší dorost'
+
+--Nyní bude mít Starší dorost odehráno x+1 utkání
+select * from Ml_Kategorie_Počet_Odehraných_Zápasů where Název = 'Starší dorost'
+
+--Počet odehraných utkání u ostatních kategorií zůstal beze změny
+select * from Ml_Kategorie_Počet_Odehraných_Zápasů
+
+
+--Prázdné_Soupisky
+--Vrátí všechny soupisky neobsahující hráče
+select * from Prázdné_Soupisky
+--(Kontaktní informace, pokud jsou k dispozici se vážou k osobě, která zapsala soupisku)
+
+--Podíváme se jestli jsou vrácené soupisky opravdu prázdné pomocí funkce dbo.Soupiska_Počet_Lidí
+--(Pokud jsme vůbec nějaké prázdné soupisky vytvořili, např. spuštěním některého testovacího kódu výše)
+select [Id soupisky], dbo.Soupiska_Počet_Lidí([Id soupisky]) as 'Počet zapsaných hráčů', Jméno, Příjmení, Email, [Tel. č.] from Prázdné_Soupisky
+--Na všech soupiskách je Počet zapsaných hráčů roven 0
+
+--Protože nám tyto soupisky k ničemu moc nejsou můžeme se jich zbavit
+exec Smaž_Prázdné_Soupisky
+
+--Nyní již žádné prázdné soupisky v DB nemáme
+select * from Prázdné_Soupisky
+
+--Rozhodčí_Místo_Počet_Odpískaných_Utkání
+--Rozhodčí, klub s počtem odpískaných utkání
+select * from Rozhodčí_Místo_Počet_Odpískaných_Utkání
+
+--Nově přidaný rozhodčí bude mít 0 odpískaných utkání
+exec Přidej_Rozhodčího 'Radek', 'Zítka', 'radek.zitka@komna.cz', '123452344'
+select * from Rozhodčí_Místo_Počet_Odpískaných_Utkání where Jméno = 'Radek'
+
+--Necháme Radka Zítku jeden zápas odpískat
+declare @r_id int
+select @r_id = max(Id) from Rozhodčí
+update Utkání SET Rozhodčí_Id = @r_id
+where Id IN (select top 1 Id from Utkání)
+
+--Teď už má jeden zápas odpískaný
+select * from Rozhodčí_Místo_Počet_Odpískaných_Utkání where Jméno = 'Radek'
+
+--Bližší pohled na utkání, které Radek Zítka odpískal
+select * from Zápas where [Jméno rozh.] = 'Radek' and [Příjmení rozh.] = 'Zítka'
+
+--Rozhodčí_Počet_Odpískaných_Utkání
+--Obdobný pohled jako předchozí, neseskupuje počty podle rozhodčího a místa, ale pouze podle rozhodčího
+select * from Rozhodčí_Počet_Odpískaných_Utkání
+
+--Sezóna_Počet_Utkání
+--Vrátí jednotlivé sezóny s počtem odehraných utkání
+--Všimneme si že v sezóně 2011/2012 se odehrála 2 utkání a 2015/2016 se žádné utkání neodehrálo
+select * from Sezóna_Počet_Utkání
+
+--V sezoně 2011/2012 se odehrála 2 utkání
+--Podíváme se na všechna utkání sezóny 2011/2012 zkrze pohled Zápas
+select * from Zápas where [Sez. start] = '2011-03-06'
+--Vskutku se jedná o dvě utkání
+
+--V sezóně 2015/2016 se neodehrálo žádné utkání
+select * from Zápas where [Sez. start] = '2015-11-11'
+--Výstup je prázdný
+
+--Soupiska_Kontakt_Zapisovatel
+--Vrátí všechny soupisky s kontatními informacemi zapisovatele a počtem zapsaných hráčů
+select * from Soupiska_Kontakt_Zapisovatel
+
+--Vytvoříme si prázdnou soupisku, kterou zapsal Jiří Nedočkavý a prázdnou soupisku o níž nevím, kdo ji zapsal
+declare @kj int
+select @kj = Id from Kontakt where Jméno = 'Jiří' and Příjmení = 'Nedočkavý'
+exec Vytvoř_Prázdnou_Soupisku @kj
+exec Vytvoř_Prázdnou_Soupisku
+
+select * from Soupiska_Kontakt_Zapisovatel where [Id soupisky] IN (select top 2 Id from Soupiska order by Id desc)
+--Máme je mezi soupiskami, aktuálně na nich je 0 hráčů
+
+--Na poslední přidanou soupisku přidáme tři hráčky
+declare @ls int, @reg int, @cislo int = 4
+select @ls = max(Id) from Soupiska
+declare cur CURSOR LOCAL for select top 3 [Reg. č.] from Hráči where [Hráčská kat.] = 'Starší žákyně'
+open cur
+fetch next from cur into @reg
+while @@FETCH_STATUS = 0 
+begin
+	exec Přidej_Hráče_Na_Soupisku @reg, @ls, @cislo, 0
+	set @cislo = @cislo + 1
+	fetch next from cur into @reg
+end
+close cur
+deallocate cur
+
+--Kontrola
+select * from Soupiska_Kontakt_Zapisovatel where [Id soupisky] IN (select top 2 Id from Soupiska order by Id desc)
+--Korektně na poslední soupisku přidali 3 hráčky, druhá nově přidaná soupiska zůstala beze změny
+

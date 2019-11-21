@@ -14,9 +14,9 @@ drop function dbo.Doma_Venku
 drop function dbo.Ml_Kategorie_Formátované
 drop function dbo.Bit_Pohlaví
 drop function dbo.Má_Platné_Hostování
-drop function dbo.Počet_Odehraných_Utkání
-drop function dbo.Počet_Odehraných_Utkání_Náhradník
-drop function dbo.Počet_Odehraných_Utkání_V_Základu
+drop function dbo.Počet_Zápisů_Na_Soupisce
+drop function dbo.Počet_Zápisů_Na_Soupisce_Náhradník
+drop function dbo.Počet_Zápisů_Na_Soupisce_V_Základu
 drop function dbo.Sídlí_Klub
 drop function dbo.Soupiska_Počet_Lidí
 drop function dbo.Tel_Číslo

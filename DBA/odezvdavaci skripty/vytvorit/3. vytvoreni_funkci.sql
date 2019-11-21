@@ -113,8 +113,8 @@ begin
 end
 GO
 
---Pro @reg_id hráče vrátí počet utkání, ve kterém hráč nastoupil (v základu i jako náhradník)
-CREATE function dbo.Počet_Odehraných_Utkání(@reg_id nvarchar(7))
+--Pro @reg_id hráče vrátí počet soupisek, ve kterých je hráč zapsán (v základu i jako náhradník)
+CREATE function dbo.Počet_Zápisů_Na_Soupisce(@reg_id nvarchar(7))
 returns int
 with schemabinding
 as
@@ -129,8 +129,8 @@ end
 GO
 
 
---Pro @reg_id hráče vrátí počet utkání, ve kterém hráč nastoupil jako náhradník
-CREATE function dbo.Počet_Odehraných_Utkání_Náhradník(@reg_id nvarchar(7))
+--Pro @reg_id hráče vrátí počet soupisek, ve kterých je hráč zapsán jako náhradník
+CREATE function dbo.Počet_Zápisů_Na_Soupisce_Náhradník(@reg_id nvarchar(7))
 returns int
 with schemabinding
 as
@@ -144,8 +144,8 @@ begin
 end
 GO
 
---Pro @reg_id hráče vrátí počet utkání, ve kterém hráč nastoupil v základní sestavě
-CREATE function dbo.Počet_Odehraných_Utkání_V_Základu(@reg_id nvarchar(7))
+--Pro @reg_id hráče vrátí počet soupisek, ve kterých je hráč zapsán v základní sestavě
+CREATE function dbo.Počet_Zápisů_Na_Soupisce_V_Základu(@reg_id nvarchar(7))
 returns int
 with schemabinding
 as
