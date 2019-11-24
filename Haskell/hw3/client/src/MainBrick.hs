@@ -23,24 +23,19 @@ import GameTypes
 data Tick = Tick
 
 {- this is for creating the initial state -}
-initState :: Handle -> ScreenState
-initState h = ScreenState
-                        { curPos = (0, 0)
+initState :: ScreenState
+initState = ScreenState { curPos = (0, 0)
                         , curHighlighted = True
                         , cells = empty
-                        , width = boardW 
-                        , height = boardH
-                        , handle = h
+                        , width = defaultWidth 
+                        , height = defaultHeight
                         }
-
--- putWriter :: Writer -> ScreenState -> ScreenState
--- putWriter w s = s { writer = w }
 
 putWriterReader :: Writer -> Reader -> ScreenState -> ScreenState
 putWriterReader w r s = s { writer = w, reader = r}
 
 sendMsg :: ScreenState -> String -> IO ()
-sendMsg s = write (writer s) (handle s)
+sendMsg s = write (writer s)
 
 receiveMsg :: ScreenState -> IO (Maybe String)
 receiveMsg s = lastMsg (reader s) 
@@ -98,13 +93,11 @@ cursorHl = attrName "cursorHl"
 handleEvent :: ScreenState -> BrickEvent () Tick -> EventM () (Next ScreenState)
 handleEvent s (AppEvent Tick) = do
                                 msgM <- liftIO $ receiveMsg s
-                                case msgM of
-                                    Just msg -> let ws = words msg in
-                                                if head ws == "board" then
-                                                    continue $ s { cells = conv $ ws !! 1 }
-                                                else continue s 
-                                    Nothing -> continue s
-
+                                case words <$> msgM of 
+                                  Just ws -> if head ws == "board" then
+                                                  continue $ s { cells = conv s $ ws !! 1 }
+                                             else continue s
+                                  Nothing -> continue s
 
 handleEvent s (T.VtyEvent (V.EvKey k [])) =
   case k of
@@ -120,8 +113,8 @@ handleEvent s (T.VtyEvent (V.EvKey k [])) =
     V.KChar 'l' -> move R s
     V.KChar 'v' -> continue $ s {curHighlighted = not (curHighlighted s)}
     V.KChar 'x' -> do
-                   let pos = curPos s
-                   liftIO . sendMsg s $ "flip " ++ show (fst pos) ++ " " ++ show (snd pos)
+                   let pos = map show $ (\(x,y) -> [x,y]) $ curPos s
+                   liftIO . sendMsg s $ "flip " ++ pos!!0 ++ " " ++ pos!!1
                    continue s
 
     V.KChar ' ' -> liftIO (sendMsg s "step") >> continue s
@@ -129,7 +122,7 @@ handleEvent s (T.VtyEvent (V.EvKey k [])) =
     _ -> continue s --ignore all other keys
 handleEvent s _ = continue s --also ignore all other events
 
-move :: Dir -> ScreenState -> EventM n (Next ScreenState)
+move :: Dir -> ScreenState -> EventM () (Next ScreenState)
 move d s
   | d == L = continue $ s {curPos = (max 0 (x - 1), y)}
   | d == R = continue $ s {curPos = (min (width s - 1) (x + 1), y)}
@@ -156,16 +149,24 @@ mainBrick :: Socket -> IO ()
 mainBrick sck = do
        h <- socketToHandle sck ReadWriteMode
        hSetBuffering h (BlockBuffering Nothing) --we will flush manually
+
        chan <- newBChan 10
-       timerTId <- forkIO $ forever $ do
-                          writeBChan chan Tick
-                          threadDelay 100000 --100ms
+       timerTId <- forkIO . forever $ do
+                                      writeBChan chan Tick
+                                      threadDelay 10000 --10ms
+
        initVty <- V.mkVty V.defaultConfig
        E.bracket
           (do 
-           w <- initWriter
+           w <- initWriter h
            rInf <- initReader h
            return (w,rInf)
           )
-          (\(w,rInf) -> killThread timerTId >> stopWriter w >> killThread (snd rInf) >> hClose h)
-          (\(w,rInf) -> void $ customMain initVty (V.mkVty V.defaultConfig) (Just chan) app (putWriterReader w (fst rInf) (initState h)))
+          (\(w,rInf) -> do 
+                        killThread timerTId 
+                        stopWriter w 
+                        killThread $ snd rInf 
+                        hClose h
+          )
+          (\(w,rInf) -> void $ customMain initVty (V.mkVty V.defaultConfig) (Just chan) app (putWriterReader w (fst rInf) initState)
+          )

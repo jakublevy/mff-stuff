@@ -2,25 +2,23 @@ module GameTypes
   ( Pos
   , ScreenState(..)
   , Dir(..)
-  , boardW
-  , boardH
+  , defaultWidth
+  , defaultHeight
   , module Writer
   , module Reader
-  , module System.IO 
   ) where
 
 import Data.Set
-import System.IO(Handle)
 import Writer
 import Reader
 
 type Pos = (Int, Int)
 
-boardW :: Int
-boardW = 20
+defaultWidth :: Int
+defaultWidth = 20
 
-boardH :: Int
-boardH = 20
+defaultHeight :: Int
+defaultHeight = 20
 
 {- 
  - ScreenState is our datatype for storing the state of the screen. The record
@@ -41,8 +39,6 @@ data ScreenState =
     , width :: Int
     -- board height
     , height :: Int
-    -- network handle
-    , handle :: Handle
     -- network writer
     , writer :: Writer
     -- network reader

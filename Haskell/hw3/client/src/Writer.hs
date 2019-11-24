@@ -8,35 +8,35 @@ import Control.Concurrent.MVar(MVar)
 import System.IO(Handle, hPutStr, hFlush)
 
 newtype Writer = Writer (MVar WriteCmd)
-data WriteCmd = Message Handle String | Stop (MVar ())
+data WriteCmd = Message String | Stop (MVar ())
 
-initWriter :: IO Writer
-initWriter = do
-             m <- newEmptyMVar
-             let w = Writer m
-             forkIO $ writer w
-             return w
+initWriter :: Handle -> IO Writer
+initWriter h = do
+               m <- newEmptyMVar
+               let w = Writer m
+               forkIO $ writer h w
+               return w
 
-writer :: Writer -> IO ()
-writer (Writer m) = loop
+writer :: Handle -> Writer -> IO ()
+writer h (Writer m) = loop
     where
         loop = do
                cmd <- takeMVar m
                case cmd of
-                    Message h msg -> do
-                                     hPutStr h $ msg ++ "\r\n"
-                                     hFlush h
-                                     loop
+                    Message msg -> do
+                                   hPutStr h $ msg ++ "\r\n"
+                                   hFlush h
+                                   loop
                     Stop s -> putMVar s ()
 
 
-write :: Writer -> Handle -> String -> IO ()
-write (Writer m) h msg = do 
-                         forkIO $ putMVar m (Message h msg)
-                         return ()
+write :: Writer -> String -> IO ()
+write (Writer m) msg = do 
+                       forkIO $ putMVar m (Message msg)
+                       return ()
 
 stopWriter :: Writer -> IO ()
 stopWriter (Writer m) = do
-                  s <- newEmptyMVar
-                  putMVar m (Stop s)
-                  takeMVar s
+                        s <- newEmptyMVar
+                        putMVar m (Stop s)
+                        takeMVar s
