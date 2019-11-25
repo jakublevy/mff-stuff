@@ -10,6 +10,7 @@ module GameTypes
   , module Reader
   , module Lens.Micro
   , module Lens.Micro.TH
+  , module Control.Concurrent.STM.TVar
   , curPos
   , curHighlighted
   , cells
@@ -17,10 +18,13 @@ module GameTypes
   , height
   , writer
   , reader
+  , speedVar
+  , speed
   , curPosX
   , curPosY
   ) where
 
+import Control.Concurrent.STM.TVar (TVar)
 import Data.Set
 import Lens.Micro
 import Lens.Micro.TH
@@ -59,6 +63,10 @@ data ScreenState =
     , _writer :: Writer
     -- network reader
     , _reader :: Reader
+    -- update speed TVar
+    , _speedVar :: TVar Int
+    -- update speed 
+    , _speed :: Int
     }
 
 makeLenses ''ScreenState

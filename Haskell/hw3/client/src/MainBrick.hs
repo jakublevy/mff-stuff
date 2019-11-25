@@ -9,25 +9,26 @@ import Brick.Util (bg, fg, on)
 import Brick.Widgets.Border (border)
 import Brick.Widgets.Center (center)
 import Control.Concurrent (forkIO, killThread, threadDelay)
+import Control.Concurrent.STM.TVar (newTVar, readTVarIO, writeTVar)
 import qualified Control.Exception as E
 import Control.Monad (forever, void)
 import Control.Monad.IO.Class (liftIO)
+import Control.Monad.STM (atomically)
 import Data.Maybe (fromJust)
 import Data.Set (empty)
+import Game
+import GameTypes
 import qualified Graphics.Vty as V
 import qualified Graphics.Vty.Attributes as Color
 import Network.Socket
 import System.IO
 
-import Game
-import GameTypes
-
 data Tick =
   Tick
 
 {- this is for creating the initial state -}
-initState :: ScreenState
-initState =
+initState :: TVar Int -> ScreenState
+initState speedVar =
   ScreenState
     { _curPos = (0, 0)
     , _curHighlighted = True
@@ -36,6 +37,8 @@ initState =
     , _height = defaultHeight
     , _writer = DummyWriter
     , _reader = DummyReader
+    , _speedVar = speedVar
+    , _speed = 100000
     }
 
 putWriterReader :: Writer -> Reader -> ScreenState -> ScreenState
@@ -53,7 +56,7 @@ quitBricks s = liftIO (sendMsg s "quit") >> halt s
 {- This function converts the state to a list of widget layers to be drawn,
  - we only draw a single layer. -}
 renderApp :: ScreenState -> [Widget n]
-renderApp s = [center (title <=> mainLayer s)]
+renderApp s = [center (title s <=> mainLayer s)]
 
 {- Operator <=> combines widgets vertically (as seen above),
  - operator <+> combines them horizontally. -}
@@ -81,8 +84,9 @@ pos2widget s pos
       then withAttr cursorHl $ str " "
       else str " "
 
-title :: Widget n
-title = border $ str "Game of Life"
+title :: ScreenState -> Widget n
+title s =
+  border . str $ "Game of Life (" ++ show (s ^. speed `div` 1000) ++ "ms)"
 
 cursorHl :: AttrName
 cursorHl = attrName "cursorHl"
@@ -113,6 +117,14 @@ handleEvent s (T.VtyEvent (V.EvKey k [])) =
     V.KRight -> move R s
     V.KUp -> move U s
     V.KDown -> move D s
+    V.KChar '+' -> do
+      let ns = s & speed +~ 5000
+      liftIO . atomically $ writeTVar (ns ^. speedVar) (ns ^. speed)
+      continue ns
+    V.KChar '-' -> do
+      let ns = s & speed %~ \v -> max 5000 (v - 5000)
+      liftIO . atomically $ writeTVar (ns ^. speedVar) (ns ^. speed)
+      continue ns
     V.KChar 'q' -> quitBricks s
     V.KChar 'h' -> move L s
     V.KChar 'j' -> move D s
@@ -157,10 +169,12 @@ mainBrick sck = do
   h <- socketToHandle sck ReadWriteMode
   hSetBuffering h (BlockBuffering Nothing) --we will flush manually
   chan <- newBChan 10
+  speed <- atomically $ newTVar 100000 --100ms default
   timerTId <-
     forkIO . forever $ do
       writeBChan chan Tick
-      threadDelay 100000 --100ms
+      int <- readTVarIO speed
+      threadDelay int
   initVty <- V.mkVty V.defaultConfig
   E.bracket
               --acquire resources
@@ -181,4 +195,4 @@ mainBrick sck = do
          (V.mkVty V.defaultConfig)
          (Just chan)
          app
-         (putWriterReader w (fst rInf) initState))
+         (putWriterReader w (fst rInf) (initState speed)))

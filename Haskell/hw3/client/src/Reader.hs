@@ -23,7 +23,7 @@ reader :: Handle -> Reader -> IO ()
 reader h (Reader m) = loop
   where
     loop = do
-      inp <- init <$> hGetLine h
+      inp <- hGetLine h
       tryTakeMVar m
       putMVar m inp
       loop
