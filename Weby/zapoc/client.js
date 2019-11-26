@@ -8,6 +8,10 @@ function deleteBtnOnClick() {
         if(httpRequest.status === 200) {
             var row = document.getElementById('row-' + this.posted);
             if(row !== null) {
+                if(row.nextElementSibling === null && row.previousElementSibling !== null) {
+                    var pr = row.previousElementSibling;
+                    pr.children[2].removeChild(pr.children[2].children[0]);
+                }
                 row.remove();
             }
         }

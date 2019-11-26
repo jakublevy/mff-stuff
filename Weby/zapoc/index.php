@@ -1,7 +1,8 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <title>Shopping list</title>
-<script type="text/javascript" src="client.js"></script>
+<script src="client.js"></script>
 <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>

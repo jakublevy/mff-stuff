@@ -7,6 +7,7 @@ function generate_datalist() : String {
     foreach($data as $row) {
         $out .= "<option value=\"${row['name']}\">";
     }
+    $out .= '</datalist>';
     return $out;
 }
 

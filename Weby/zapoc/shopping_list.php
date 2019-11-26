@@ -28,10 +28,10 @@ function display_cart() {
         echo("<tr id=\"row-${row['id']}\">");
         if($i < $c) {
             $next_id = $data[$i+1]['id'];
-            echo("<td width=\"60%\">${row['name']}</td><td width=\"20%\" id=\"act-${row['id']}\">${row['amount']}</td><td class=\"btnCell\" width=\"2%\">" . swap_btn($row['id'], $next_id) . "</td><td class=\"btnCell\" width=\"9%\">" . delete_btn($row['id']) . '</td><td class="btnCell" width="9%">' . edit_btn($row['id']) . '</td>');
+            echo("<td class=\"itemCell\">${row['name']}</td><td class=\"amountCell\" id=\"act-${row['id']}\">${row['amount']}</td><td class=\"swapCell\" >" . swap_btn($row['id'], $next_id) . "</td><td class=\"btnCell\" >" . delete_btn($row['id']) . '</td><td class="btnCell" >' . edit_btn($row['id']) . '</td>');
         }
         else {
-            echo("<td width=\"60%\">${row['name']}</td><td width=\"20%\" id=\"act-${row['id']}\">${row['amount']}</td><td class=\"btnCell\" width=\"2%\"></td><td class=\"btnCell\" width=\"9%\">" . delete_btn($row['id']) . '</td><td class="btnCell" width=9%>' . edit_btn($row['id']) . '</td>');
+            echo("<td class=\"itemCell\">${row['name']}</td><td class=\"amountCell\" id=\"act-${row['id']}\">${row['amount']}</td><td class=\"swapCell\" ></td><td class=\"btnCell\" >" . delete_btn($row['id']) . '</td><td class="btnCell" >' . edit_btn($row['id']) . '</td>');
         }
         echo('</tr>');
         ++$i;
