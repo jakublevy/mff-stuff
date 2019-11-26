@@ -42,7 +42,7 @@ function generate_form() : String {
  */
 function item2id(string $item) : ?Int {
     $stmt = $GLOBALS['_DBH']->prepare('select id from items where items.name = :itm;');
-    $stmt->bindValue(':itm', $item, PDO::PARAM_STR);
+    $stmt->bindValue(':itm', htmlspecialchars($item), PDO::PARAM_STR);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC); 
     if(isset($result['id'])) {
@@ -60,7 +60,7 @@ function item2id(string $item) : ?Int {
  */
 function insert_item(string $item) : Int {
     $stmt = $GLOBALS['_DBH']->prepare('insert into items (name) values (:itm);');
-    $stmt->bindValue(':itm', $item, PDO::PARAM_STR);
+    $stmt->bindValue(':itm', htmlspecialchars($item), PDO::PARAM_STR);
     $stmt->execute();
     return $GLOBALS['_DBH']->lastInsertId();
 }
