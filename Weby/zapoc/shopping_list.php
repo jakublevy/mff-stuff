@@ -1,23 +1,55 @@
 <?php
 require_once('db.php');
 
+/**
+ * Fetches the shopping list from DB.
+ *
+ * @return Array Products on the shopping list.
+ */
 function get_cart() : Array {
     $data = $GLOBALS['_DBH']->query('select items.id, name, amount from list join items on items.id = item_id order by position;')->fetchAll();
     return $data;
 }
 
+/**
+ * Button for deleting an item from the shopping list.
+ *
+ * @param int $id item_id in DB
+ *
+ * @return String HTML button element.
+ */
 function delete_btn(int $id) : String {
     return "<button class=\"btn dltBtn\" data-id=\"$id\">Delete</button>";
 }
 
+/**
+ * Button for editing the amount of an item on the shopping list.
+ *
+ * @param int $id item_id in DB.
+ *
+ * @return String HTML button element.
+ */
 function edit_btn(int $id) : String {
     return "<button class=\"btn editBtn\" data-id=\"$id\">Edit</button>";
 }
 
+/**
+ * Button for swapping two adjacent rows.
+ *
+ * @param int $prev_id First row.
+ * @param int $next_id Next adjacent row.
+ *
+ * @return String HTML button element.
+ */
 function swap_btn(int $prev_id, int $next_id) : String {
     return "<button class=\"btn swapBtn\" data-prev=\"$prev_id\" data-next=\"$next_id\" id=\"swp-$prev_id-$next_id\">↕</button>";
 }
 
+/**
+ * Displays a table containing shopping list.
+ *
+ * @return void
+ */
 function display_cart() {
     $data = get_cart();
     

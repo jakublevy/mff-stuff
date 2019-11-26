@@ -1,3 +1,22 @@
+//Connecting buttons events.
+window.onload = function() {
+    var deleteBtns = document.getElementsByClassName("dltBtn");
+    for(var i = 0; i < deleteBtns.length; ++i) {
+        deleteBtns[i].addEventListener('click', deleteBtnOnClick, false);
+    }
+
+    var editbtns = document.getElementsByClassName('editBtn')
+    for(var i = 0; i < editbtns.length; ++i) {
+        editbtns[i].addEventListener('click', editBtnOnClick, false);
+    }
+
+    var swapbtns = document.getElementsByClassName('swapBtn');
+    for(var i = 0; i < swapbtns.length; ++i) {
+        swapbtns[i].addEventListener('click', swapBtnOnClick, false);
+    }
+}
+
+//Request to delete an item from the shopping list.
 function deleteBtnOnClick() {
     var id = this.getAttribute('data-id');
     httpRequest = new XMLHttpRequest()
@@ -22,6 +41,11 @@ function deleteBtnOnClick() {
     httpRequest.send('del_item_id=' + id);
 }
 
+/*
+Converts String to Node.
+@param html: string representation of an Node.
+@returns: Node representation of an Node.
+*/
 function htmlToElement(html) {
     var template = document.createElement('template');
     html = html.trim(); 
@@ -29,23 +53,11 @@ function htmlToElement(html) {
     return template.content.firstChild;
 }
 
-window.onload = function() {
-    var deleteBtns = document.getElementsByClassName("dltBtn");
-    for(var i = 0; i < deleteBtns.length; ++i) {
-        deleteBtns[i].addEventListener('click', deleteBtnOnClick, false);
-    }
 
-    var editbtns = document.getElementsByClassName('editBtn')
-    for(var i = 0; i < editbtns.length; ++i) {
-        editbtns[i].addEventListener('click', editBtnOnClick, false);
-    }
-
-    var swapbtns = document.getElementsByClassName('swapBtn');
-    for(var i = 0; i < swapbtns.length; ++i) {
-        swapbtns[i].addEventListener('click', swapBtnOnClick, false);
-    }
-}
-
+/*
+Request to edit the amount of an item on the shopping list.
+Displays simple form.
+*/
 function editBtnOnClick() {
     var id = this.getAttribute('data-id');
     var label = htmlToElement("<span>Amount: </span>");
@@ -56,6 +68,8 @@ function editBtnOnClick() {
     var parenttr = document.getElementById('row-' + id);
     if(parenttr.cells.length === 5) {
 
+        var curAmount = document.getElementById('act-' + id).innerText;
+        amount.value = curAmount;
         cancel.addEventListener('click', cancelBtnOnClick, false);
         ok.addEventListener('click', okBtnOnClick, false);
         var form = htmlToElement('<td class="ed" id="edit-'+ id +'"></td>')
@@ -67,6 +81,10 @@ function editBtnOnClick() {
     }
 }
 
+/*
+Request to cancel the edit of the amount of an item on the shopping list.
+Removes the amount editation form from the page.
+*/
 function cancelBtnOnClick() {
    var id = this.getAttribute('data-id');
    var editTd = document.getElementById('edit-' + id);
@@ -74,10 +92,16 @@ function cancelBtnOnClick() {
        editTd.remove();
    }
 }
+
+/*
+Request to POST the new amount of an item
+Uses AJAX
+*/
 function okBtnOnClick() {
     var id = this.getAttribute('data-id');
     var amountEl = document.getElementById('amount-' + id);
-    if(amountEl.checkValidity()) {
+    var oldVal = document.getElementById('act-' + id).innerText;
+    if(amountEl.checkValidity() && oldVal !== amountEl.value) {
         httpRequest = new XMLHttpRequest()
         httpRequest.open('POST', 'edit_amount.php', true);
         httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -98,12 +122,27 @@ function okBtnOnClick() {
         }
         httpRequest.send('item_id=' + id + '&new_amount=' + amountEl.value);
     }
+    else if (oldVal === amountEl.value) {
+        document.getElementById('cnc-'+ id).click();
+    }
 }
 
+/*
+Given row name, returns the id part.
+@param row: Name of an row.
+@returns: Id part of an row.
+
+Ex: Let row = 'row-12', the function returns 12.
+*/
 function extractId(row) {
     return row.split('-')[1];
 }
 
+/*
+Swap button clicked.
+Sends the new order of items to the server using AJAX.
+After sucessful processing by the server, reorders the items to reflect the change.
+*/
 function swapBtnOnClick() {
     var prevId = this.getAttribute('data-prev');
     var nextId = this.getAttribute('data-next');
