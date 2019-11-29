@@ -67,10 +67,11 @@ function insert_item(string $item) : Int {
 
 /**
  * @return Int Last position of an item on the shopping list.
+ *             If no item is present in DB, then 0.
  */
 function last_position() : Int {
     $data = $GLOBALS['_DBH']->query('select max(position) from list;')->fetchAll();
-    return $data[0]['max(position)'];
+    return $data[0]['max(position)'] === null ? 0 : $data[0]['max(position)'];
 }
 
 /**
