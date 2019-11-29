@@ -10,6 +10,9 @@ Přeskočené části jsou buďto zdokumentovány, nebo je jasná jejich funkcio
 a žádnou dokumentaci nevyžadují.
 */
 
+USE Levý_Fotbal
+GO
+
 --Test constraints
 
 --Constraints tabulky Adresa
@@ -37,6 +40,9 @@ exec Přidej_Hostování '10A45XXX12', '2020-02-10', '2020-01-10', 5000, '165065
 --při selhání DB zůstane neupravena díky využítí transakce
 --Neprojde - neplatný formát FAČR registračního čísla
 exec Přidej_Hráče '1434A59', 'Milan', 'Konečný', 'mužské', '1989-11-05', 'mkonecny@email.cz', '744389520'
+
+--A do DB nebyla žádná osoba se jménem Milan Konečný přidána
+select * from Kontakt where Jméno = 'Milan' and Příjmení = 'Konečný'
 
 --Neprojde - hráči musí být alespoň pět let před registrací
 exec Přidej_Hráče '1434159', 'Milan', 'Konečný', 'mužské', '2017-11-05', 'mkonecny@email.cz', '744389520'
@@ -138,6 +144,9 @@ exec Vytvoř_Prázdnou_Soupisku @soupiska_id = @ns2 output
 --jeden hráč má číslo dresu 5 a druhý 6
 exec Přidej_Hráče_Na_Soupisku '0001820', @ns2, 5, 0
 exec Přidej_Hráče_Na_Soupisku '0004530', @ns2, 6, 0
+
+--Kontrola
+select * from Hráči_Na_Soupisce where [Id soupisky] in (select max(Id) from Soupiska)
 
 --Maximální počet náhradníku (7)
 --Pokusíme se přidat 8 náhradníků na novou soupisku
@@ -302,7 +311,7 @@ exec Přidej_Utkání 5, 3, @s3, @a3, @r3, @sb, 'Mladší žáci'
 select * from Hráči_Na_Soupisce where [Id soupisky] IN (select max(Id) from Soupiska)
 
 --Kontrola, zda-li na adrese, kde se koná utkání sídlí nějaký klub
---Utkání se jinde konat nemůže -- kde nesídlí klub není hriště :)
+--Utkání se jinde konat nemůže -- kde nesídlí klub, není hřiště :)
 --Vytvoříme si novou adresu, která nebude asociována s žádným klubem a zkusíme na ní vytvořit utkání
 declare @a4 int
 exec Přidej_Adresu 'Národní', '23', 'Praha', '10002', @adresa_id = @a4 output
@@ -708,7 +717,7 @@ select * from Ml_Kategorie_Počet_Odehraných_Zápasů
 --Prázdné_Soupisky
 --Vrátí všechny soupisky neobsahující hráče
 select * from Prázdné_Soupisky
---(Kontaktní informace, pokud jsou k dispozici se vážou k osobě, která zapsala soupisku)
+--(Kontaktní informace, pokud jsou k dispozici, se vážou k osobě, která zapsala soupisku)
 
 --Podíváme se jestli jsou vrácené soupisky opravdu prázdné pomocí funkce dbo.Soupiska_Počet_Lidí
 --(Pokud jsme vůbec nějaké prázdné soupisky vytvořili, např. spuštěním některého testovacího kódu výše)
