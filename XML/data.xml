@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE football SYSTEM "data.dtd">
+<football>
+
+	<people>
+		<person id="per1">
+			<first-name>Josef</first-name>
+			<last-name>Balcar</last-name>
+			<contact>
+				<email>jaroslav.balcar@seznam.cz</email>
+				<telephone>
+					<prefix>+420</prefix>
+					<suffix>775948271</suffix>
+				</telephone>
+			</contact>
+		</person>
+		<person id="per2">
+			<first-name>Jan</first-name>
+			<last-name>Adámek</last-name>
+			<contact>
+				<email>jan.adamek@email.cz</email>
+				<email>janadamek@centrum.cz</email>
+				<telephone>
+					<prefix>+420</prefix>
+					<suffix>603489145</suffix>
+				</telephone>
+			</contact>
+		</person>
+	</people>
+
+	<clubs>
+		<club id="cl1">
+			<name>SK Babí&org-type;</name>
+			<motto since="2012">
+				<!-- escaping double quotes -->
+				<![CDATA[
+				"Hrát fotbal je velmi jednoduché. Ale hrát jednoduchý fotbal, to je jedna z nejtěžších věcí na světě." — Johan Cruijff
+				]]>
+			</motto>
+			<address>
+				<street>Broumovská</street>
+				<number>350</number>
+				<town>Náchod</town>
+				<postcode>547 01</postcode>
+			</address>
+			<possessions>
+				<owned-stadion refId="st1" />
+				traktor
+			</possessions>
+		</club>
+		<club id="cl2">
+			<name>TJ Velké Pořičí&org-type;</name>
+			<motto since="2002">
+				&quot;Rok <?php echo date("Y"); ?> bude pro nás ten nejlepší&quot; — kapitán mužstva
+			</motto>
+			<address>
+				<street>Náměstí</street>
+				<number>320</number>
+				<town>Velké Pořičí</town>
+				<postcode>549 32</postcode>
+			</address>
+			<possessions>
+				<owned-stadion refId="st2" />
+				parkoviště
+			</possessions>
+		</club>
+	</clubs>
+	
+	<stadions>
+		<surfaces>
+			<surface id="sf1">umělý trávník</surface>
+			<surface id="sf2">živý trávník</surface>
+		</surfaces>
+		<stadion id="st1" surface="sf1">
+			<address>
+				<street>Příkopy</street>
+				<number>1186</number>
+				<town>Náchod</town>
+				<postcode>547 01</postcode>
+			</address>
+		</stadion>
+		<stadion id="st2" surface="sf2">
+			<address>
+				<street>Náchodská</street>
+				<number>393</number>
+				<town>Velké Pořičí</town>
+				<postcode>549 32</postcode>
+			</address>
+		</stadion>
+	</stadions>
+	
+	<players>
+		<genders>
+			<gender id="m">mužské</gender>
+			<gender id="f">ženské</gender>
+		</genders>
+		<categories>
+			<category id="cat1">ml. žáci</category>
+			<category id="cat2">st. žáci</category>
+			<category id="cat3">ml. dorost</category>
+			<category id="cat4">st. dorost</category>
+			<category id="cat5">muži</category>
+			<category id="cat6">ml. přípravka</category>
+			<category id="cat7">st. přípravka</category>
+			<category id="cat8">dorostenky</category>
+			<category id="cat9">ženy</category>
+			<category id="cat10">ml. žákyně</category>
+			<category id="cat11">st. žákyně</category>
+		</categories>
+		<player person="per2" category="cat1" gender="m" club="cl1">
+			<reg-num format="old">594220</reg-num>
+		</player>
+	</players>
+</football>
