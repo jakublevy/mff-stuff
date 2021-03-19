@@ -1,0 +1,16 @@
+    Capital :: [A-Z]
+      Small :: [a-z]
+
+ SmallGroup :: []
+ SmallGroup :: Small SmallGroup
+
+       Atom :: Capital SmallGroup
+       Atom :: Reference
+  Reference :: Number Reference
+  Reference :: []
+     Number :: [0-9]
+
+     Smiles :: Atom
+     Smiles :: Atom Smiles Atom
+     Smiles :: '(' Smiles Atom
+     Smiles :: Atom Smiles ')'

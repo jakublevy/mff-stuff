@@ -1,5 +1,0 @@
-program zapoctak;
-
-begin
-  vyrazcislo[i]:=vyrazcislo[i+konst]
-end.

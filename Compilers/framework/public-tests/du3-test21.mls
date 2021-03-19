@@ -1,8 +1,0 @@
-program zapoctak;
-
-const maximum=2147483647;
-
-begin
-    clsscrn;
-    ahoj
-end.

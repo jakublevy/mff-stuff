@@ -1,0 +1,82 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[12pt, a4paper]{article}
+%\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes.gates.logic.US,shapes.gates.logic.IEC,calc}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{pdfpages}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\captionsetup{labelformat=empty}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+	
+\fancypagestyle{firstpage}
+{
+	\rhead{Jakub Levý \footnotesize{(Usurituri)}}
+}
+	
+\begin{document}
+	\thispagestyle{firstpage}
+	\section*{Všemocný NAND}
+	$\mathrm{XOR}(a,b) = (a \wedge  \neg b) \vee (\neg a \wedge b) \\
+	\mathrm{NAND}(a,b) = \neg(a \wedge b) = \neg a \vee \neg b$ \\ \\
+    Negace pomocí NANDu jde jednoduše zkonstruovat. \\
+    $\mathrm{NOT}(a) = \mathrm{NAND}(a,a) = \neg a \vee \neg a = \neg a$ \\ \\
+	Triviální je konstrukce XORu pomocí 5 NANDů. \\
+	Označme $\varphi = (a \wedge \neg b)$, $\psi = (\neg a \wedge b)$ (první a druhá elementární konjunkce funkce XOR).
+	\begin{flalign*}
+	\neg \varphi &= (\neg a \vee b) = \mathrm{NAND}(a, \mathrm{NAND}(b,b))\\
+	\neg \psi &= (a \vee \neg b) = \mathrm{NAND}(\mathrm{NAND}(a, a), b)\\
+	\mathrm{XOR}(a, b) &= \mathrm{NAND}(\neg \varphi, \neg \psi)
+	\end{flalign*}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.75]{5gate.pdf}
+\end{figure}\noindent
+Problém je v plýtvání hradly pro každou negaci. Koneckonců $\varphi$ a $\psi$ jsou symetrické formule.
+\paragraph{Pozorování: (trik)}
+\begin{flalign*}
+\overbrace{\neg \left(\overbrace{(\neg a \vee \neg b)}^{\mathrm{NAND}(a,b)} \wedge a \right)}^{\mathrm{NAND}(\mathrm{NAND}(a,b),a)} &= (\neg a \vee b) = \neg \varphi \\
+\underbrace{\neg \left(\underbrace{(\neg a \vee \neg b)}_{\mathrm{NAND}(a,b)} \wedge b \right)}_{\mathrm{NAND}(\mathrm{NAND}(a,b),b)} &= (a \vee \neg b) = \neg \psi
+\end{flalign*}
+Jeden NAND se dá šikovně ušetřit tak, že místo jednotlivých negací si spočítáme $\mathrm{NAND}(a,b)$ a využijeme triku. Na výsledný $\mathrm{XOR}(a,b)$ je použito poslední zbývající 4. hradlo stejně jako v předchozí 5 hradlové konstrukci 5. hradlo.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.75]{4gate.pdf}
+\end{figure}\noindent
+Každou booleovskou formuli můžeme přeložit na booleovský obvod využívající hradla $\mathrm{AND}$, $\mathrm{OR}$ a $\mathrm{NOT}$, které jsou dohromady funkčně kompletní. Zbývá tedy ukázat že z hradla $\mathrm{NAND}$ dovedeme vyrobit hradlo $\mathrm{AND}$ a $\mathrm{OR}$. Hradlo $\mathrm{NOT}$ již bylo ukázáno.
+\begin{flalign*}
+\mathrm{NAND}(a, b) &= ( \neg a \vee \neg b )\\
+\neg(\neg a \vee \neg b) &= (a \wedge b) = \mathrm{NAND}\left(\mathrm{NAND}(a,b), \mathrm{NAND}(a,b)\right) = \mathrm{AND}(a,b)\\
+\end{flalign*}
+\vspace*{-2cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.75]{and.pdf}
+\end{figure}\noindent
+\begin{flalign*}
+\mathrm{NAND}(a, b) &= ( \neg a \vee \neg b )\\
+a \vee b &= \mathrm{NAND}\left(\mathrm{NAND}(a,a), \mathrm{NAND}(b,b)\right)
+\end{flalign*}
+\vspace*{-1.2cm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.68]{or.pdf}
+\end{figure}
+
+\end{document}	

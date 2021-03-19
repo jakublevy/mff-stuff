@@ -1,0 +1,4 @@
+test x{ if(x == 5 || x == 6) { 15 } {1} }
+ahoj y{ if(if(y == 5) {1} {0} || if(y == 6) {1} {0}==1) {15}{1} }
+check a { test(a) == ahoj(a) }
+main { check(read()) }

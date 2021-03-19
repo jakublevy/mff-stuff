@@ -1,0 +1,851 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[11pt,a4paper,x11names]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{newfloat}
+\DeclareFloatingEnvironment[name={Tabulka}]{sheetfigure}
+\renewcommand{\listsheetfigurename}{Seznam tabulek}
+\DeclareFloatingEnvironment[name={Ukázka kódu}]{codefigure}
+\renewcommand{\listcodefigurename}{Seznam ukázek kódu}
+\usepackage{enumitem}
+\usepackage{tikzsymbols}
+\usepackage{fancyvrb}
+
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{latexsym}
+\usepackage[figure,table]{totalcount}
+\usepackage{csquotes}
+\MakeOuterQuote{"}
+\DeclareCaptionLabelFormat{blank}{}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
+
+
+\expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks%  save the current one
+	\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j%
+	\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t%
+	\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D%
+	\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
+	\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
+	\do\Y\do\Z}
+
+\newcommand{\Csharp}{%
+	{\settoheight{\dimen0}{C}C\kern-.05em \resizebox{!}{\dimen0}{\raisebox{\depth}{\#}}}}
+
+\date{červen/červenec 2018}
+
+
+
+
+\usepackage[edges]{forest}
+
+\definecolor{foldercolor}{RGB}{124,166,198}
+
+\tikzset{pics/folder/.style={code={%
+			\node[inner sep=0pt, minimum size=#1](-foldericon){};
+			\node[folder style, inner sep=0pt, minimum width=0.3*#1, minimum height=0.6*#1, above right, xshift=0.05*#1] at (-foldericon.west){};
+			\node[folder style, inner sep=0pt, minimum size=#1] at (-foldericon.center){};}
+	},
+	pics/folder/.default={20pt},
+	folder style/.style={draw=foldercolor!80!black,top color=foldercolor!40,bottom color=foldercolor}
+}
+
+\forestset{is file/.style={edge path'/.expanded={%
+			([xshift=\forestregister{folder indent}]!u.parent anchor) |- (.child anchor)},
+		inner sep=1pt},
+	this folder size/.style={edge path'/.expanded={%
+			([xshift=\forestregister{folder indent}]!u.parent anchor) |- (.child anchor) pic[solid]{folder=#1}}, inner xsep=0.6*#1},
+	folder tree indent/.style={before computing xy={l=#1}},
+	folder icons/.style={folder, this folder size=#1, folder tree indent=3*#1},
+	folder icons/.default={12pt},
+}
+
+
+
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\author{Jakub Levý}
+\title{Dokumentace k zápočtovému programu}
+\begin{document}
+\null  % Empty line
+\nointerlineskip  % No skip for prev line
+\vfill
+\let\snewpage \newpage
+\let\newpage \relax
+\maketitle
+\let \newpage \snewpage
+\vfill 
+\thispagestyle{empty}
+\begin{abstract}
+	Tento program reimplementuje hru Space Invaders. Je napsán v jazyce \Csharp, využívá knihovnu WinForms a GDI+. Hraní hry je doprovázeno původními zvukovými efekty\break a animacemi při eliminaci nepřátel. Součástí programu je několik cheatů, pomocí kterých je možné jednodušeji testovat hru.
+\end{abstract}
+\pagebreak
+\tableofcontents
+\pagebreak
+\section{O Space Invaders}
+\label{sec:about_space_invaders}
+Jedná se o arkádovou hru vytvořenou Tomohirem Nishikadem. Hra byla uvolněna již v roce 1978. Hráč pohybuje tankem s laserem a jeho cílem je eliminovat nepřátelskou invazi blížící se k tanku. Vzhledem ke stáří hry se jedná o jednu z prvních stříleček.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.7\linewidth]{space_invaders_original.png}
+		\caption{původní hra}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1.0\linewidth]{space_invaders_remake.png}
+		\caption{moje verze}
+	\end{subfigure}
+	\caption{porovnání originální hry s mojí verzí}
+\end{figure}
+\section{Využité technologie}
+Program, které se tato dokumentace týká, by nemohl vzniknout bez různých technologií,\break o kterých se rozepíšu v této kapitole.
+\subsection{C\#}
+Celý program byl napsán v programovacím jazyku \Csharp. Tento programovací jazyk jsem zvolil\newline z důvodu jeho jednoduchosti, výkonnosti a možnosti objektově orientovaného programování.
+\subsection{WinForms}
+Pro jednoduchou práci s tlačítky jsem se rozhodl použít grafické rozhraní.
+%Pro jednoduché zadání vstupu a jeho případné editace jsem se rozhodl využít grafického rozhraní.
+Ačkoliv knihovna WPF je modernější, zvolil jsem knihovnu WinForms ze dvou důvodů:
+\begin{enumerate}
+	\item kompatibilita s jinými operačními systémy než Windows,
+	\item jednoduchá tvorba uživatelského rozhraní.
+\end{enumerate}
+\subsection{Visual Studio 2017}
+U volby vývojového prostředí jsem neváhal. Konkurenční JetBrains Rider a MonoDevelop neobsahují designer pro tvorbu uživatelského prostředí aplikací využívajících knihovnu WinForms.
+\subsection{GDI+}
+Kvůli jednoduchosti se o vykreslování stará součást API OS Windows. Pro účely tohoto programu je dostačující.
+\subsection{Adobe Photoshop}
+Už jenom tento dokument obsahuje \totalfigures\ obrázků. Několik dalších je součástí programu. Často bylo potřeba udělat přesný výběr objektu, odstranit pozadí a přidat nějaký prvek do obrázku. Jedná se sice o základní funkcionality, ale samotná možnost rozdělit si části obrázku do vrstev mi značně ulehčila práci.
+\section{Program}
+\label{sec:program}
+V této kapitole popíšu jednotlivé části programu ze dvou různých pohledů. Nejprve z pohledu uživatelského, pokračovat budu programátorskou částí, kde rozeberu vybrané bloky kódu. %\\ \\
+%Nadále budu rozumět pojmem \textit{hra} tento zápočtový program.
+\subsection{Uživatelská část}
+V této části se, jak již název podkapitoly napovídá, zaměřím na části programu z takového pohledu, že i obyčejnému uživateli mohou přijít informace získané přečtením zajímavé a poučné, nacházejí se zde i informace, které se dají považovat za nutné ke hraní hry.
+\subsubsection{Ovládání}
+Pro ovládání tanku nám stačí 3 tlačítka viz následující tabulka.
+\begin{sheetfigure}[H]
+	\centering
+\begin{tabular}{ l | c  r }
+	pohyb tanku doleva & $\leftarrow$ \\ \hline
+	pohyb tanku doprava & $\rightarrow$ \\ \hline
+	střelba & \texttt{mezerník}, alt. \texttt{x} \\
+\end{tabular}
+\caption{tlačítka ovládající tank}
+\end{sheetfigure}
+\paragraph{Cheaty} 
+Hra obsahuje celkem 5 podvodů, které nám pomůžou k poražení nepřátel. Opět jejich přehled v tabulce.
+\begin{sheetfigure}[H]
+	\centering
+	\begin{tabular}{ l | c | r }
+		\textit{popis cheatu} & \textit{od slova} & \textit{klávesová zkratka} \\ \hline
+		přídání jednoho životu & \textbf{h}ealth & \texttt{h} \\ \hline
+		regenerace bariéry & \textbf{b}arrier & \texttt{b} \\ \hline
+		zakázání/povolení střílení nepřátel & \textbf{m}issile & \texttt{m} \\ \hline
+		zničení náhodného nepřítele & \textbf{d}elete & \texttt{d} \\ \hline
+		zvýšení skóre o 100 & \textbf{s}core & \texttt{s} \\ 
+		
+	\end{tabular}
+%	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{seznam cheatů}
+\end{sheetfigure}
+\paragraph{Pauza} 
+pokud okno hry ztratí \textit{focus}, nebo hráč stiskne klávesu \texttt{p}, hra se pozastaví. Toto platí i při minimalizaci okna, což je pouze speciální případ.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.22]{paused_game.png}
+	\caption{pozastavená hra}
+\end{figure}
+\subsubsection{Modely postav}
+\label{subsub_sec:models}
+V následujícím textu budu rozumět pojmem \textit{model} grafiku hry, která je vykreslená z předpřipraveného \texttt{.png} obrázku. \\ \\
+Nepřátelská invaze je složena z několika různých modelů. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=1]{invader_types.png}
+	\caption{sloupec nepřátelské invaze}
+\end{figure}
+
+\begin{enumerate}[label=\textbf{(\arabic*)}]
+	\item TopInvader -- vzhledem k jeho menšímu hitboxu je za jeho eliminaci 30 bodů.
+	\item MiddleInvader -- těch je nejvíce, za eliminaci je 20 bodů.
+	\item BottomInvader je první na ráně a hráč za něj získá 10 bodů.
+\end{enumerate}
+\noindent
+Každý z těchto tří prochází při pochodu dvěma stavy pohybu.
+
+\begin{figure}[H]
+	\centering
+	%[width=0.15\textwidth]
+	\includegraphics{top2.png}%
+	\begin{minipage}[b]{0.1\textwidth}
+		\centering
+		\huge$\leadsto$\normalsize
+		\vspace{0.3cm}
+	\end{minipage}%
+	\includegraphics{top1.png}
+	%\captionsetup{textformat=empty,labelformat=blank}
+    \caption{stavy TopInvadera}
+
+\end{figure}
+\begin{figure}[H]
+	\centering
+	%[width=0.15\textwidth]
+\includegraphics{middle2.png}%
+\begin{minipage}[b]{0.1\textwidth}
+	\centering
+	\huge$\leadsto$\normalsize
+	\vspace{0.3cm}
+\end{minipage}%
+\includegraphics{middle1.png}
+%\captionsetup{textformat=empty,labelformat=blank}
+\caption{stavy MiddleInvadera}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	%[width=0.15\textwidth]
+	\includegraphics{bottom2.png}%
+	\begin{minipage}[b]{0.1\textwidth}
+		\centering
+		\huge$\leadsto$\normalsize
+		\vspace{0.3cm}
+	\end{minipage}%
+	\includegraphics{bottom1.png}
+%	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{stavy BottomInvadera}
+\end{figure}
+\noindent
+Tito střílí po našem tanku:
+\begin{figure}[H]
+	\centering
+	\textcolor{white}{,,}\includegraphics{lightning.png} .
+	\caption{nepřátelské střelivo}
+\end{figure}
+\noindent
+Posledním speciálním členem nepřátelské invaze je tzv. mystery. Ten s náhodnou rychlostí 3 až 10 px za 15ms, v náhodném čase z rozmezí 10 až 20s prosviští vrchní částí herní plochy. Podle jeho rychlosti jsou za jeho eliminaci přiděleny body. 
+\begin{figure}[H]
+	\centering
+	\includegraphics{mystery.png}
+	\caption{mystery}
+\end{figure}
+\noindent
+Mystery jako jediný člen invaze neprochází mezi dvěma stavy a nestřílí. Pouze se plynule pohybuje. \\ \\
+Pokud se z tanku laserem trefíme do invadera, který umí střílet zahraje znělka \ref{item:invader_elimination}. Při zásahu mysteryho zahraje \ref{item:mystery_elimination}. Mimo zvukového efektu se na pozici rozstřeleného nepřítele objeví buďto:
+\begin{figure}[H]
+	\centering
+	\textcolor{white}{,,}\includegraphics{boom.png}\,,
+	%\captionsetup{textformat=empty,labelformat=blank}
+	\caption{eliminace invadera}
+	\label{fig:invader_eliminated_pic}
+\end{figure}
+\noindent
+nebo
+\begin{figure}[H]
+	\centering
+	\includegraphics{mystery_boom.png}
+%	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{eliminace mysteryho}
+\end{figure}
+
+\noindent
+v případě eliminace mysteryho. \\ \\
+Nyní se zaměřím na modely týkající se hráčova tanku.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.2\textwidth}
+		\centering
+		\includegraphics[width=.7\linewidth]{tank.png}
+		\caption{tank}
+	\end{subfigure}%
+	\begin{subfigure}{.16\textwidth}
+		\centering
+		\includegraphics[width=1.0\linewidth]{tank_destroyed.png}
+		\caption{tank zasažen}
+	\end{subfigure}
+	%\captionsetup{textformat=empty,labelformat=blank}
+	\caption{tank a jeho ruiny}
+\end{figure}
+%\vspace{-1cm}
+\noindent
+Pří zasažení tanku se v případě, že máme ještě rezervní život, spustí příslušná zvuková hláška \ref{item:tank_hit} a po dobu 300ms se zobrazí jeho ruiny (b). Následně se objeví na náhodné pozici nový tank, který bude po dobu 3s žlutý a imunní vůči nepřátelským střelám. Po uplynutí doby, kdy je tank nezranitelný, se jeho barva změní opět na zelenou. 
+\begin{figure}[H]
+	\centering
+	\includegraphics{immune_tank.png}
+	\caption{imunní tank}
+\end{figure}
+\noindent
+V opačném případě, kdy už život nemáme, se zobrazí konec hry. \\ \\
+Modely jsem vystříhal z různých variant her Space Invaders a upravil pomocí Adobe Photoshopu.
+\subsubsection{Konec hry}
+Hra může skončit ze dvou důvodů:
+\begin{enumerate}
+	\item tank byl zasažen a nezbývá už žádný rezervní život,
+	\item invadeři se dostali na pozici tanku.
+\end{enumerate}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.22]{gameover.png}
+	\caption{GAME OVER!}
+\end{figure}
+\subsubsection{Pochod invaze}
+Invaze vždy začíná na levé straně herní plochy a pochoduje směrem k pravé straně do té doby, než dosáhne pravého okraje. Následně invaze sestoupí blíže k tanku, zvýší svoji rychlost pochodu a obrátí směr pochodu na levou stranu. \\ \\ Invaze pochoduje periodicky a to po uplynutí času na časovači.
+\subsubsection{Úrovně}
+Hra začíná první úrovní. Při eliminaci všech střílecích nepřátel hra postoupí do další úrovně. Všechny úrovně mají stejné rozestavení nepřátel z invaze. Úrovně hry se liší pouze v následujícím:
+\begin{itemize}
+	\item[--] invaze nepřátel z vyšší úrovně začíná na pozici blíže k tanku,
+	\item[--] invaze z vyšší úrovně sestupuje směrem dolů, blíže k tanku o větší vzdálenost,
+	\item[--] s každým přiblížením k tanku se zrychlí pochod celé invaze. \newline (čím vyšší úroveň, tím vyšší zrychlení)
+\end{itemize}
+\subsubsection{Bariéry}
+\label{subsub_sec:barrier}
+Během vytváření nové úrovně hry se vygenerují 3 bariéry. Tyto bariéry jsou vytvořeny a vykreslovány po sloupcích ze čtverců o rozměru $5 \times 5$ px. \\ \\
+Nyní bych rád popsal, jak funguje plošné poškození bariéry. \\ \\
+Pokud dojde ke kolizi bariéry a nějaké střely, ať už nepřátelské, nebo naší pocházející z tanku, tak se nejprve zjistí kolikátý sloupec bariéry byl zasažen. V tomto sloupci se zničí všechny čtverečky, jejichž vzdálenost je menší než \texttt{SplashRadius}. Ve všech ostatních sloupcích se\newline s pravděpodobnostní 70\% zničí čtverečky, jejichž vzdálenost je menší než \texttt{SplashRadius} a s 30\% pravděpodobností zůstanou zachovány. Tímto vznikne efekt plošného poškození.
+\begin{figure}[H]
+	\centering
+	%[width=0.15\textwidth]
+	\includegraphics[scale=0.5]{before_splash_damage.png}%
+	\begin{minipage}[b]{0.1\textwidth}
+		\centering
+		\huge$\leadsto$\normalsize
+		\vspace{1cm}
+	\end{minipage}%
+	\includegraphics[scale=0.5]{after_splash_damage.png}
+	\caption{před plošným poškozením a po}
+\end{figure}
+\noindent
+Pokud se nepřátelé dostanou na hranici bariéry, všechny bariéry jsou instantně zničeny, toto zničení je avizováno hláškou \ref{item:barrier_destroyed}.
+\subsubsection{Střelba}
+Invadeři, jak již bylo několikrát zmíněno, střílejí po tanku. Nyní bych chtěl popsat jak funguje proces výběru invadera, který bude střílet. \\ \\
+Invadeři střílejí po uplynutí času na příslušném časovači. Při vytvoření nové úrovně hry se interval časovače nastaví na 1s. Při eliminaci invadera se tento čas snižuje o 5ms. Pokud invadeři sestoupí blíže k tanku, tento interval se sníží o 30ms až do minima 420ms. \\ \\
+Vždy střílí 1 až 3 invadeři v závislosti na náhodném výběru. S 30\% pravděpodobností se vybere invader, který má šanci zasáhnout tank, tj. invader, jehož souřadnice Y je nejblíže k souřadnici Y tanku. Zbylá 70\% pravděpodobnost pokrývá náhodný výběr invadera, který bude střílet. \\ \\
+Pokud zbývá už pouze poslední střílecí invader nastane speciální případ. Interval na časovači určující rychlost střelby se na nastaví na 350ms a interval na časovači určující rychlost pochodu na 100ms. Invader bude velmi rychle střílet a bude obtížné ho zasáhnout.
+\subsubsection{Autentičnost}
+\label{subsub_sec:authenticity}
+Vzhledem k tomu, že Space Invaders je už 40 let stará hra, snažil jsem se mé verzi dát alespoň jakýsi nádech grafiky původní doby. Nejvýznamnější podíl na tom má písmo Space Invaders \ref{item:space_invaders}.
+\begin{figure}[H]
+	\centering
+	\includegraphics{space_invaders_title.png}
+	\caption{nápis Space Invaders v písmu Space Invaders}
+\end{figure}
+\noindent
+Dále jsem napodobil menu hry z původní verze z roku 1978.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.7\linewidth]{1978_menu.png}
+		\caption{původní menu z roku 1978}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.7\linewidth]{my_menu.png}
+		\caption{moje menu}
+	\end{subfigure}
+%	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{porovnání původního menu z 1978 a mého menu}
+\end{figure}
+\noindent
+A reimplementoval jsem bariéry, které jsou plošně poškozovány při střelbě.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.4\linewidth]{original_barrier.png}
+		\caption{původní bariéra}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.6\linewidth]{my_barrier.png}
+		\caption{moje bariéra}
+	\end{subfigure}
+	%\captionsetup{textformat=empty,labelformat=blank}
+	\caption{porovnání původní bariéru s mojí bariérou}
+\end{figure}
+%porovnani moje bariery vs 1978
+\subsubsection{Responzivita}
+Ačkoliv mi knihovna WinForms příliš nepomáhá, tak se hra přizpůsobí velikosti okna aplikace. Změnu velikosti okna není možné provést při spuštěné hře. Pro hraní hry v jiné velikosti okna než výchozí, musíme změnit velikost okna již v menu před započetím hry.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.7\linewidth]{game_with_long_height.png}
+		\caption{hra s velkou výškou}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1.0\linewidth]{game_with_long_width.png}
+		\caption{hra s velkou sířkou}
+	\end{subfigure}
+	%\captionsetup{textformat=empty,labelformat=blank}
+	\caption{porovnání hry s velkou délkou a šířkou}
+\end{figure}
+\subsubsection{Zvukové efekty}
+Hra je doprovázena zvukovými efekty a hudbou. 
+\paragraph{Menu}
+V hlavní nabídce hraje hudba \ref{item:menu_music} z roku 1980, která pochází z australského hudebního nočního vysílání \href{https://en.wikipedia.org/wiki/Rage_(TV_program)}{Rage}.\\ \\
+Další zvukové efekty:
+\begin{itemize}
+	\item[--] výstřel z tanku \ref{item:tank_shoot},
+	\item[--] eliminace invadera  \ref{item:invader_elimination},
+	\item[--] eliminace mysteryho \ref{item:mystery_elimination},
+	\item[--] průlet mysteryho  \ref{item:mystery_flying},
+	\item[--] zásah tanku \ref{item:tank_hit},
+	\item[--] konec hry \ref{item:gameover}
+\end{itemize}
+pochází z různých verzí hry Space Invaders. Zbylé zvukové efekty jsem přidal dle vlastního uvážení.
+\pagebreak
+\subsection{Programátorská část}
+Druhá část se podstatně liší od první, uživatelské části. Zde je popsána struktura projektu, jednotlivé soubory a bloky kódu, které implementují mechaniky hry. Čtenáři doporučuji, aby si nejdříve prošel část uživatelskou, neboť se tu budou často rozvíjet koncepty již částečně popsané v předchozí části.
+\subsubsection{Struktura projektu}
+	\begin{forest}
+		for tree={font=\sffamily, grow'=0,
+			folder indent=.9em, folder icons,
+			edge=densely dotted}
+		[SpaceInvaders
+		   [SpaceInvaders, this folder size=20pt
+		   [Properties
+		      [(zde je několik souborů týkajících se sestavení projektu), is file]]
+		   [Resources
+		   [obrázky... (*.png), is file]
+		   [zvuky... (*.wav), is file]
+		   [space\_invaders.ttf, is file]
+		   [app.ico, is file]]
+		   [App.config, is file]
+		   [Barrier.cs, is file]
+		   [Constants.cs, is file]
+		   [ExtensionMethods.cs, is file]
+		   [Form1.cs, is file]
+		   [Form1.Designer.cs, is file]
+		   [Form1.resx, is file]
+		   [Game.cs, is file]
+		   [Invader.cs, is file]
+		   [Program.cs, is file]
+		   [ScoreTableUC.cs, is file]
+		   [ScoreTableUC.Designer.cs, is file]
+		   [SpaceInvaders.csproj, is file]
+		   [Utils.cs, is file]
+		]
+		[SpaceInvaders.sln, is file]
+		]
+	\end{forest}
+\subsubsection{Adresáře projektu}
+\paragraph{SpaceInvaders/Properties}
+Zde se nachází několik souborů obsahujících verzi, název, jazyk,... výsledného spustitelného souboru hry.
+\paragraph{SpaceInvaders/Resources}
+Tato složka obsahuje soubory, které aplikace při svém běhu využívá. Při kompilaci projektu se tyto soubory přidají do spustitelného souboru hry. \\ \\
+Zbytek \hyperref[sec:program]{kapitoly 3} již bude obsahovat informace o souborech nacházejících se v adresáři \newline \textbf{SpaceInvaders/}. Budu tedy předpokládat, že se v tomto adresáři pohybujeme a jeho název již budu vynechávat.
+\subsubsection{Game.cs}
+Součástí souboru je jádro celé hry, které obsahuje veškerou logiku herního módu. Tento soubor je jednoznačně nejdůležitějším a největším ze všech souborů projektu. Jeho popis je rozdělen do několika částí, z nichž v každé bude rozebráno několik důležitých a ne zcela jednoduše uchopitelných celků souboru. \\ \\
+V této části se vyskytuje několik seznamů, ať už proměnných nebo metod, jejichž pořadí je stejné jako jejich pořadí deklarace v programu.
+\paragraph{Hlavní smyčka} Každá hra potřebuje nějakou hlavní smyčku, ve které se skokově aktualizuje herní prostředí. V této hře to má na starosti časovač \texttt{drawingTimer} s nastaveným intervalem tiknutí na 15ms. Při tiknutí se zavolá metoda \texttt{drawingTimer\_Elapsed}, kde se herní plocha překreslí a o odpovídající vzdálenost se posunou jednotlivé objekty. Dále se zde řeší veškeré kolize prvků, které mohou nastat. 
+\paragraph{Vlastnosti}
+\begin{itemize}
+	\item[--] \texttt{Form1 Form \{ get; \}} \quad formulář aplikace nad kterým je spuštěna hra
+	\item[--] \texttt{int Life \{ get; private set; \} = 5;} \quad obsahuje zbývající počet životů
+	\item[--] \texttt{int Level \{ get... set... \}} \quad aktuální úroveň hry
+	\item[--] \texttt{int Score \{ get... set... \}} \quad současné skóre
+\end{itemize}
+\paragraph{Proměnné}
+\begin{itemize}
+	\item[--] \texttt{List<PointF> tankMissiles} \quad kolekce střel tanku, střela je uložena bodem s největší hodnotou souřadnice Y
+	\item[--] \texttt{List<PointF> explosions} \quad obsahuje pozice padlých invaderů u kterých se ještě objevuje posmrtný efekt tj. \hyperref[fig:invader_eliminated_pic]{obrázek 9}
+	\item[--] \texttt{List<PointF> explosionsSafe} \quad obdobné jako bod výše, jenom z této kolekce se posmrtný efekt vykresluje, aby nedošlo k synchronizačním problémům
+    \item[--] \texttt{List<PointF> invadersMissiles} \quad součástí jsou střely pocházející od invaderů, uloženy jsou bodem s nejmenší hodnotou Y
+    \item[--] \texttt{List<PointF> invadersMissilesSafe} \quad obdobné jako \texttt{explosionsSafe}
+    \item[--] \texttt{List<Invader> invaders} \quad seznam všech střílecích invaderů
+    \item[--] \texttt{List<Barrier> barriers} \quad kolekce bariér
+    \item[--] \texttt{List<RectangleF> bottomLine} \quad jednotlivé obdélníčky tvořící spodní zelenou čáru
+    \item[--] \texttt{PointF? mysteryLocation} \quad pozice mysteryho, \texttt{null} pokud žádný mystery není na herní ploše
+    \item[--] \texttt{PointF? mysteryExplosion} \quad obdobné jako \texttt{explosions}, pouze pro mysteryho
+    \item[--] \texttt{PointF tankLocation} \quad souřadnice tanku
+    \item[--] \texttt{Timer mysteryExplosionTimer} \quad časovač, který tikne když by měl posmrtný efekt mysteryho zmizet
+    \item[--] \texttt{Timer drawingTimer} \quad časovač hlavní smyčky
+    \item[--] \texttt{Timer mysteryShouldAppearTimer} \quad tik nastane, když by se měl objevit nový mystery, interval tohoto časovače je nastaven jako \texttt{random.Next(10000, 20000)}
+    \item[--] \texttt{Timer invadersShouldMoveTimer} \quad  má na starost pochod invaze
+    \item[--] \texttt{Timer explosionsTimer} \quad obdobné jako \texttt{mysteryExplosionTimer}, jenom pro střílecí nepřátele z invaze
+    \item[--] \texttt{Timer invadersShouldShootTimer} \quad při tiku vystřelí 1 až 3 invadeři v závislosti\break na náhodném generátoru
+    \item[--] \texttt{Timer tankExplosionTimer} \quad tikne potom, co jsme 300ms viděli ruiny našeho předchozího tanku, umístí na náhodnou pozici tank nový a dá mu na 3s imunitu
+    \item[--] \texttt{Timer immunityTimer} \quad tento časovač naopak tikne, když jsme si imunitu užívali 3s\break a sebere nám ji
+    \item[--] \texttt{Timer tankCanShootTimer} \quad po výstřelu tank 1s nabíjí, časovač tikne, když tank už nabil a může opět střílet
+    \item[--] \texttt{bool canTankShoot} \quad \textit{flag} indikující zda tank může střílet, po výstřelu je nastaven\break na \texttt{false}, následně ho na \texttt{true} nastaví \texttt{tankCanShootTimer} po uplynutí doby nutné\break na nabití
+    \item[--] \texttt{bool keyLArrow, keyRArrow, keySpace} \quad obsahují \texttt{true} pokud je daná klávesa stisknuta, v opačném případě \texttt{false}
+    \item[--] \texttt{bool invadersMovingRight} \quad směr kterým pochoduje invaze
+    \item[--] \texttt{bool lckMovement} \quad zámek na pohyb invaze, využívá se pokud invaze dojde na kraj herní plochy, před sestoupením invaze je totiž menší prodleva
+    \item[--] \texttt{bool lockingToken} \quad udává pokud právě probíhá vykonávání kódu metody\newline \texttt{drawingTimer\_Elapsed}
+    \item[--] \texttt{bool shouldDrawTank} \quad udává zda-li se má vykreslovat tank, nebo jeho ruiny
+    \item[--] \texttt{bool immunity} \quad \textit{flag}, v kterém je uloženo zda je imunita tanku aktivní
+    \item[--] \texttt{bool forcePause} \quad zajišťuje funkci pauzy v případě pozastavení hry hráčem v okamžiku, kdy se právě zobrazovaly ruiny tanku
+    \item[--] \texttt{bool paused} \quad byla hra pozastavena hráčem stisknutím klávesy \texttt{p}?
+    \item[--] \texttt{bool endGame} \quad nastal konec hry?
+    \item[--] \texttt{bool enableExtraSpeed} \quad indikuje aktivaci nastavení nejvyšší rychlosti pohybu invaderů, tato hodnota se nastavuje na \texttt{true}, pokud na hracím poli zbývá pouze jeden invader
+    \item[--] \texttt{bool enemyShootingDisabled} \quad udává zapnutí/vypnutí cheatu, kdy nepřátelé přestanou střílet
+    \item[--] \texttt{bool barrierDestroyedPlayed} \quad nastaven na \texttt{true}, pokud byla přehrána znělka \ref{item:barrier_destroyed}, jinak je \texttt{false}
+    \item[--] \texttt{int mysterySpeed} \quad rychlost prolétajícího mysteryho, jedná se o náhodně generovanou hodnotu $x$ z intervalu 3 až 10 znamenající rychlost $x$\,px za 15ms
+    \item[--] \texttt{int movementAccelerationMs} \quad při sestupu invaze se interval časovače\newline \texttt{invadersShouldMoveTimer} sníží o hodnotu \texttt{movementAccelerationMs}, pochod se tedy zrychlí
+    \item[--] \texttt{int greenLineY} \quad souřadnice Y spodní zelené čáry, její hodnota se spočítá na základě velikosti okna
+    \item[--] \texttt{double shootingPrecision} \quad pravděpodobnost "inteligentního" výběru střelce tj. výběr střelce, který má šanci zasáhnout tank
+    \item[--] \texttt{double invadersShouldMoveOriginalInterval} \quad při sestupu invaze se na chvíli změní hodnota intervalu časovače \texttt{invadersShouldMove} pro docílení menší prodlevy při sestupování invaze, poté je třeba obnovit původní hodnotu intervalu časovače, ta se uloží\break do proměnné \texttt{invadersShouldMoveOriginalInterval}
+    \item[--] \texttt{float bottomInvaderY} \quad souřadnice Y invadera s největší hodnotou této souřadnice, užitečné to je pro detekci, zda se už invadeři nedostali příliš blízko a nemělo by dojít\break k instantnímu zničení bariér
+    \item[--] \texttt{float barrierY} \quad souřadnice Y bariéry, její hodnota je závislá na velikosti okna
+    \item[--] \texttt{float splashRadius} \quad poloměr značící maximální vzdálenost od bodu střetu střely\break s bariérou a zbytkem bariéry, kde může dojít k jejímu poškození
+    \item[--] \texttt{StopWatch immunityStopwatch} \quad pokud by hra byla pozastavena během imunity tanku, nikdy by nedošlo k tiku časovače \texttt{immunityTimer}, protože při pozastavení hry se všechny časovače zakazují, to znamená, že se nám znovu resetuje imunita na 3s. Jde o nežádoucí efekt a ten řeší tyto stopky, které zaznamenají již uplynulý čas imunity, interval \newline\texttt{immunityTimer}u se o naměřený čas zkrátí
+    \item[--] \texttt{Random random} \quad náhoda se vždy hodí, ať už se jedná o výběr střelce, rychlost mysteryho nebo místo, kde se po zasažení objeví nový tank
+\end{itemize}
+\paragraph{Konstrukce objektu Game}
+Během vytváření instance třídy se v následujícím pořadí provede:
+\begin{itemize}
+	\item[--] inicializace časovače hlavní smyčky,
+	\item[--] registrace potřebných událostí \texttt{Form1},
+	\begin{itemize}
+		\item \texttt{Paint} \quad vykresluje herní plochu
+		\item \texttt{Resize} \quad pozastaví hru při minimalizaci okna
+		\item \texttt{KeyDown} \quad nastaví stisk všech kláves na \texttt{true}
+    	\item \texttt{KeyUp} \quad nastaví stisk všech kláves na \texttt{false}
+		\item \texttt{Deactivate} \quad pozastaví hru při ztrátě \textit{focus}u
+	\end{itemize}
+    \item[--] vytvoření bariér,
+    \item[--] vytvoření spodní zelené čáry, tj. čára nacházející se těsně pod tankem
+    \begin{figure}[H]
+    	\centering
+   \textcolor{white}{,,}\includegraphics[scale=1]{green_bottom_line.png} ,
+    \caption{spodní zelená čára}
+     \end{figure}
+    \item[--] registrace událostí všech ostatních časovačů,
+    \item[--] spuštění 1. úrovně hry.
+\end{itemize}
+\paragraph{Uvolnění objektu Game}
+Uvolnění objektu probíhá následovně:
+\begin{enumerate}
+	\item zastaví se všechny časovače,
+	\item překreslí se okno hry,
+	\item zobrazí se konec hry,
+	\item uvolní se objekt \texttt{Game} zavoláním metody \texttt{Dispose}.
+\end{enumerate}
+\paragraph{Veřejné metody} Třída obsahuje pouze 2 veřejné metody a to sice:
+\begin{itemize}
+	\item[--] \texttt{CheatKey}, jenž je volána z přetížené metody \texttt{ProcessCmdKey}, metoda \texttt{CheatKey} zjistí zda byla stisknuta klávesa, která aktivuje cheat, a v případě, že ano, tak zavolá metody, které cheat aktivují,
+	\item[--] \texttt{End}, ta zastaví všechny časovače, zobrazí konec hry a uvolní objekt \texttt{Game}.
+\end{itemize}
+\paragraph{Soukromé metody}
+Oproti veřejným metodám je soukromých o poznání více. Některé\break na vstupu dostávají více parametrů a nemusí být zcela jasné k čemu slouží. Všechny metody, kde hrozí zmatení ze vstupních parametrů, je mají popsány. Z popisu je vynechán návratový typ \texttt{void}, události formuláře a události časovačů které byly popsány v rámci popisů časovačů jako proměnných.
+%
+\begin{itemize}
+	\item[--] \texttt{GenerateBarrier()} \quad $3 \times$ zavolá metodu \texttt{CreateBarrier}, což odpovídá počtu bariér\break na herní ploše
+	\item[--] \texttt{PutTextIntoControl(int value, Label l)} \quad bezpečně aktualizuje vlastnost WinForms komponent \texttt{Text} z jiného vlákna
+	\item[--] \texttt{PrepareForMovingDown()} \quad zajišťuje menší prodlevu při sestupu invaze, dochází tu\break ke změně tiku časovače \texttt{invadersShouldMoveTimer} a k nastavení zámku pohybu \texttt{lckMovement}
+	\item[--] \texttt{MovingDown()} \quad po zavolání metody \texttt{PrepareForMovingDown} se vykoná kód této metody, ta zajistí posun všech invaderů a úpravu intervalu časovačů
+	\item[--] \texttt{Invader RightInvader()} \quad vrátí invadera z kolekce \texttt{invaders} s největší hodnotou\break souřadnice X
+    \item[--] \texttt{Invader LeftInvader()} \quad oproti předchozímu bodu, tato metoda vrátí invadera s nejmenší hodnotou souřadnice X, tyto dvě metody společně se hodí k detekci zda-li se invaze\break už nedostala na kraj herní plochy
+    \item[--] \texttt{CreateBottomLine()} \quad naplní proměnnou \texttt{bottomLine} obdélníčky tvořícími spodní zelenou čáru
+    \item[--] \texttt{CreateBarrier(PointF origin, float w, float h, int partN, ref Barrier b)} \newline naplní prázdnou bariéru předanou referencí obdélníčky 
+        \begin{enumerate}[label={\arabic*. parametr},leftmargin=0.95in]
+    	\item \quad pozice levého horního rohu bariéry
+    	\item \quad šířka bariéry
+    	\item \quad výška bariéry
+    	\item \quad bariéra se vytváří po jednotlivých částech, tento parametr určuje část,\newline\phantom{\quad}která je právě vytvářena, standardně by tato metoda měla být volána\newline\phantom{\quad}s tímto parametrem nastaveným na 1
+    	\begin{figure}[H]
+    		\centering
+    		\includegraphics[scale=0.6]{parts_of_barrier.png}
+    		\caption{části bariéry}
+    	\end{figure}
+    	\item \quad bariéra, která se naplní obdélníčky
+    \end{enumerate}
+    \item[--] \texttt{SmallShootingSpeedIncrease()} \quad tato metoda je volána po zásahu invadera pro 5ms zrychlení tiku časovače \texttt{invadersShouldShootTimer}
+    \item[--] \texttt{DisableAllTimers()} \quad pomocí reflexe metoda zastaví všechy časovače
+    \item[--] \texttt{bool CollisionWithBarrier(PointF missile, Barrier barrier, out int columnIdx, bool fromInvader)} \quad návratová hodnota určuje, jestli došlo ke kolizi bariéry na vstupu a \texttt{missile}
+    \begin{enumerate}[label={\arabic*. parametr},leftmargin=0.95in]
+    	\item \quad střela
+    	\item \quad bariéra 
+    	\item \quad pokud metoda vrátí \texttt{true}, tak do 3. parametru uloží index sloupce bariéry, \phantom{\quad}kde došlo ke kolizi
+    	\item \quad indikátor původce střely
+    \end{enumerate}
+    \item[--] \texttt{SplashDamage(PointF impactPoint, Barrier barrier, int columnIdx, \newline bool fromInvader)} \quad aplikuje plošené poškození bariéry vymazáním příslušných čtverečků tvořících bariéru
+    \begin{enumerate}[label={\arabic*. parametr},leftmargin=0.95in]
+    	\item \quad bod bariéry, který byl zasažen střelou
+    	\item \quad objekt zasažené bariéry
+    	\item \quad index sloupce bariéry, v kterém se nachází \texttt{impactPoint}
+    	\item \quad pochází střela zasahující bariéru od invadera?
+    \end{enumerate}
+    \item[--] \texttt{ShowTankExplosion()} \quad bez zobrazení zprávy o tom, že by hra byla pozastavena ji pozastaví, během té doby nastaví několik \textit{flag}ů, díky kterým se budou vykreslovat ruiny tanku, pauzu pak zruší \texttt{tankExplosionTimer}, který tato metoda aktivuje, časovač pak\break v okamžiku tiku nastaví tank imunním a zruší pozastavení
+    \item[--] \texttt{NextLevel()} \quad zvýšení úrovně hry, úprava intervalů časovačů pro zvýšení obtížnosti
+    \item[--] \texttt{List<Invader> NClosestInvaders(int n)} \quad vrátí seznam $N$ invaderů takových,\break aby platilo, že vzdálenost souřadnice X invadera a tanku je minimální
+    \item[--] \texttt{int InvaderComparator(Invader i1, Invader i2)} \quad komparátor, díky kterému je možné seřadit kolekci invaderů podle vzdáleností souřadnice X invadera a tanku, to se hodí\break v případě, že chceme vybrat vhodné střelce
+    \item[--] \texttt{MakeInvaderShootMissile(Invader invader)} \quad na vstupu dostane instanci třídy \texttt{Invader}, metoda přidá do kolekce \texttt{invadersMissiles} novou střelu s nastavenou pozicí tak, aby vypadala, jako že pochází od invadera na vstupu
+    \item[--] \texttt{GenerateInvadersForLevel()} \quad naplní seznam \texttt{invaders} armádou nových invaderů
+    \item[--] \texttt{UpdateBottomInvader()} \quad zaktualizuje proměnnou \texttt{bottomInvaderY}
+    \item[--] \texttt{ShowNormalExplosion(PointF invaderLocation)} \quad na vstupu dostane pozici padlého invadera, metoda zajistí, aby se na této pozici zobrazila posmrtná exploze přidáním této pozice do kolekce \texttt{explosions}
+    \item[--] \texttt{ShowMysteryExplosion()} \quad obdobné jako \texttt{ShowNormalExplosion}, pouze verze pro mysteryho
+    \item[--] \texttt{PauseWOMsg()} \quad zastavení hry bez zobrazení nápisu "PAUSED", hodí se pro vytvoření menší prodlevy při zásahu tanku a 300ms zobrazení jeho ruin
+    \item[--] \texttt{PauseGameWMsg()} \quad standardní zastavení hry vyvolané uživatelem stisknutím klávesy \texttt{p}
+    \item[--] \texttt{ResumeGame()} \quad spustí všechy časovače a zajistí pokračování hry
+    
+\end{itemize}
+\subsubsection{Form1.cs}
+Jediný formulář hry, spouští se hned po startu aplikace. Během startu programu se nejprve nastaví ikonka aplikace, poté se všem \texttt{Label}ům nastaví písmo Space Invaders viz
+\hyperref[codefig:setting_space_invaders_font]{Ukázka kódu 1}. Jako poslední se spustí hudba \ref{item:menu_music}, která hraje ve smyčce. \\ \\
+Po startu hry se zobrazí již nám známé (z části \ref{subsub_sec:authenticity}) menu aplikace s jedním tlačítkem\break pro spuštění hry. Kód tohoto souboru obsahuje logiku pro reakci aplikace při interakci s tlačítkem. Jmenovitě se jedná o metody:
+\begin{itemize}
+	\item[--] \texttt{playLabel\_MouseClick} sloužící ke spuštení herního módu,
+	\item[--] \texttt{clickableLabel\_MouseMove}, \texttt{clickableLabel\_MouseLeave} měnící barvu textu a vzhled kurzoru při přejetí myší.
+\end{itemize}
+Další metody:
+\begin{itemize}
+	\item[--] \texttt{SetGameMode},
+	\item[--] \texttt{EnableResizing}, \texttt{DisableResizing},
+	\item[--] \texttt{SetScoreAndLevelLabelVisibility},
+	\item[--] \texttt{SetMenuVisibility},
+	\item[--] \texttt{ShowGameOver}
+\end{itemize}
+upravují uživatelské rozhraní při přechodu módů (menu, hra, konec hry). \\ \\
+Pokud se program nachází ve hře, potřebuje se dozvědět případné stisknuté klávesy. K tomu slouží přetížená metoda \texttt{ProcessCmdKey}, která volá instanční metodu \texttt{CheatKey}, jež náleží objektu \texttt{Game}.
+\subsubsection{ScoreTableUC.cs}
+Jedná se o seskupení 16 WinForms komponent na obrázku do logického celku.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.4]{score_table_uc.png}
+	\caption{uživatelská komponenta ScoreTableUC}
+\end{figure}
+\noindent
+Jedinou věcí, kterou má tento celek na starost, je nastavení písma Space Invaders všem jeho\break 12 \texttt{Label}ům. To je naštěstí v \Csharp\ primitivní:
+\begin{codefigure}[H]
+	\centering
+\begin{BVerbatim}
+foreach (Control c in Controls)
+{
+   if (c is Label)
+      Utils.ChangeFontToSpaceInvaders(c);
+}.
+\end{BVerbatim}
+\caption{nastavení písma Space Invaders všem \texttt{Label}ům}
+\label{codefig:setting_space_invaders_font}
+%\vspace{-1.4cm}
+\end{codefigure}
+\subsubsection{Invader.cs}
+Soubor Invader.cs obsahuje hned 4 třídy. Jejich vztah je následující:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[every tree node/.style=draw,level 1/.style={sibling distance=10mm}]
+\tikzset{level distance=50pt}
+\Tree [.{\texttt{abstract Invader}}
+[.{\texttt{TopInvader}} ]
+[.{\texttt{MiddleInvader}} ]
+[.{\texttt{BottomInvader}}
+]
+]
+\end{tikzpicture}
+%\captionsetup{textformat=empty,labelformat=blank}
+\caption{vztah tříd v souboru Invader.cs}
+\end{figure}
+\noindent
+Bázová třída obsahuje několik vlastností, z nichž většina je virtuálních. Nevirtuální jsou pouze 2 a jedná se o \texttt{Location} a \texttt{State}. První vlastnost je typu \texttt{PointF} a tedy určuje pozici invadera. Druhá je typu \texttt{bool} a její hodnota definuje stav invadera, více o stavech v části \ref{subsub_sec:models}. \\ \\
+Mezi virtuální vlastnosti patří:
+\begin{itemize}
+	\item[--] \texttt{int ScoreGain}, což je skóre, které získáme při eliminaci invadera,
+	\item[--] \texttt{Image Look1}, \texttt{Image Look2}, každá z těchto vlastností obsahuje obrázek invadera v jednom stavu,
+	\item[--] \texttt{int Width}, \texttt{int Height} obsahující šířku a výšku obrázku invadera, což je v pořádku, protože všechny obrázky jednoho invadera mají stejné rozměry.
+\end{itemize}
+Co se týče metod, tak zde není potřeba využívat polymorfismus, protože invadeři pochodují společně a vždy se posunou o stejnou vzdálenost. Bázová třída obsahuje metody:
+\begin{itemize}
+	\item[--] \texttt{Image ActiveLook()}, ta vrací aktuální obrázek invadera podle jeho stavu,
+	\item[--] \texttt{void SwapState()} prohazující stav invadera,
+	\item[--] \texttt{void MoveLeft()}, \texttt{void MoveRight()}, obě dvě nejprve zavolají metodu \texttt{SwapState}, poté změní pozici invadera příslušným směrem o krok,
+	\item[--] \texttt{void MoveDown(int lvl)}, která vyžaduje jako vstupní parameter úroveň hry, podle parametru se nastaví velikost kroku, který invader udělá.
+\end{itemize}
+Žádné další nezmíněné vlastnosti ani metody nejsou obsaženy v žádném z potomků bázové třídy. Samozřejmě všechny virtuální vlastnosti a metody jsou patřičně přetíženy.
+\subsubsection{Barrier.cs}
+Již bylo zmíněno v uživatelské části, že každá bariéra se skládá ze čtverečků o rozměru $5\times5$ vykreslovaných po sloupcích. Bude se tedy hodit čtverečky uskupit po sloupcích hlavně kvůli implementaci plošného poškození. Soubor vypadá následovně:
+\begin{codefigure}[H]
+	\centering
+\begin{BVerbatim}
+class Barrier
+{
+   public List<Column> Columns { get; set; } = new List<Column>();
+   public float TopY { get; set; } = float.MaxValue;
+}
+
+class Column
+{
+   public List<RectangleF> Rectangles { get; set; } = new List<RectangleF>();
+}
+\end{BVerbatim}
+%\captionsetup{textformat=empty,labelformat=blank}
+\caption{soubor Barrier.cs}
+%\vspace{-1.4cm}
+\end{codefigure}
+\noindent
+Poslední vlastnost s zatím nejasnou funkcí je \texttt{TopY}, do ní se ukládá souřadnice Y čtverečku\break s největší hodnotou Y. To se hodí v případě, kdy by nepřátelé měli instantně zničit bariéru. \\ \\
+Další informace o bariéře se nachází v části \ref{subsub_sec:barrier}.
+\subsubsection{Constants.cs}
+V tomto souboru můžeme nalézt několik proměnných, jejichž hodnota se nikdy nemění. Jde např. o délku střely tanku, dobu po kterou je tank imunní, rozměr čtverečků tvořících bariéry a další...
+\subsubsection{ExtensionMethods.cs}
+Jak již je z názvu patrné, zde se nacházejí metody, které "zvenčí" rozšiřují instanční metody třídy. Přesněji řečeno v tomto souboru se nachází pouze jedna metoda a tou je \texttt{DrawInvader}.
+\begin{codefigure}[H]
+\centering
+\begin{BVerbatim}
+public static void DrawInvader(this Graphics g, Invader invader)
+{
+   g.DrawImage(invader.ActiveLook(), invader.Location);
+}
+\end{BVerbatim}
+\caption{metoda \texttt{DrawInvader}}
+%\vspace{-1.4cm}
+\end{codefigure}
+\noindent
+Na pozici invadera se vykreslí obrázek reprezentující invadera v závislosti na jeho aktuálním stavu.
+\subsubsection{Utils.cs}
+Pro případy, kdy využití statické třídy je přehlednější a dává smysl oproti vymýšlení \textit{extension metod}, je tu soubor Utils.cs. V něm je možné nalézt klasické metody, jako např. vzdálenost dvou bodů nebo jestli se bod nachází uvnitř obdélníku. \\ \\ O něco zajímavější je metoda \texttt{Play} \ref{item:play}, která na svém vstupu dostane \texttt{UnmanagedMemoryStream}. Tento proud dat bude reprezentovat zvuková data a ta se přehrají pomocí \texttt{SoundPlayer}u. \\ \\
+Dále se zde nachází dvojce metod umožňující nastavit komponentě WinForms písmo Space Invaders, jmenovitě: \texttt{InitSpaceInvadersFont} a \texttt{ChangeFontToSpaceInvaders} viz \ref{item:font}. \\ \\ Poslední dvě metody \texttt{TopOfTankMissile} a \texttt{BottomOfInvaderMissile} mají symetrické chování. Obě na vstupu dostanou bod a vrátí bod. Nejprve se zaměřím na první metodu, ta bude\break na vstupu dostávat střely z tanku. Střela, znázorněná na následujícím obrázku, je uložena\break v paměti bodem \textbf{(1)}. Pokud metoda na vstup dostane bod \textbf{(1)}, vrátí bod \textbf{(2)}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.2]{tank_missile.png}
+	\caption{zvětšená střela z tanku}
+\end{figure}
+\noindent
+Symetricky pro druhou metodu, střela od invadera je uložena v paměti bodem \textbf{\{1\}}. Pokud dostane na vstup bod \textbf{\{1\}}, vrátí bod \textbf{\{2\}}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{invader_missile.png}
+	\caption{zvětšená střela od invadera (invertované barvy)}
+\end{figure}
+\noindent
+\subsubsection{Další soubory}
+\paragraph{App.config}
+XML soubor obsahující verzi prostředí .NET Framework nutnou ke spuštění hry.
+\paragraph{SpaceInvaders.csproj} Opět XML soubor, jeho součástí jsou informace o souborech přítomných v projektu Visual Studia.
+\pagebreak
+\section{Závěr}
+Povedlo se mi implementovat hru Space Invaders v takovém rozsahu, v jakém jsem si ji představoval. GDI+ je plně dostačující pro vytvoření grafiky takovéto hry. Nejedná se ale o žádného "rychlíka". Použitím DirectX nebo OpenGL bych mohl snížit zatížení procesoru přesunutím výpočtů\break na grafickou kartu. Na druhou stranu práce s GDI+ je velmi jednoduchá. \\ \\
+Dále by bylo zajimavé rozšířit hru o:
+\begin{itemize}
+	\item[--] různá rozestavení invaze nepřátel v závislosti na úrovni hry,
+	\item[--] "padání" bonusů z padlých nepřátel (inspirace z Arkanoidu).
+\end{itemize}
+\newpage
+\listoffigures
+\listofsheetfigures
+\listofcodefigures
+\pagebreak
+\section*{Zdroje}
+    \paragraph{Grafické modely}
+    Veškeré grafické modely byly vystříhány z her Space Invaders a upraveny v Adobe Photoshop.
+    \paragraph{Autentičnost hry}
+    Písmo Space Invaders, který celá hra používá obzvlášť zlepšil herní zážitek.
+    \begin{enumerate}[label={[\arabic*]}]
+    	\item space\_invaders.ttf \label{item:space_invaders}
+    	\begin{enumerate}[label=]
+    		\item \url{https://fonts2u.com/download/space-invaders-regular.font}
+    	\end{enumerate}
+    \end{enumerate}
+    \paragraph{Informace o hře Space Invaders}
+    Nějaké obecné informace o hře se mi hodily zejména\break pro napsání \texttt{\hyperref[sec:about_space_invaders]{kapitoly 1}} a usnadnily mi výběr zápočtového programu.
+    \begin{enumerate}[label={[\arabic*]}]
+  		\setcounter{enumi}{1}
+    	\item anglická wikipedie
+    	\begin{itemize}[label=]
+    		\item \url{https://en.wikipedia.org/wiki/Space_Invaders}
+    	\end{itemize}
+        \item různé pohledy a ukázky ze hry na youtube
+       	\begin{itemize}[label=]
+       		\item \url{https://www.youtube.com/watch?v=D1jZaIPeD5w}
+       		\item \url{https://www.youtube.com/watch?v=UZlEXl9xgR8}
+       		\item \url{https://www.youtube.com/watch?v=MU4psw3ccUI}
+       \end{itemize}
+    \end{enumerate}
+    \paragraph{C\# inženýrské věci}
+    Během vývoje hry jsem si zaznamenával kolikrát, a co jsem sháněl jak udělat  (kde jinde než na stackoverflow \Winkey).
+    \begin{enumerate}[label={[\arabic*]}]
+  		\setcounter{enumi}{3}
+    	\item jak použít externí font ve WinForms \label{item:font}
+   	    \begin{itemize}[label=]
+   	    	\item \url{https://stackoverflow.com/questions/1297264/using-custom-fonts-on-a-label-on-winforms}
+      	\end{itemize}
+      \item jak spustit zvukovou nahrávku \label{item:play}
+      \begin{itemize}[label=]
+      	\item \url{https://stackoverflow.com/questions/3502311/how-to-play-a-sound-in-c-net}
+      \end{itemize}
+      \item jak spojit všechny \texttt{List<T>} do jednoho pomocí LINQ
+      \begin{enumerate}[label=]
+      	\item \url{https://stackoverflow.com/questions/1191054/how-to-merge-a-list-of-lists-with-same-type-of-items-to-a-single-list-of-items}
+      \end{enumerate}
+      \item jak používat resources 
+      \begin{enumerate}[label=]
+      	\item \url{https://stackoverflow.com/questions/90697/how-to-create-and-use-resources-in-net}
+      \end{enumerate}
+      \item jak zjistit, že okno ztratilo \textit{focus}
+      \begin{enumerate}[label=]
+      	\item \url{https://stackoverflow.com/questions/570021/forms-lost-focus-in-c-sharp/570045}
+      \end{enumerate}
+      \item jak updatovat GUI z jiného threadu
+      \begin{enumerate}[label=]
+      	\item \url{https://stackoverflow.com/questions/10775367/cross-thread-operation-not-valid-control-textbox1-accessed-from-a-thread-othe}
+      \end{enumerate}
+     \pagebreak
+     \item jak vytvořit cyklus přes všechny proměnné objektu
+     \begin{itemize}[label=]
+     	\item \url{https://stackoverflow.com/questions/9893028/c-sharp-foreach-property-in-object-is-there-a-simple-way-of-doing-this}
+     	\item \url{https://stackoverflow.com/questions/7649324/c-sharp-reflection-get-field-values-from-a-simple-class}
+     \end{itemize}
+     \item jak zjistit, zda-li se dva obdélníky překrývají
+     \begin{itemize}[label=]
+     	\item \url{https://stackoverflow.com/questions/14662796/check-if-two-areas-are-in-contact}
+     \end{itemize}
+     \item jak spočítat počet řádek kódu celého VS projektu
+     \begin{itemize}[label=]
+     	\item \url{https://stackoverflow.com/questions/1244729/how-do-you-count-the-lines-of-code-in-a-visual-studio-solution}
+     \end{itemize}
+     \item proč se nevolá událost \texttt{KeyDown}
+     \begin{itemize}[label=]
+     	\item \url{https://stackoverflow.com/questions/3172731/forms-not-responding-to-keydown-events}
+     \end{itemize}
+    \end{enumerate}
+	\paragraph{Zvukové soubory}
+\begin{enumerate}[label={[\arabic*]}]
+	\setcounter{enumi}{13}
+	\item hudba v menu  \label{item:menu_music}
+	\begin{itemize}[label=]
+		\item \url{https://www.youtube.com/watch?v=8teuyCYeDxQ}
+	\end{itemize}
+	\item výstřel z tanku \label{item:tank_shoot}
+	\begin{itemize}[label=]
+		\item \url{http://www.classicgaming.cc/classics/space-invaders/files/sounds/shoot.zip}
+	\end{itemize}
+    \item eliminace invadera \label{item:invader_elimination}
+    \begin{itemize}[label=]
+    	\item \url{http://www.classicgaming.cc/classics/space-invaders/files/sounds/invaderkilled.zip}
+    \end{itemize}
+   \item eliminace mysteryho \label{item:mystery_elimination} 
+   \begin{enumerate}[label=]
+   	\item \url{http://www.classicgaming.cc/classics/space-invaders/files/sounds/ufo_highpitch.zip}
+   \end{enumerate}
+   \item průlet mysteryho \label{item:mystery_flying}
+   \begin{enumerate}[label=]
+   	\item \url{http://www.classicgaming.cc/classics/space-invaders/files/sounds/ufo_lowpitch.zip}
+   \end{enumerate}
+   \item zásah tanku \label{item:tank_hit}
+   \begin{enumerate}[label=]
+   	\item \url{http://www.classicgaming.cc/classics/space-invaders/files/sounds/explosion.zip}
+   \end{enumerate}
+	\item konec hry \label{item:gameover}
+	\begin{itemize}[label=]
+		\item \url{https://www.youtube.com/watch?v=AD0-L9L_NrM}
+	\end{itemize}
+    \item zničení bariéry \label{item:barrier_destroyed}
+    \begin{itemize}[label=]
+    	\item \url{https://uloz.to/!5878yRtYUY0C/barrier-destroyed-wav}
+    \end{itemize}
+\end{enumerate}
+\end{document}

@@ -1,0 +1,4 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -D CMAKE_C_COMPILER=/usr/bin/clang -D CMAKE_CXX_COMPILER=/usr/bin/clang++ -G "CodeBlocks - Unix Makefiles" /home/jakub/CLionProjects/Lsm
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/jakub/CLionProjects/Lsm/cmake-build-debug

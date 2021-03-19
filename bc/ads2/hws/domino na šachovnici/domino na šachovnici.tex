@@ -1,0 +1,214 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[11pt, a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage[linesnumbered,algoruled,boxed,lined]{algorithm2e}
+\SetKwInput{KwIn}{Vstup}
+\SetKwInput{KwResult}{Výstup}
+\SetAlgorithmName{Algoritmus}
+
+
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\newcommand{\thispageheader}[2][R]{\expandafter\def\csname header#1\endcsname{#2}}
+\captionsetup{labelformat=empty}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\begin{document}
+\pagestyle{fancy}
+\thispageheader[R]{Jakub Levý \footnotesize{(Usurituri)}} \noindent
+\section*{Domino na šachovnici}
+Problém půjde přeformulovat na hledání maximálního párování v bipartitním grafu.
+\subsection*{Značení}
+$[n] = \{1,2,...,n\}$
+\subsection*{Rozbor}
+Mějme na vstupu pole $grid$ rozměru $r \times s$. Pro $i \in [r]$ a $j \in [s]$ s~hodnotami:
+\[ 
+grid[i, j] =
+\begin{cases} 
+1 & \text{políčko na indexu } [i,j] \text{ je povolené} \\
+0 & \text{políčko na indexu } [i,j] \text{ je zakázané}
+\end{cases}
+\]
+\paragraph{Pozorování:}
+Pokud počet povolených políček je liché číslo\newline $\left( \sum_{i=1}^{r} \sum_{j=1}^{s} grid[i,j] = 2k+1 \text{ pro } k \in \mathbb{N}_0 \right)$, pak neexistuje žádné rozmístění kostek, které by pokrylo všechna políčka. Každá kostka musí pokrýt přesně $2$ políčka, tedy $1$ políčko nám vždy bude přebývat. 
+\\ \\
+Vytvoříme si z pole $grid$ graf $G = (V, E)$.
+\begin{itemize}
+	\item $V = \{ v_{i,j} \ | \ i \in [r] \ \wedge \ j \in [s] \ \wedge \ grid[i,j] = 1 \}$
+	\begin{itemize}[label=]
+		\item vrcholy budou pouze povolená políčka
+	\end{itemize}
+	\item $E = \{ \{v_{i,j}, v_{k,l}\} \ | \ i,k \in [r] \ \wedge \ j,l \in [s] \ \wedge \ |i-k| + |j-l| = 1 \ \wedge \ grid[i,j] = grid[k,l] = 1 \}$
+		\begin{itemize}[label=]
+		\item hrany budou mezi vrcholy jejichž:
+		\begin{itemize}
+			\item Manhattonská vzdálenost je právě 1
+			\item oba dva vrcholy jsou povolená políčka (jiná políčka v grafu ani nejsou)
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+Každá hrana grafu $G$ reprezentuje možnost položení kostky. Pokud kostku umístíme na hranu $e$, pokryjeme oba dva její vrcholy (políčka) tvořící hranu. Chceme "`pokrýt všechny vrcholy pomocí hran". To je definice perfektního párování.
+\paragraph{Def. (perfektní párování)} Nechť $G$ je graf a $m$ je párování v $G = (V, E)$. $m$ nazveme perfektním párováním v grafu $G$ pokud $\displaystyle \left| \bigcup_{e \in m} e \right| = |V|$. \\ \\ \\
+Tohle přesně odpovídá našemu pozorování. Graf s lichým počtem vrcholů nemůže mít perfektní párování. \\ \\
+Perfektní párování by se dalo najít třeba pomocí Edmonsova kytičkového algoritmu. Tímto způsobem bychom však nezískali příznivou časovou složitost. Problém je v tom, že graf $G$ považujeme za obecný graf, ačkoliv se jedná o graf bipartitní. \\ \\
+Mějme dáno pole $grid$, které si můžeme představit jako mřížku:
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\draw[step=1cm,gray, thin] (-2,-2) grid (2,2);
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (A) at (-1.5,1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (B) at (-0.5,1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (C) at (0.5,1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (D) at (1.5,1.5) {};
+	
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (E) at (-1.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (F) at (-0.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (G) at (0.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (H) at (1.5, 0.5) {};
+	
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (I) at (-1.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (J) at (-0.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (K) at (0.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (L) at (1.5, -0.5) {};
+	
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (M) at (-1.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (N) at (-0.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (O) at (0.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=black,scale=0.7] (P) at (1.5, -1.5) {};
+	
+	\begin{scope}[every edge/.style={thick, draw=black, thick}]
+	\path [-] (A) edge node {} (B);
+	\path [-] (A) edge node {} (E);
+	\path [-] (B) edge node {} (C);
+	\path [-] (C) edge node {} (D);
+	\path [-] (B) edge node {} (F);
+	\path [-] (C) edge node {} (G);
+	\path [-] (D) edge node {} (H);
+	\path [-] (E) edge node {} (F);
+	\path [-] (F) edge node {} (G);
+	\path [-] (G) edge node {} (H);
+	
+	\path [-] (I) edge node {} (J);
+	\path [-] (J) edge node {} (K);
+	\path [-] (K) edge node {} (L);
+	\path [-] (I) edge node {} (E);
+	\path [-] (J) edge node {} (F);
+	\path [-] (K) edge node {} (G);
+	\path [-] (L) edge node {} (H);
+	\path [-] (M) edge node {} (N);
+	\path [-] (N) edge node {} (O);
+	\path [-] (O) edge node {} (P);
+	\path [-] (I) edge node {} (M);
+	\path [-] (J) edge node {} (N);
+	\path [-] (K) edge node {} (O);
+	\path [-] (L) edge node {} (P);
+	\end{scope}
+	\end{tikzpicture}
+	\caption*{pole \textit{grid} a odpovídající graf}
+\end{figure} \noindent
+\thispagestyle{plain}
+Předpokládejme, že žádná políčka zakázaná nejsou. To můžeme BÚNO, protože pokud nějaké políčko je zakázané, pak není v grafu žádný vrchol reprezentující zakázané políčko ani žádná hrana vedoucí do zakázaného políčka. Smazání vrcholu i s jeho hranami v bipartitním grafu neovlivní bipartitnost bipartitního grafu. \\ \\
+Zbývá najít rozdělení vrcholů do dvou partit. \textcolor{red}{Červené} vrcholy budou reprezentovat jednu partitu a \textcolor{blue}{modré} druhou.
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\draw[step=1cm,gray, thin] (-2,-2) grid (2,2);
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (A) at (-1.5,1.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (B) at (-0.5,1.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (C) at (0.5,1.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (D) at (1.5,1.5) {};
+	
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (E) at (-1.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (F) at (-0.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (G) at (0.5, 0.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (H) at (1.5, 0.5) {};
+	
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (I) at (-1.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (J) at (-0.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (K) at (0.5, -0.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (L) at (1.5, -0.5) {};
+	
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (M) at (-1.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (N) at (-0.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=blue,scale=0.7] (O) at (0.5, -1.5) {};
+	\node[shape=circle,draw=black,fill=red,scale=0.7] (P) at (1.5, -1.5) {};
+	
+	\begin{scope}[every edge/.style={thick, draw=black, thick}]
+	\path [-] (A) edge node {} (B);
+	\path [-] (A) edge node {} (E);
+	\path [-] (B) edge node {} (C);
+	\path [-] (C) edge node {} (D);
+	\path [-] (B) edge node {} (F);
+	\path [-] (C) edge node {} (G);
+	\path [-] (D) edge node {} (H);
+	\path [-] (E) edge node {} (F);
+	\path [-] (F) edge node {} (G);
+	\path [-] (G) edge node {} (H);
+	
+	\path [-] (I) edge node {} (J);
+	\path [-] (J) edge node {} (K);
+	\path [-] (K) edge node {} (L);
+	\path [-] (I) edge node {} (E);
+	\path [-] (J) edge node {} (F);
+	\path [-] (K) edge node {} (G);
+	\path [-] (L) edge node {} (H);
+	\path [-] (M) edge node {} (N);
+	\path [-] (N) edge node {} (O);
+	\path [-] (O) edge node {} (P);
+	\path [-] (I) edge node {} (M);
+	\path [-] (J) edge node {} (N);
+	\path [-] (K) edge node {} (O);
+	\path [-] (L) edge node {} (P);
+	\end{scope}
+	\end{tikzpicture}
+	\caption*{rozdělení vrcholů do partit}
+\end{figure} \noindent
+V grafu na obrázku platí, že hrany vedou pouze mezi vrcholy různé barvy, protože vrcholy stejné barvy leží na diagonálách. Tímto způsobem obarvování vrcholů po diagonálách se střídáním barvy je možné rozdělit vrcholy do dvou partit libovolně velkých mřížek. \\ \\
+Problém byl převeden na hledání perfektního párování v bipartitním grafu, pomocí toků v sítích dovedeme najít jenom maximální párování. Pokud obě partity jsou vyvážené, tyto koncepty splývají. V opačném případě, kdy byly zakázány nějaké vrcholy a partity nejsou vyváženy, neexistuje perfektní párování v bipartitním grafu. Po pokrytí všech vrcholů menší partity nám budou přebývat nepokryté vrcholy v druhé partitě, které už ale nemáme jak pokrýt.
+\subsection*{Pseudocode}
+\begin{algorithm}[H]
+	\KwIn{pole $grid$ rozměru $r \times s$}
+	\KwResult{množina hran, na které umístit kostky domina}
+	\textit{\#povolených} $\gets \sum_{i=1}^{r} \sum_{j=1}^{s} grid[i,j]$ \\
+	\If{\textit{\#povolených} \% 2 $\ne 0$}{
+		\Return{$\{\}$} \Comment{Není možné kostkami pokrýt lichý počet políček}
+	}
+	Vytvoříme graf $G = (V, E)$ z pole $grid$ viz Rozbor \\
+	Rozdělíme $V$ na dvě partity $X, Y$\\
+	\If{$|X| \ne |Y|$}{
+		\Return{$\{\}$} \Comment{Velikosti partit se liší, neexistuje perfektní párování}
+	}
+	\textit{výstup} $\gets$ hrany maximálního párování grafu $G$ \\
+	\Return{výstup}
+	\caption{Domino na šachovnici}
+\end{algorithm}
+\subsection*{Časová složitost}
+\begin{itemize}
+	\item Spočtení hodnoty proměnné \textit{\#povolených} stojí $\mathcal{O}(r\cdot s)$ času.
+	\item Pro vytvoření grafu opět potřebujeme projít celé pole, potřebujeme. $\mathcal{O}(r \cdot s)$.
+	\item Pro rozdělení vrcholů na dvě partity je nutné projít všechny vrcholy grafu. To stojí $\mathcal{O}(|V|) \in \mathcal{O}(r \cdot s)$.
+	\item Výpočet maximálního párování stojí $\mathcal{O}(|V| \cdot |E|)$ času. Počet hran je však lineární s počtem vrcholů. Platí tedy $\mathcal{O}(|V| \cdot |E|) \in \mathcal{O}(r^2 \cdot s^2)$
+\end{itemize}
+Výsledná časová složitost bude $\mathcal{O}(r^2 \cdot s^2)$.
+\thispagestyle{plain}
+\subsection*{Paměťová složitost}
+Vstup nebude počítán do paměťové složitosti. 
+\begin{itemize}
+	\item Na každý vrchol grafu $G$, kterých může být až $r\cdot s$, případě konstantně mnoho hran. Pro uložení grafu bude potřeba $\mathcal{O}(r\cdot s)$ paměti.
+	\item Maximální párování bude potřebovat $\mathcal{O}(|V| + |E|) \in \mathcal{O}(r \cdot s)$ paměti.
+\end{itemize}
+Celkově bude potřeba $\mathcal{O}(r\cdot s)$ paměti.
+\end{document}

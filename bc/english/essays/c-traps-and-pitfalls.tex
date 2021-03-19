@@ -1,0 +1,105 @@
+% !TeX spellcheck = en_US
+% !TeX program = lualatex
+\documentclass[12pt, a4paper,twoside]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usetikzlibrary{lindenmayersystems}
+\usepackage{float}
+\usepackage{subcaption}	
+\usepackage{enumitem}
+\usepackage[bottom,hang,flushmargin]{footmisc}
+\usepackage{unicode-math}
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+\usepackage{booktabs}
+
+\setmainfont{XITS} % you can use any other Times font if you wish
+\setmathfont{XITS Math}
+
+\setlength{\footnotesep}{1.5\baselineskip}
+
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\newcommand{\thispageheader}[2][R]{\expandafter\def\csname header#1\endcsname{#2}}
+\captionsetup{labelformat=empty}
+\setlength{\parindent}{0pt}
+
+\pgfdeclarelindenmayersystem{Koch curve}{
+	\rule{F -> F-F++F-F}}
+
+\linespread{1.7}
+
+\begin{document}
+	%\thispageheader[L]{Final Essay}
+	%\thispageheader[C]{English Wed 2}
+%	\thispageheader[R]{Jakub Levý} 
+	\fancypagestyle{mypagestyle}{%
+		\fancyhf{}% Clear header/footer
+		\fancyhead[OR]{Jakub Levý}% Author on Odd page, Centred
+		\fancyfoot[C]{\thepage}%
+		\renewcommand{\headrulewidth}{0pt}
+	}
+\pagestyle{mypagestyle}
+	
+	\begin{center}
+		\huge Summary
+	\end{center}
+	\vspace{0.5cm}
+	The specialized text is an excerpt from the book \textit{C Traps and Pitfalls} written by Andrew Koenig\footnote{a former AT\&T and Bell Labs researcher and programmer. Mostly known for his later work on C++ standards.}. The text contains introductory chapter 0, the whole content of the first two chapters and a small taste of the third chapter of the book. All of the chapters are oriented towards pitfalls every C programmer even experienced one, may get into.
+	\paragraph{Chapter 1 (Lexical pitfalls)} encompasses mainly the idea of techniques of lexical analysis that all C compilers implement. After reading this chapter a careful reader will be familiar with greedy lexical analysis and understand that \texttt{a---b} means the same as \texttt{a-- - b} rather than \mbox{\texttt{a- --b}}.
+	\paragraph{Chapter 2 (Syntactic pitfalls)} In the very beginning of this chapter a reader is introduced to a formal definition of C variable declaration as it turns out to be necessary for understanding complicated C types. The chapter continues with examples of pitfalls caused by the ignorance of operator priorities. The last section wraps the chapter up with mind-blowing pitfalls caused by superfluous/missing semicolons.
+	\paragraph{Chapter 3 (Semantic pitfalls)} starts with a brief overview of a notion of pointers and arrays and discusses the differences that may sometimes arise when mindlessly interchanging them. 
+	\pagebreak
+	\begin{center}
+		\huge Opinion
+	\end{center}
+	\vspace{0.5cm}
+	The first book I read from Andrew Koenig was \textit{Accelerated C++}\footnote{This book basically covers the same ground as the legendary C++ Primer (1k pages) but does so on a fourth of its space. This is particularly so because it does not attempt to be an introduction to programming, but an introduction to C++ for people who've previously programmed in some other language. It has a steeper learning curve, but, for those who can cope with this, it is a very compact introduction to the language.}, it was back in 2014. I immediately became fond of his writing style -- write less than others but cover the same. Even though the first reading is usually a bit dense, one can learn much faster.
+	\\ \\
+	On closer inspection, the typesetting of the text looks rather modern, but the book was published in 1989 which is quite a lot for a book about a certain programming language. A knowledgeable reader cannot just overlook that some of the presented pitfalls are not a problem any more thanks to the standardization committee that works hard and brings a better language to us every year. For example, one pitfall was presented by \texttt{a =/*b}. Although it might look like \texttt{a = /* b}, it is actually handled by a tokenizer quite differently -- it actually means \mbox{\texttt{a =/ *b}}. Unfortunately the last version of C language that used \texttt{/=} as an operator was so called \textit{K\&R C}\footnote{In 1978, Brian Kernighan and Dennis Ritchie published the first edition of The C Programming Language. This book, known to C programmers as K\&R, served for many years as an informal specification of the language. The version of C that it describes is commonly referred to as K\&R C.}. Later on, C language was standardized by \textit{ANSI}\footnote{ANSI = American National Standards Institute} and \texttt{=/} was superseded by \texttt{/=} and this pitfall vanished.
+	\\ \\
+	The previous paragraph indicates the presence of outdated pitfalls. Even though the book is 30 years old so far, there is still plenty of pitfalls that are still valid. My favorite is this one: \newpage
+	Suppose you were given the following piece of code to audit.
+	\begin{verbatim}
+	if(flag_A & flag_B) {
+	   //execute code here if the condition is satisfied
+	   ...
+	}
+	\end{verbatim}
+	This code is perfectly valid, but the condition looks mysterious to non-C programmers. It doesn't look like a proper condition even though it means: \\[8pt] if \texttt{flag\_A} \textit{bitwise\_and}\footnote{An example of bitwise\_and operation (values are in a binary representation): \begin{tabular}{cccccc}
+			\texttt{flag\_A =} &  & 1 & 0 & 0 & 1 \\
+			\texttt{flag\_B =} &  & 1 & 1 & 0 & 0 \\ \hline
+			\texttt{result =} &   & 1 & 0 & 0 & 0 \\
+	\end{tabular}} \texttt{flag\_B} \textcolor{blue}{is not equal to 0} then execute code shown as three dots. 
+	\\[8pt]
+	A good idea is to make this explicit so you might rewrite your code to:
+	\begin{Verbatim}[commandchars=\\\{\},xleftmargin=-1.7cm]
+	if(flag_A & flag_B \textcolor{blue}{!= 0}) \{
+           ...
+        \}
+	\end{Verbatim}
+	This statement is now easier to understand. It is also wrong, because \texttt{!=} binds more tightly than \texttt{\&}, so the interpretation is now:
+	\begin{verbatim}
+	if(flag_A & (flag_B != 0)) {
+	   ...
+	}
+	\end{verbatim}
+	What you had in mind must be written with explicit parentheses this way:
+	\begin{verbatim}
+	if((flag_A & flag_B) != 0) {
+	   ...
+	}
+	\end{verbatim}
+	Maybe that is the reason why the original code relied on implicit comparison with 0 and didn't use any explicit parentheses. \newpage
+	Overall this book is worth the time spent on if you consider yourself to be a C expert. Some examples are obsolete whereas others are not. I would definitely recommend it to anyone who is interested in historical problems of C language and history of programming in general, but I do not completely agree with a sentence from the preface "This book belongs on your shelf if you are using C at all seriously even if you are an expert...". In my opinion, you can definitely do without and spend your time on different C books.
+\end{document}

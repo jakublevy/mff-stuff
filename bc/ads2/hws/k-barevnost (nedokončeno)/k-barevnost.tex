@@ -1,0 +1,69 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[12pt, a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{complexity}
+\usepackage{enumitem}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\captionsetup{labelformat=empty}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+	
+\fancypagestyle{firstpage}
+{
+	\rhead{Jakub Levý \footnotesize{(Usurituri)}}
+}
+
+\newclass{\CNF}{CNF}
+	
+\begin{document}
+	\thispagestyle{firstpage}
+	\section*{$k$-barevnost}
+	Problém si rozdělíme na 2 části. Víme, že 2-$\SAT$ $\in \P$. V první části budeme chtít dokázat\\[2pt]
+	\fbox{\begin{minipage}{9.5em}	
+		$2$-barevnost $\rightarrow$ $2$-$\SAT$
+	\end{minipage}}\\[2pt]
+	Tím ukážeme, že problém 2-barevnosti $\in \P$.
+	\\[12pt]
+	Nechť $k \ge 3$, potom je $k$-$\SAT$ $\NP$-úplný, v druhé části budeme chtít dokázat\\[2pt]
+	\fbox{\begin{minipage}{9.5em}	
+			$k$-$\SAT$ $\rightarrow$ $k$-barevnost
+	\end{minipage}}\\[2pt]
+	Čímž získáme, že $k$-barevnost $\in \NP$.
+	\subsection*{$2$-barevnost $\rightarrow$ $2$-$\SAT$}
+	Na vstupu jsme dostali graf $G = (V, E)$, chceme vyrobit formuli v $\CNF$, jejíž každá klauzule obsahuje nejvýše 2 literály a je splnitelná právě tehdy když $G$ je 2-obarvitelný.
+	Předpokládejme, že $V = \{ v_1, v_2,\ldots, v_n \}$. Vytvoříme si proměnné  \[v_{i,b} = 
+	\begin{cases}
+	1 & \text{pokud vrchol } v_i \text{ je obarven barvou }b \in \{1, 2\} \\
+	0 & \text{jinak} 
+	\end{cases}
+	\]
+	Formuli, kterou hledáme bude obsahovat následující klauzule:
+	\begin{itemize}
+		\item $\forall i \in \{1,\ldots,n \} \colon$
+		\begin{itemize}[label={}]
+			\item $(v_{i,1} \vee v_{i,2})$ \quad (každý vrchol je obarvenou alespoň 1 barvou)
+			\item $\neg(v_{i,1} \wedge v_{i,2}) = (\neg v_{i,1} \vee \neg v_{i,2})$ \quad (žádný vrchol není obarven 2 barvami)
+		\end{itemize}
+	\item $\forall i, j \in \{1,\ldots,n \}$ takové, že $\{v_i, v_j\} \in E \colon$
+	\begin{itemize}[label={}]
+		\item $\neg(v_{i,1} \wedge v_{j,1}) = (\neg v_{i,1} \vee \neg v_{j,1})$ \quad \newline (vrcholy spojené hranou nejsou zároveň obarveny 1. barvou)
+		\item $\neg(v_{i,2} \wedge v_{j,2}) = (\neg v_{i,2} \vee \neg v_{j,2})$ \quad \newline (vrcholy spojené hranou nejsou zároveň obarveny 2. barvou)
+	\end{itemize}
+	\end{itemize}
+Formule v $\CNF$ obsahující tyto klauzule je splnitelná právě tehdy když graf $G$ je \newline $2$-obarvitelný. Je potřeba však ještě ukázat, že takovýto převod z grafu na formuli stihneme v polynomiálním čase. A to stihneme, protože počet klauzulí je závislý na počtu vrcholů a hran grafu, přičemž hran má graf nejvýše kvadraticky mnoho k počtu vrcholů. 
+\subsection*{$k$-$\SAT$ $\rightarrow$ $k$-barevnost}
+\end{document}

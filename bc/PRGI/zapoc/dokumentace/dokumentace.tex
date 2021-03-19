@@ -1,0 +1,583 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{textcomp}
+\usepackage{spverbatim}
+\DeclareCaptionLabelFormat{blank}{}
+\usepackage{tikz}
+\usepackage[ddmmyyyy]{datetime}
+\renewcommand{\dateseparator}{.}
+\usetikzlibrary{lindenmayersystems}
+
+
+
+\usepackage[edges]{forest}
+
+\definecolor{foldercolor}{RGB}{124,166,198}
+
+
+\tikzset{pics/folder/.style={code={%
+			\node[inner sep=0pt, minimum size=#1](-foldericon){};
+			\node[folder style, inner sep=0pt, minimum width=0.3*#1, minimum height=0.6*#1, above right, xshift=0.05*#1] at (-foldericon.west){};
+			\node[folder style, inner sep=0pt, minimum size=#1] at (-foldericon.center){};}
+	},
+	pics/folder/.default={20pt},
+	folder style/.style={draw=foldercolor!80!black,top color=foldercolor!40,bottom color=foldercolor}
+}
+
+\forestset{is file/.style={edge path'/.expanded={%
+			([xshift=\forestregister{folder indent}]!u.parent anchor) |- (.child anchor)},
+		inner sep=1pt},
+	this folder size/.style={edge path'/.expanded={%
+			([xshift=\forestregister{folder indent}]!u.parent anchor) |- (.child anchor) pic[solid]{folder=#1}}, inner xsep=0.6*#1},
+	folder tree indent/.style={before computing xy={l=#1}},
+	folder icons/.style={folder, this folder size=#1, folder tree indent=3*#1},
+	folder icons/.default={12pt},
+}
+
+
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
+\renewcommand{\contentsname}{Obsah}
+\renewcommand{\figurename}{Obrázek}
+\renewcommand*\listfigurename{Seznam obrázků}
+\renewcommand{\abstractname}{Abstrakt}
+
+
+\author{Jakub Levý}
+\begin{document}
+\date{10.1.2018}
+\captionsetup[subfigure]{labelformat=empty}
+\title{Dokumentace k~zápočtovému programu}
+
+\null  % Empty line
+\nointerlineskip  % No skip for prev line
+\vfill
+\let\snewpage \newpage
+\let\newpage \relax
+\maketitle
+\let \newpage \snewpage
+\vfill 
+\thispagestyle{empty}
+\begin{abstract}
+	Tento program implementuje neparametrický 2D L-systém. Je napsán v~jazyce C\#, využívá knihovnu WinForms a GDI+. Kontroluje vstupy a umožňuje vykreslení více fraktálu najednou. V~uživatelském rozhraní lze jednoduše zadat a editovat vstup. Součástí programu je 10 fraktálů, které je možné použít jako testovací data.
+\end{abstract}
+\break % page break
+\pagebreak
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+\section{Úvod do L-systémů}
+Tato kapitola popisuje funkčnost jednoduchých 2D L-systémů. Rád bych podotknul, že tento úvod se nesnaží formálně správně definovat L-systémy. Jde spíše o~jejich pochopení. 
+\subsection{Historie}
+Důležitý koncept, který L-systémy používají se nazývá \textbf{přepisování}. Jedná se o~techniku definování komplexních objektů neustálým přepisováním částí původního objektu pomocí \textbf{přepisovacích pravidel}. Klasický příklad takového objektu je \textit{Kochova vločka} navržená roku 1905 Helge von Kochem! Její postupnou konstrukci definoval následovně:
+\begin{center}
+	Mějme dva obrázky, první nazveme iniciátor a druhý generátor: 
+	\begin{figure}[h]
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\begin{tikzpicture}
+			\shorthandoff{-} 
+			\draw (0,0) node{}
+			-- (2,0) node{}
+			-- (1,2) node{}
+			-- cycle;
+			\end{tikzpicture}
+			\caption*{iniciátor}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\begin{tikzpicture}
+			\shorthandoff{-} 
+			\draw (0,0) --(1.5,0);
+			\draw (1.5,0) --(2,1);
+			\draw (2,1) --(2.5,0);
+			\draw (2.5, 0) --(4,0);
+			\end{tikzpicture}
+			\caption*{generátor}
+		\end{subfigure}%
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{iniciátor a generátor}
+	\end{figure}
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+Postupnou aplikací generátoru na iniciátor dostáváme:
+\begin{figure}[h]
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\shorthandoff{-} 
+		\draw [l-system={rule set={F -> F-F++F-F}, step=16pt, angle=60,
+			axiom=F++F++F, order=1}] lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{1.}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\shorthandoff{-} 
+		\draw [l-system={rule set={F -> F-F++F-F}, step=6pt, angle=60,
+			axiom=F++F++F, order=2}] lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{2.}
+	\end{subfigure}%
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{1. a 2. generace Kochovy vločky}
+\end{figure}
+\begin{figure}[h]
+	\centering
+		\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\shorthandoff{-} 
+		\draw [l-system={rule set={F -> F-F++F-F}, step=2pt, angle=60,
+			axiom=F++F++F, order=3}] lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{3.}
+	\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\shorthandoff{-} 
+		\draw [l-system={rule set={F -> F-F++F-F}, step=0.7pt, angle=60,
+		axiom=F++F++F, order=4}] lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{4.}
+\end{subfigure}%
+	\captionsetup{textformat=empty,labelformat=blank}
+\caption{3. a 4. generace Kochovy vločky}
+\end{figure}
+\end{center}
+Takovéto přepisovací systémy se začaly studovat už v~polovině 20. století. Už v~té době se~pro~reprezentaci používali systémy, kde se přepisovaly znaky textovými řetězci. Až v~roce 1968 biolog Aristid \textbf{L}indenmayer publikoval nový systém, který my nyní známe pod pojmem \textbf{L}-system.
+\subsection{Popis} 
+Nyní se můžeme podívat jak 2D L-systémy fungují. Definujeme každému znaku, kterému \mbox{L-systém} rozumí nějakou akci:
+\begin{center}
+\begin{tabular}{| c | c |}
+	\hline
+	znak & akce \\ \hline
+	$A - Z$ & vykresli úsečku ve směru aktuální rotace \\ \hline
+	$a - z$ & posuň pozici štětce ve směru aktuální rotace \\ \hline
+	$+$ & otoč se o~předem stanovený úhel proti směru hodinových ručiček \\ \hline
+    $-$ & otoč se o~předem stanovený úhel ve směru hodinových ručiček \\ \hline
+   	$[$ & ulož aktuální stav na zásobník \\ \hline
+ 	$]$ & nastav aktuální stav na vrchol zásobníku a smaž ho \\
+	\hline
+\end{tabular}
+\end{center}
+\begin{itemize}
+	\item stavem se rozumí: aktuální pozice štětce a úhel rotace
+	\item délka jednotlivého kroku tj. délka vykreslené úsečky, případně délka posunu štětce musí být předem dohodnutá
+	\item úhel rotace také musí být předem známý, v~případě Kochovy vločky nakreslené výše se jednalo o~$60\si{\degree}$
+	\item implicitně uvažujeme že úsečky se vykreslují černou barvou, což nemusí být vždy zcela vhodné
+\end{itemize}
+L-system na vstupu dostane 3 zásadní informace:
+\begin{enumerate}
+	\item iniciátor, kterému se říká \textbf{axiom}
+	\item asociativní pole generátorů, kterému se říká \textbf{přepisovací pravidla}
+	\item úhel, o~který se má rotovat 
+\end{enumerate}
+Další informace, které L-systém dostane, nejsou nutné pro teoretickou funkčnost. 
+\subsection{Příklad}
+Ukažme si jednoduchý příklad vstupu L-systému pro vykreslení již naší známé Kochovy vločky.
+\begin{itemize}
+	\item axiom $:= F++F++F$
+	\item přepisovací pravidla $ := \{ F \rightarrow F-F++F-F	 \}$
+	\item úhel rotace $:= 60 \si{\degree}$
+\end{itemize}
+\subsubsection{Vykreslení 0. generace}
+Vykreslením 0. generace se rozumí vykreslení axiomu. Uložme si axiom do proměnné instrukce. Předpokládejme že výchozí orientace štětce je vpravo. Pojďme se podívat na jednotlivé iterace kreslení:
+\paragraph{1. iterace}
+instrukce $=\textbf{F}++F++F$, úhel orientace štětce $= 0\si{\degree}$ \newline
+(tučně zobrazený znak je právě prováděná instrukce)
+\begin{figure}[h]
+	\centering
+\begin{tikzpicture}
+\shorthandoff{-} 
+\draw[thick,->] (0,0) --(2,0);
+\end{tikzpicture}
+\caption{provedení 1. instrukce}
+\end{figure}
+\pagebreak
+\paragraph{2. a 3. iterace}
+instrukce $= F\textbf{++}F++F$, úhel orientace štětce $= 120\si{\degree}$ \newline
+Dvakrát změníme orientaci štětce, pokaždé přičtením $60\si{\degree}$. Náš obrázek se tedy po provedení těchto instrukcí nezměnil. Stále vypadá stejně:
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+	\shorthandoff{-} 
+	\draw[->] (0,0) --(2,0);
+	\end{tikzpicture}
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{provedení 2. a 3. instrukce}
+\end{figure}
+\paragraph{4. iterace}
+instrukce $=F++\textbf{F}++F$, úhel orientace štětce $= 120\si{\degree}$ \newline
+Oproti 1. iterace nyní vykreslíme úsečku pod úhlem $120 \si{\degree}$.
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+	\shorthandoff{-} 
+	\draw[->] (0,0) --(2,0);
+	\draw[thick,->] (2,0) --(1,1.5);
+	\end{tikzpicture}
+	\caption{provedení 4. instrukce}
+\end{figure}
+\paragraph{5. a 6. iterace}
+instrukce $=F++F\textbf{++}F$, úhel orientace štětce $= 240\si{\degree}$ \newline
+Obdobně jako v~2. a 3. iteraci, dvakrát přičteme $60 \si{\degree}$.
+\paragraph{7. iterace}
+instrukce $=F++F++\textbf{F}$, úhel orientace štětce $= 240\si{\degree}$ \newline
+V~poslední instrukci vykreslíme úsečku pod úhlem $240 \si{\degree}$. Dostáváme tedy obrázek našeho axiomu, který je stejný jako obrázek iniciátoru.
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+	\shorthandoff{-} 
+	\draw[->] (0,0) --(2,0);
+	\draw[->] (2,0) --(1,1.5);
+	\draw[thick, ->] (1,1.5) --(0,0);
+	\end{tikzpicture}
+	\caption{provedení 7. instrukce}
+\end{figure}
+
+\subsubsection{Vykreslení 1. generace}
+Nejprve v~našem axiomu nahradíme všechny znaky, které jsou klíčem nějaké hodnoty v~přepisovacích pravidlech. Znaky, které nejsou klíčem žádné hodnoty v~přepisovacích pravidlech necháme být. Dostaneme:
+\begin{center}
+	instrukce $= F-F++F-F++F-F++F-F++F-F++F-F$
+\end{center}
+Po provedení jednotlivých instrukcí:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\shorthandoff{-} 
+	\draw [l-system={rule set={F -> F-F++F-F}, step=16pt, angle=60,
+		axiom=F++F++F, order=1}] lindenmayer system -- cycle;
+\end{tikzpicture}
+\caption{1. generace Kochovy vločky}
+\end{figure}
+
+\subsubsection{Vykreslení n-té generace}
+Stačí pouze n-krát nahradit všechny znaky stejným způsobem, který je popsán pro vykreslení 1. generace.
+\section{Využité technologie}
+Program L-system, kterého se tato dokumentace týká by nemohl vzniknout bez různých technologií, kterým chci věnovat tuto kapitolu.
+\subsection{C\#}
+Celý program byl napsán v~programovacím jazyku C\#. Tento programovací jazyk jsme zvolil z~důvodu jeho jednoduchosti, výkonnosti a možnosti objektově orientovaného programování.
+\subsection{WinForms}
+Pro jednoduché zadání vstupu a jeho případné editace jsem se rozhodl využít grafického rozhraní. Ačkoliv knihovna WPF je modernější, rozhodl jsem se naprogramovat rozhraní v~knihovně WinForms ze dvou důvodů:
+\begin{enumerate}
+	\item kompatibilita s~UNIX / UN*X / Mac OS X / Windows
+	\item jednoduchá tvorba uživatelského rozhraní
+\end{enumerate}
+\subsection{Visual Studio 2017}
+U~volby vývojové prostředí jsem neváhal. Konkurenční JetBrains Rider a MonoDevelop neobsahují designer pro tvorbu uživatelského prostředí aplikací využívajících knihovnu WinForms.
+\subsection{GDI+}
+Kvůli jednoduchosti se o~vykreslování stará součást API OS Windows. Pro účely tohoto programu je dostačující.
+\section{Program}
+V~této kapitole popíšu jednotlivé části programu.
+\subsection{Struktura projektu}
+
+\begin{forest}
+	for tree={font=\sffamily, grow'=0,
+		folder indent=.9em, folder icons,
+		edge=densely dotted}
+	[L-system
+	[L-system, this folder size=20pt
+	[bin
+	[L-system.exe, is file]
+	]
+	[Properties
+	[AssemblyInfo.cs, is file]
+	[Resources.Designer.cs, is file]
+	[Resources.resx, is file]
+	[Settings.Designer.cs, is file]
+	]
+	[Resources
+	[icon.ico, is file]
+	[logo.png, is file]
+	]
+	[AboutBox1.cs, is file]
+	[AboutBox1.Designer.cs, is file]
+	[AboutBox1.resx, is file]
+	[App.config, is file]
+	[ColorUC.cs, is file]
+	[ColorUC.Designer.cs, is file]
+	[ColorUC.resx, is file]
+	[Form1.cs, is file]
+	[Form1.Designer.cs, is file]
+	[Form1.resx, is file]
+	[Fractal.cs, is file]
+	[L-system.csproj, is file]
+	[Lsystem.cs, is file]
+	[NumericUpDownUnit.cs, is file]
+	[Program.cs, is file]
+	[RuleUC.cs, is file]
+	[RuleUC.Designer.cs, is file]
+	[RuleUC.resx, is file]
+	[Turtle.cs, is file]
+	[Utils.cs, is file]
+	]
+	[L-system.sln, is file]
+	]
+\end{forest}
+\pagebreak
+\subsection{Uživatelské rozhraní}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{gui.png}
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{uživatelské rozhraní}
+\end{figure}
+\paragraph{(1)}
+Zobrazí nabídku předem připravených fraktálů k~vykreslení.
+\paragraph{(2)}
+Vykreslí zadaný fraktál.
+\paragraph{(3)}
+Zobrazí informace o~programu.
+\paragraph{(4)}
+Zadání axiomu.
+\paragraph{(5)}
+Zadání úhlu rotace.
+\paragraph{(6)}
+Zadání délky kroku (při kreslení úsečky nebo pohybu štětce).
+\paragraph{(7)}
+Zadání koeficientu zkracování kroku.
+\paragraph{(8)}
+Zadání výchozí orientace štětce.
+\paragraph{(9)}
+Zadání požadované generace fraktálu.
+\paragraph{(10)}
+Souřadnice počátku kreslení.
+\paragraph{(11)}
+Zobraz/skryj křížek zobrazující souřadnice počátku kreslení.
+\paragraph{(12)}
+Index právě aktivního fraktálu.
+\paragraph{(13)}
+Smaž právě aktivní fraktál.
+\paragraph{(14)}
+Komponenta pravidlo obsahující klíč, hodnotu a tlačítko ke smazání.
+\paragraph{(15)}
+Přidání pravidla.
+\paragraph{(16)}
+Přidání změny barvy.
+\paragraph{(17)}
+Komponenta změny barvy obsahující klíč, hodnotu a tlačítko ke smazání.
+\paragraph{(18)}
+Křížek zobrazující souřadnice počátku kreslení.
+\subsection{Ověřování vstupu}
+Program kontroluje vstupy po opuštění textových polí. Následně pomocí třídy \nolinkurl{ErrorProvider} upozorní na neplatný vstup a zakáže tlačítko (2).
+\begin{figure}[h]
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[scale=0.8]{error1.png}
+		\caption*{prázdný axiom}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[scale=0.8]{error2.png}
+		\caption*{neplatný znak v~axiomu}
+	\end{subfigure}%
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{1. a 2. neplatný vstup}	
+\end{figure}\\
+V~případě, že uživatel neopustí textové pole a stiskne tlačítko (2), provede se kontrola vstupu ihned po stisku před vykreslením.
+\begin{figure}[h]
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[scale=0.8]{error3.png}
+		\caption*{prázdný axiom}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[scale=0.8]{warning1.png}
+		\caption*{barva s~chybějícím klíčem}
+	\end{subfigure}%
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{3. a 4. neplatný vstup}	
+\end{figure}
+\subsection{Složky programu}
+\paragraph{L-system/bin}
+Obsahuje jediný soubor a tím je spustitelný soubor programu.
+\paragraph{L-system/Properties}
+Jedná se o~několik souborů obsahujících informace, verzi a název programu.
+\paragraph{L-system/Resources}
+Obsahuje ikonku aplikace a logo, které se zobrazuje při stisknutí tlačítka (3).
+\subsection{Lsystem/}
+V~následujícím textu kapitoly \textbf{3.5} budeme předpokládat, že se pohybujeme pouze v~této složce.
+\subsubsection{Lsystem.cs a Turtle.cs}
+Jde o~nejzajímavější soubory programu. Nejprve si popíšeme nejdůležitější součásti třídy \verb|Lsystem|, nacházející se v~souboru Lsystem.cs.
+
+Pro vytvoření instance nám stačí axiom (\verb|string|), můžeme však předat i přepisovací pravidla (\verb|Dictionary<char, string>)|, ty lze však předat později pomocí vlastnosti \verb|Rules|. Po předání přepisovacích pravidel se můžeme používat funkci \verb|void NthGeneration(int generation)|, které do vlastnosti \verb|Sentence| uloží instrukce pro nakreslení fraktálu. Tyto instrukce bude zpracovávat třída \verb|Turtle|, nacházející se v~souboru Turtle.cs, která se stará o~vykreslení fraktálu.
+
+Tímto končí funkčnost třídy \verb|Lsystem|. Přesuneme se ke třídě \verb|Turtle|. Pro vytvoření instance této třídy už potřebujeme více dat.
+\begin{spverbatim}
+	public Turtle(string sentence, Panel panel, double lineLength, 
+	              double rotationAngle, Point startingPoint, 
+	              Point directionPoint, Dictionary<char, Color> colors, 
+	              double lineLengthCofficient = 1)
+\end{spverbatim}
+\paragraph{string sentence} Hned prvním parametrem jsou instrukce (vlastnost Sentence) z~třídy \verb|Lsystem|.
+\paragraph{Panel panel} Dalším nezbytným parametrem je panel na který se má kreslit.
+\paragraph{double lineLength} Délka kroku.
+\paragraph{double rotationAngle} Úhel, který se přičte/odečte k~aktuálnímu úhlu při zpracovávání instrukce $+$/$-$.
+\paragraph{Point startingPoint} Souřadnice počátku kreslení.
+\paragraph{Point directionPoint} Jednotkový vektor určující výchozí orientaci štětce.
+\paragraph{Dictionary$<$char, Color$>$ colors} Asociativní pole, klíč je znak (instrukce) a hodnota je barva. Při zpracovávání instrukce kreslení čáry se kreslí barvou takovou, která je asociována s~klíčem, pokud klíč neexistuje v~poli, kreslí se černou barvou.
+\paragraph{double lineLengthCoefficient = 1} Koeficient zkracování délky kroku. Délka kroku se tímto koeficientem vynásobí po každé provedené instrukci kresby nebo posunu. Vzhledem k~tomu, že obvykle délku kroku chceme konstantní, je výchozí hodnota nastavena na 1.
+\\
+\\
+Soubor Turtle.cs obsahuje dvě struktury. První je struktura \verb|DrawInfo|. Její implementace vypadá takto:
+\begin{spverbatim}
+	struct DrawInfo
+	{
+        public PointF Start { get; set; }
+        public PointF End { get; set; }
+        public Pen Pen { get; set; }
+	}
+\end{spverbatim}
+Instance této struktury budou reprezentovat jednotlivé čáry fraktálu, tyto se budou ukládat do kolekce, z~které se pak fraktál bude možné překreslit. Druhou strukturou souboru Turtle.cs je \verb|State|, jejíž implementace vypadá následovně:
+\begin{spverbatim}
+	struct State
+	{
+        public PointF Location { get; set; }
+        public double CurrentAngle { get; set; }
+	}
+\end{spverbatim}
+Obsahuje tedy aktuální stav, pozici štětce a jeho orientaci vůči té výchozí.
+Tyto dvě struktury se nám budou hodit pro popsání nejdůležitější metody \verb|void Render()|, která vykreslí fraktál. Funguje následovně: 
+
+Nejprve budeme potřebovat několik proměnných:
+\paragraph{Instanční} 
+\begin{itemize}
+	\item \verb|List<DrawInfo> drawInfo = new List<DrawInfo>();|
+\end{itemize}
+\paragraph{Lokální}
+\begin{itemize}
+	\item \verb|State currentState = new State {Location = StartingPoint, CurrentAngle = 0};|
+	\item \verb|Stack<State> states = new Stack<State>();|
+\end{itemize}
+Nyní budeme iterovat znak po znaku vlastnoti \verb|Sentence|, nechť právě zpracovávaný znak je \verb|Sentence[i]|.
+
+Pokud se jedná o~nějaký znak z~těchto čtyř: $+ - [ \ ]$ tak v~případě prvních dvou pouze \newline přičtu / odečtu \verb|RotationAngle| k~\verb|currentState.CurrentAngle|. V~posledních dvou případech uložím aktuální stav na zásobník \verb|states| / nastavím \verb|currentState| na vrchol zásobníku a ten smažu.
+
+Nyní zbývají znaky posouvající štětec $a-z$ a znaky kreslící úsečku $A-Z$, které však pozici štětce taktéž posunou. V~obou případech tedy potřebujeme zjistit vektor posunu souřadnic štětce. Ten vypočítáme tak, že \verb|DirectionPoint| orotujeme o~\verb|currentState.CurrentAngle| a vynásobíme \verb|LineLength|.
+
+Pokud \verb|Sentence[i]| je znak $a-z$ tak k~\verb|currentState.Location| přičteme vektor posunu souřadnic a máme hotovo.
+
+V~případě znaku $A-Z$ si uložíme starou a novou pozici štětce do kolekce \verb|drawInfo| spolu s~kreslícím perem \verb|Pen|, kterému nastavíme správnou barvu z~asociativního pole \verb|Colors| (pokud existuje záznam, jinak černou).
+
+Po ukončení iterování stačí pouze překreslit \verb|Panel|:
+\begin{spverbatim}
+	private void Panel_Paint(object sender, PaintEventArgs e)
+	{
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        for (int i = 0; i < drawInfo.Count; ++i)
+        {
+            e.Graphics.DrawLine(drawInfo[i].Pen, drawInfo[i].Start.X, 
+                                drawInfo[i].Start.Y, drawInfo[i].End.X, 
+                                drawInfo[i].End.Y);
+        }
+    }
+\end{spverbatim}
+\pagebreak
+\subsubsection{Fractal.cs}
+Jednoduchá třída sdružující kompletní informace o~fraktálu. 
+\begin{spverbatim}
+	class Fractal
+	{
+        public Lsystem Lsys { get; set; }
+        public Turtle Turtle { get; set; }
+	}
+\end{spverbatim}
+\subsubsection{Form1.cs}
+Obsahuje třídu \verb|LsystemForm : Form|. Její kód se spouští při startu aplikace. Zejména má na starosti:
+\begin{itemize}
+	\item Nastavení vícenásobného bufferování panelu, na který se kreslí fraktály.
+	\item Vykreslení (18)
+	\item Veškeré reakce programu při interakci s~uživatelským rozhraním
+\end{itemize}
+Její součástí je i kód 10 testovacích fraktálů, která se dají použít jako testovací data.
+\subsubsection{User Controly}
+\paragraph{RuleUC.cs}
+Součástí je třída \verb|RuleUC : UserControl|, přijímá znak (klíč) a k~němu asociuje textový řetězec (hodnota), který uživatel zadá do textového pole. Viz (14).
+\paragraph{ColorUC.cs}
+Obsahuje třídu \verb|ColorUC : UserControl|, která se stará o~uživatelský vstup kreslícího znaku a asociuje k~němu barvu, kterou uživatel vybere přes \verb|ColorDialog|. Viz (17).
+\subsubsection{NumericUpDownUnit.cs}
+Vzhledem k~tomu, že controla \verb|NumericUpDown|, která je součástí WinForms neumožňuje zobrazit jednotku veličiny, využil jsem mírně upravenou verzi dostupnou z~[3].
+\begin{figure}[h]
+	\centering
+	\includegraphics[]{suffix.png}
+	\caption{stupně a pixely}
+\end{figure}
+\subsubsection{Utils.cs}
+Součástí je statická proměnná, regulární výraz, který se používá pro kontrolu vstupu axiomu a přepisovacích pravidel. Dále se zde nachází 5 statických metod:
+\begin{enumerate}
+	\item zobrazuje \verb|MessageBox| s~chybovou hláškou
+	\item násobí vektor skalárem
+	\item sčítá dva vektory
+	\item na vstup dostane vektor a úhel, vrátí nový patřičně orotovaný vektor
+	\item převede vektor na nový vektor s~nezápornými komponentami
+\end{enumerate}
+\subsubsection{AboutBox1.cs}
+Formulář obsahující informace o~programu, zobrazí se při stisku tlačítka (3).
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{aboutbox.png}
+	\captionsetup{textformat=empty,labelformat=blank}
+	\caption{AboutBox1.cs}
+\end{figure}	
+\subsubsection{Další soubory}
+\paragraph{App.config}
+XML soubor obsahující verzi prostředí .NET Framework nutnou ke spuštění programu.
+\paragraph{L-system.csproj}
+Soubor jehož součástí jsou informace o~souborech přítomných v~projektu Visual Studia
+\section{Další hezké fraktály}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{levy.png}
+	\caption{Lévyho C křivka}
+\end{figure}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{dragon.png}
+	\caption{Dračí křivka}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{anticurve.png}
+	\caption{Kochova antivločka}
+\end{figure}
+\pagebreak
+\section{Závěr}
+Dále by bylo možné a zajímavé rozšířit program na:
+\begin{enumerate}
+	\item PL-system, který ke každému symbolu asociuje libovolný počet parametrů. 
+	\item randomizující L-system, tedy L-system, který dostane nějakou pravděpodobnost na znáhodnění délky kroku a úhlu rotace
+	\item případně ještě L-system, který ke každé instrukci asociuje několik přepisovacích pravidel, která vybírá na základě nějakého parametru
+\end{enumerate}
+Nicméně po implementaci těchto vylepšení by tento program byl již mnohem více složitý. 
+\pagebreak
+\listoffigures
+\section*{Zdroje}
+\begin{enumerate}[label={[\arabic*]}]
+	\item PRZEMYSLAW PRUSINKIEWICZ, Aristid Lindenmayer a WITH JAMES S. HANAN .. [ET AL.]. The algorithmic beauty of plants. New York: Springer-Verlag, 1996. ISBN 9780387946764.	
+	\item PRUSINKIEWICZ, Przemyslaw. Graphical applications of L-systems. Regina: Dept. of Computer Science, University of Regina, 1985. ISBN 9780773100350.
+	\item \url{https://stackoverflow.com/questions/5921446/having-text-inside-numericupdown-control-after-the-number}
+\end{enumerate}
+\end{document}

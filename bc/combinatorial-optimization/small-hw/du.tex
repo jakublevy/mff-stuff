@@ -1,0 +1,149 @@
+% !TeX spellcheck = cs_CZ
+% !TeX program = lualatex
+\documentclass[12pt, a4paper, twoside]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\usepackage{parskip}
+\setmainfont{XITS}
+\setmathfont{XITS Math}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\captionsetup{labelformat=empty}
+
+\def\doubleunderline#1{\underline{\underline{#1}}}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+%\fbox{text} na ctverec kolem textu
+	
+\fancypagestyle{pageStyle}{%
+	\fancyhf{}% Clear header/footer
+	\fancyhead[OR]{Jakub Levý \footnotesize{(awk)}}% Author on Odd page, Centred
+	\fancyfoot[C]{\thepage}%
+	\renewcommand{\headrulewidth}{0pt}
+}
+
+\addtolength{\jot}{3pt}
+	
+\begin{document}
+	\pagestyle{pageStyle}
+	
+	\section*{Zadání}
+	Pomocí simplexové metody nalezněte nejprve přípustné bázické řešení a následně i optimální řešení následující úlohy:
+\begin{equation*}
+\begin{array}{ll@{}ll}
+\text{maximalizuj}  & 4x_1+x_3+x_4 \\[8pt]
+\text{za podmínek}
+& 8x_1 - 5x_3- x_4&=40   \\
+& 4x_2 - x_3 - x_4 &= 24 \\
+& x_3  +x_5 &= 8 \\
+& -2x_3+x_4+x_6 &=8 \\
+& x_1,\ldots,x_6 &\ge 0 
+\end{array}
+\end{equation*}
+\section*{Řešení}
+Lineární program je zadán v rovnicovém tvaru s vektorem pravých stran $b = \begin{pmatrix} 40 \\ 24 \\  8 \\ 8 \end{pmatrix}$, $b \ge 0$. Abychom mohli simplexovou metodou najít optimální řešení, potřebujeme najít přípustné bázické řešení. To nalezneme vyřešením pomocného programu:
+\begin{equation*}
+\begin{array}{ll@{}ll}
+\text{maximalizuj}  & -p_1-p_2-p_3-p_4 \\[8pt]
+\text{za podmínek}
+& 8x_1 - 5x_3- x_4 + p_1 &=40   \\
+& 4x_2 - x_3 - x_4 + p_2 &= 24 \\
+& x_3  +x_5 + p_3 &= 8 \\
+& -2x_3+x_4+x_6 + p_4 &=8 \\
+& x_1,\ldots,x_6, p_1,\ldots,p_4 &\ge 0 
+\end{array}
+\end{equation*}
+
+U pomocného programu víme přípustnou bázi. Můžeme postupovat simplexovou metodou:
+\begin{minipage}{0.3\textwidth}
+	\begin{align*}
+	p_1 &= 40 - 8x_1 + 5x_3 + x_4 \\
+	p_2 &= 24 - 4x_2 + x_3 + x_4  \\
+	\text{\circled{$p_3$}} &= 8-x_3-\text{\circled{$x_5$}} \\
+	p_4 &= 8+2x_3 - x_4 - x_6 \\
+	\makebox[0pt][l]{\underline{\phantom{$z = -80 + 8x_1 + 4x_2 - 7x_3 - x_4 + x_5 + x_6$}}}
+	z &= -80 + 8x_1 + 4x_2 - 7x_3 - x_4 + x_5 + x_6 \\[14pt]	
+	x_5 &= 8 - x_3 - p_3 \\
+	p_1 &= 40 - 8x_1 + 5x_3 + x_4 \\
+	p_2 &= 24 - 4x_2 + x_3 + x_4 \\
+	\text{\circled{$p_4$}} &= 8 + 2x_3 -x_4 - \text{\circled{$x_6$}} \\
+	\makebox[0pt][l]{\underline{\phantom{$z = -72 + 8x_1 + 4x_2 - 8x_3 - x_4 + x_6$}}}
+	  z &= -72 + 8x_1 + 4x_2 - 8x_3 - x_4 + x_6 
+	\end{align*}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{0.3\textwidth}
+	\begin{align*}
+		  x_6 &= 8 + 2x_3 -x_4 - p_4 \\
+	x_5 &= 8 - x_3 - p_3 \\
+	\text{\circled{$p_1$}} &= 40 - \text{\circled{$8x_1$}} + 5x_3 + x_4 \\
+	p_2 &= 24 - 4x_2 + x_3 + x_4 \\
+	\makebox[0pt][l]{\underline{\phantom{$z = -64+8x_1+4x_2-6x_3-2x_4-p_4$}}}
+	z &= -64+8x_1+4x_2-6x_3-2x_4-p_4 \\[18pt]
+	x_1 &= \frac{40+5x_3+x_4-p_1}{8} \\
+	x_6 &= 8+2x_3 - x_4 - p_4 \\
+	x_5 &= 8 -x_3 - p_3 \\
+	\text{\circled{$p_2$}} &= 24 - \text{\circled{$4x_2$}} + x_3 + x_4 \\
+	\makebox[0pt][l]{\underline{\phantom{$z = -24 + 4x_2 - x_3 - x_4 - p_1 - p_4$}}}
+	z &= -24 + 4x_2 - x_3 - x_4 - p_1 - p_4
+	\end{align*}
+\end{minipage}
+\newpage
+\begin{align*}
+x_2 &= \frac{24+x_3+x_4-p_2}{4} \\
+x_6 &= 8 + 2x_3 - x_4 - p_4 \\
+x_5 &= 8-x_3-p_3 \\
+x_1 &= \frac{40+5x_3+x_4-p_1}{8} \\
+\makebox[0pt][l]{\doubleunderline{\phantom{$z = 0 + -p_1 - p_2 - p_4$}}}
+z &= 0 + -p_1 - p_2 - p_4
+\end{align*}
+Hodnota účelové funkce již nejde zvýšit a její hodnota je $0$, původní lineární program má optimální řešení. Z tabulky dostáváme přístupné bázické řešení původního LP $(5,6,0,0,8,8)$.
+\\ \\
+Odstraněním sloupců obsahující libovolnou proměnnou $p_i$ z předchozí tabulky a nahrazením účelové funkce za původní dostáváme první simplexovou tabulku původního LP:\\
+\begin{minipage}{0.4\textwidth}
+	\begin{align*}
+	x_1 &= \frac{40+5x_3+x_4}{8} \\
+	x_2 &= \frac{24+x_3+x_4}{4} \\
+	\text{\circled{$x_5$}} &= 8-\text{\circled{$x_3$}} \\
+	x_6 &= 8+2x_3-x_4 \\
+	\makebox[0pt][l]{\underline{\phantom{$z = 20+\frac{7}{2}x_3 + \frac{3}{2}x_4$}}}
+	z &= 20+\frac{7}{2}x_3 + \frac{3}{2}x_4
+	\end{align*}
+\end{minipage}
+\hfill\vline\hfill
+\begin{minipage}{0.4\textwidth}
+	\begin{align*}
+	x_3 &= 8 - x_5 \\
+	x_1 &= \frac{80-5x_5+x_4}{8}\\
+	x_2 &= \frac{32-x_5+x_4}{4}\\
+	\text{\circled{$x_6$}} &= 24-2x_5 - \text{\circled{$x_4$}} \\
+	\makebox[0pt][l]{\underline{\phantom{$z = 48-\frac{7}{2}x_5 + \frac{3}{2}x_4$}}}
+	z &= 48-\frac{7}{2}x_5 + \frac{3}{2}x_4
+	\end{align*}
+\end{minipage}
+\\
+\phantom{c}\\
+\noindent\rule{\textwidth}{1pt}
+\begin{align*}
+x_4 &= 24-2x_5 - x_6 \\
+x_3 &= 8-x_5 \\
+x_1 &= \frac{104-7x_5-x_6}{8} \\
+x_2 &= \frac{56-3x_5-x_6}{4} \\
+\makebox[0pt][l]{\doubleunderline{\phantom{$z = 84 - \frac{13}{2} x_5 - \frac{3}{2}x_6$}}}
+z &= 84 - \frac{13}{2} x_5 - \frac{3}{2}x_6
+\end{align*}
+Hodnota účelové funkce již nejde zvýšit a její hodnota je 84, nalezli jsme optimální řešení. K~tomuto řešení odpovídá přípustné bázické řešení $(13,14,8,24,0,0)$.
+\end{document}	

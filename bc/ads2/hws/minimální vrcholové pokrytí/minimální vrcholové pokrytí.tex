@@ -1,0 +1,90 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[11pt, a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage[linesnumbered,algoruled,boxed,lined]{algorithm2e}
+\SetKwInput{KwIn}{Vstup}
+\SetKwInput{KwResult}{Výstup}
+\SetAlgorithmName{Algoritmus}
+
+
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\newcommand{\thispageheader}[2][R]{\expandafter\def\csname header#1\endcsname{#2}}
+\captionsetup{labelformat=empty}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\begin{document}
+\pagenumbering{gobble}
+\pagestyle{fancy}
+\thispageheader[R]{Jakub Levý \footnotesize{(Usurituri)}} \noindent
+\section*{Minimální vrcholové pokrytí}
+K nalezení minimálního vrcholového pokrytí v bipartitním grafu se bude hodit algoritmus pro nalezení maximálního párování v bipartitním grafu a Kőnigova-Egerváryho věta z přednášek z Kombinatoriky a grafů I.
+\subsection*{Značení}
+$m(G)\ ... $ velikost maximálního párování v grafu $G$ \\
+$v_c(G)\ ... $ velikost minimálního vrchovolého pokrytí grafu $G$
+\subsection*{Rozbor}
+Mějme tedy na vstupu bipartitní graf $G = (X \cup Y, E)$ s partitami $X$ a $Y$. Vytvoříme z něho síť $(G', s, t ,c)$, kde $G' = (X' \cup Y', E')$.
+\begin{itemize}
+	\item  $X' = X \cup \{s\}$ 
+	\item $Y' = Y \cup \{t\}$.
+	\item $E' = \{ (u,v) \ |\ u \in X,\; v \in Y,\; \{u,v\} \in E \} \cup \{ (s, u ) \ | \ u \in X \, \} \cup \{(u,t)\ |\ u \in Y\}$
+	\begin{itemize}[label={}]
+		\item hrany v síti jsou orientovány směrem "`zleva doprava", tj. od partity $X$ k $Y$
+		\item od zdroje $s$ vedou hrany do každého vrcholu partity $X$
+		\item od každého vrcholu partity $Y$ vede hrana do stoku $t$
+	\end{itemize}
+	\item $\forall e \in E' : c(e) = 1$
+\end{itemize}
+Nechť $f$ je maximální tok sítě $(G', s, t,c)$, potom $|f| = m(G)$ a hrany $ e\in E$, takové, že $f(e) = 1$ tvoří maximální párování grafu $G$. \\ \\
+Že hrany $e \in E : f(e) = 1$ tvoří párování lze nahlédnou následovně: Žádné dvě hrany takové hrany nemůžou mít společný vrchol. Pokud by totiž společný vrchol náležel do partity $Y$, pak by do tohoto vrcholu musely přitéci alespoň 2 jednotky toku, které nemají kudy odtéct. Analogicky pro partitu $X$. \\ \\
+Maximalita párování plyne z toho, že pro každý tok sítě $(G', s, t, c)$ je možné nalézt párování stejné velikosti a naopak. Existuje tedy bijekce mezi množinou všech toků a množinou všech párování, které zachovává velikost. Maximální tok tedy odpovídá maximálnímu párování. \\ \\
+Teď bychom potřebovali převést problém nalezení maximálního párování a problém hledání minimálního vrcholového pokrytí. Z kurzu Kombinatoriky a grafů I známe Kőnigova-Egerváryho větu: $\forall$ bipartitní graf $G : m(G) = v_c(G)$. \\ \\ 
+V následujícím odstavci bude znamenat pojem \textit{párování} maximální párování a \textit{vrcholové pokrytí} minimální vrcholové pokrytí. \\ \\
+Jako vrcholy vrcholového pokrytí budeme brát vrcholy hran párování. Minimálního počtu vrcholů na vrcholové pokrytí grafu dosáhneme tak, že z každé hrany párování použijeme právě jeden její libovolný vrchol, čímž pokryjeme celou hranu. Po pokrytí všech hran párování, kterých je $m(G)$, jsme vrcholově pokryli celý graf, protože párování bylo maximální a tedy žádné další disjunktní hrany se v grafu nacházet nemohou.
+\newpage
+\thispagestyle{empty}
+\subsection*{Pseudocode}
+\begin{algorithm}[H]
+	\KwIn{Bipartitní graf $G = (X \cup Y, E)$ s partitami $X$ a $Y$}
+	\KwResult{Množina vrcholů tvořících minimální vrcholové pokrytí }
+    Vytvoříme síť $(G', s, t, c)$ viz Rozbor\\
+    $f \gets$ maximální tok sítě $(G',s,t,c)$ (F-F)\\
+    $vysledek \gets \{\}$\\
+    \For{$\{u,v\} \in E, u \in X, v \in Y$}{
+    	\If{$f((u,v)) = 1$}{
+    		
+    		$vysledek$.insert(vrchol $u$, nebo $v$)
+    	}
+    }
+	\Return{$vysledek$}
+	\caption{Minimální vrcholové pokrytí}
+\end{algorithm} 
+\noindent
+\\ \\ \\ 
+Označme $n$ počet vrcholů a $m$ počet hran tokové sítě.
+\begin{itemize}
+	\item $n = |X| + |Y| + 2$
+	\item $m = |E| + |X| + |Y|$
+	\item $|V| = |X| + |Y|$.
+\end{itemize}
+\subsection*{Časová složitost}
+Tokovou síť lze postavit v lineárním čase v počtem vrcholů a hran, tj. $\mathcal{O}(n + m)$. F-F algoritmem nalezneme maximální párování v čase $\mathcal{O}(n \cdot m)$. Poté v lineárním čase s počtem hran projdeme síť, získáme minimální vrcholové pokrytí. Celková časová složitost je $\mathcal{O}(n \cdot m) = \mathcal{O}(|V| \cdot |E|)$.
+\subsection*{Prostorová složitost}
+Pro uložení:
+\begin{itemize}
+	\item grafu tokové sítě $G'$ budeme potřebovat $\Theta(n + m)$ paměti
+	\item kapacity pro každou hranu budeme potřebovat $\Theta(m)$ paměti
+	\item toku $f$ také $\Theta(m)$
+	\item proměnné \textit{vysledek} $\mathcal{O}(v_c(G)) \in \mathcal{O}(n)$
+\end{itemize}
+Výsledně tedy paměťová složitost je $\mathcal{O}(n + m) = \mathcal{O}(|V| + |E|)$.
+\end{document}

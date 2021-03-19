@@ -1,0 +1,96 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[11pt, a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\newcommand{\thispageheader}[2][R]{\expandafter\def\csname header#1\endcsname{#2}}
+\captionsetup{labelformat=empty}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\begin{document}
+\pagestyle{fancy}
+\thispageheader[R]{Jakub Levý \footnotesize{(Usurituri)}} \noindent
+\section*{Fourierovy obrazy}
+Jednotlivé obrazy jsou spočteny přímo z definice DFT. Pro výpočet užitečné jsou následující dvě lemmata:
+\paragraph{Lemma (součtové):}
+Nechť $n, j \in \mathbb{N}$, $j$ není dělitelné $n$. Potom:
+$$ \sum_{k=0}^{n-1} \left(\omega_n^j\right)^k = 0 $$
+\paragraph{Důkaz:} Tupě je možné třeba sečíst geometrickou řadu.
+\begin{align*} 
+\sum_{k=0}^{n-1} \left(\omega_n^j\right)^k &=  \frac{(\omega_n^j)^n - 1}{\omega_n^j - 1} = \frac{\left(\omega_n^n\right)^j - 1}{\omega_n^j - 1} = \frac{1^j - 1}{\omega_n^j - 1} = 0
+\end{align*}
+\paragraph{Lemma (půlící):} Nechť $n \in \mathbb{N}$. Potom:
+$$ \omega_n^{n/2} = \omega_2 = -1 $$
+\paragraph{Důkaz:}
+$\left( \omega_n^{n/2} \right)^2 = 1$. $\omega_n^{n/2} = -1$ nebo $\omega_n^{n/2} = 1$. Přicemž druhý případ není možný, protože $\omega_n$ je primitivní n-tá odmocnina z $1$.
+\\ \\
+V následujících příkladech \circled{1.} -- \circled{3.} předpokládejme následující:
+\begin{itemize}
+	\item $|x| = n$
+	\item $y$ je Fourierův obraz $x$
+	\item $|y| = n$
+\end{itemize}
+\subsection*{\circled{1.} $ x =(1,0,1,0,\ldots,1,0)$}
+\paragraph{Pozorování:} $n$ je sudé. \\
+Přímo z definice máme: $\displaystyle y_j = \sum_{k=0}^{n-1} x_k \cdot \omega_n^{kj}$. \newline Rozepsáním sumy dostaneme: $y_j = x_0 \cdot \omega_n^{0j} + x_2 \cdot \omega_n^{2j} + x_4 \cdot \omega_n^{4j} + \ldots + x_{n-2} \cdot \omega_n^{(n-2) j}$. \newline
+Ekvivalentně: $\displaystyle y_j = \sum_{k=0}^{n/2 - 1} \omega_n^{2kj} = \sum_{k=0}^{n/2 - 1} \left( \omega_n^{2j} \right)^k$. Nyní můžeme použít součtové lemma. \newline Zjistíme, že suma je rovna $0$ pro všechna $j$ vyjma dvou případů: $j = 0$ a $j = n/2$. Na první případ součtové lemma nefunguje, protože $j$ není přirozené číslo. V druhém případě je $2j$ dělitelné $n$, což porušuje předpoklad lemmatu. \\ \\
+Víme tedy, že: $y = (y_0, \underbrace{0, \ldots, 0}_{\#n/2 - 1}, y_{n/2}, \underbrace{0, \ldots,0}_{\#n/2 - 1})$. Zbývá ručně dopočítat $y_0$ a $y_{n/2}$.
+\begin{align*}
+y_0 &= \sum_{k=0}^{n/2 - 1} \omega_n^0 = \frac{n}{2} \\
+y_{n/2} &= \sum_{k=0}^{n/2 - 1} \omega_n^{2 (n/2) \cdot k} = \sum_{k=0}^{n/2 - 1} (\omega_n^{n})^k = \sum_{k=0}^{n/2 - 1} 1^k = \frac{n}{2}
+\end{align*}
+Dostáváme, že Fourierův obraz $x$ je: $y = (n/2, \underbrace{0, \ldots, 0}_{\#n/2 - 1}, n/2, \underbrace{0, \ldots,0}_{\#n/2 - 1})$.
+\subsection*{\circled{2.} $ x =(1,-1,1,\ldots,1,-1)$}
+\paragraph{Pozorování:} $n$ je sudé. \\
+Z definice víme, že: $\displaystyle y_j = \sum_{k=0}^{n-1} x_k \cdot \omega_n^{kj}$. \newline 
+Hned je vidět, že $\displaystyle y_j = \sum_{k=0}^{n-1} (-1)^k \omega_n^{kj}$. \newline
+Rozepsáním sumy dostaneme: $\displaystyle y_j = \omega_n^{0j} - \omega_n^{j} + \omega_n^{2j} - \omega_n^{3j} + \ldots - \omega_n^{(n-1)j}$. \newline
+Seskupením sudých a lichých mocnin:
+\begin{align*}
+y_j &= \omega_n^{0j} + \omega_n^{2j} + \omega_n^{4j} + \ldots + \omega_n^{(n-2)j} - (\omega_n^{j} + \omega_n^{3j} + \omega_n^{5j} + \ldots + \omega_n^{(n-1)j}) \\
+y_j &= \overbrace{\underbrace{\sum_{k=0}^{n/2 - 1} \omega_n^{2kj}}}^{y_{j,1}}_{\circled{1.}} - \overbrace{\sum_{k=0}^{n/2-1} \omega_n^{(2k+1)j}}^{y_{j,2}} \\
+y_j &= y_{j,1} + y_{j,2}
+\end{align*}
+Po zbytek příkladu nás bude zajímat pouze druhá suma. \newline
+\thispagestyle{plain}
+Upravíme si sumu do tvaru, abychom mohli použít součtové lemma. \newline
+$\displaystyle \sum_{k=0}^{n/2-1} \omega_n^{(2k+1)j} = \sum_{k=0}^{n/2-1} \left(\omega_n^{2j + j/k}\right)^{k}$ \\ \\
+Případ, kdy $j = 0$ vyřešíme později zvlášť. Narozdíl od příkladu \circled{1.}, zde není tak jednoduše vidět, kdy $2j+j/k$ je dělitelné $n$. \\ \\
+$\cfrac{2j + \frac{j}{k}}{n} = \cfrac{\frac{2jk}{k} + \frac{j}{k}}{n} = \cfrac{2jk+j}{kn} = \cfrac{j(2k+1)}{kn}$ \\ \\
+Z toho tvaru již vidíme, že $2j+j/k$ je dělitelné $n$ pouze pro $j = n/2$. \newline
+Získali jsme dva případy ($j = 0$ a $j = n/2$), ve kterých nevím hodnotu $y_{j,2}$. Ve všech ostatních případech ze součtového lemmatu platí, že $y_{j,2} = 0$.
+\begin{align*}
+y_{n/2,2} &= \sum_{k=0}^{n/2-1} \omega_n^{(2k+1) \cdot (n/2)} = \sum_{k=0}^{n/2-1} \omega_n^{kn + n/2} = \sum_{k=0}^{n/2 - 1} \omega_n^{kn} \cdot \omega_n^{n/2} = \sum_{k=0}^{n/2 - 1} \left(\omega_n^{n}\right)^{k} \cdot \omega_2 = - \frac{n}{2} \\
+y_{0, 2} &= \sum_{k=0}^{n/2 - 1} \omega_n^0 = \frac{n}{2}
+\end{align*}
+Teď už známe:
+\begin{align*}
+y_{j,2} &= (n/2, \underbrace{0, \ldots, 0}_{\#n/2 - 1}, -n/2, \underbrace{0, \ldots, 0}_{\#n/2-1}) \\
+y_{j,1} &= (n/2, \underbrace{0, \ldots, 0}_{\#n/2 - 1}, \ \: \: n/2, \underbrace{0, \ldots,0}_{\#n/2 - 1}) \quad \text{(z předchozího příkladu)}
+\end{align*}
+Přičemž $y_j = y_{j,1} - y_{j,2}$. \newline
+Fourierův obraz $x$ je: $y = (\underbrace{0, \ldots, 0}_{\#n/2}, n, \underbrace{0, \ldots, 0}_{\#n/2 - 1})$.
+\subsection*{\circled{3.} $ x =(\omega_n^0, \omega_n^1, \ldots, \omega_n^{n-1})$, \normalfont{kde} $\omega_n = \mathrm{e}^{2\pi i/n}$}
+\thispagestyle{plain}
+\paragraph{Pozorování:} $n$ je sudé nebo liché. \\
+Z definice: $\displaystyle y_j = \sum_{k=0}^{n-1} x_k \cdot \omega_n^{kj} = \sum_{k=0}^{n-1} \omega_n^k \cdot \omega_n^{kj} = \sum_{k=0}^{n-1} \left(\omega_n^{1+j}\right)^k$. \\ \\
+Okamžitě je vidět, že $1+j$ je dělitelné $n$ pokud $j = n - 1$. Pro všechna ostatní $j$ je suma rovna $0$. Zbývá tedy spočítat kolik je $y_{n-1}$ a je hotovo.
+\begin{align*}
+y_{n-1} = \sum_{k=0}^{n-1} \left(\omega_n^{1+n-1}\right)^k = \sum_{k=0}^{n-1} \left( \omega_n^n \right)^k = \sum_{k=0}^{n-1} 1^k = n
+\end{align*}
+Fourierův obraz vektoru $x$ je: $y = (\underbrace{0, \ldots, 0}_{\#n-1}, n)$.
+\end{document}

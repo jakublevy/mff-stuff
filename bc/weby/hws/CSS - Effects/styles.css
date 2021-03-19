@@ -1,0 +1,29 @@
+@font-face {
+    font-family: "myCustomFont";
+    src: url("myCustomFont.otf") format("opentype")
+}
+
+body {
+    font-size: 30px;
+    font-family: "myCustomFont";
+}
+
+:target {
+    text-decoration: line-through;
+}
+
+button {
+    background-color: black;
+    text-decoration: inherit;
+    color: white;
+    border-radius: 2em;
+    font-size: 50px;
+    perspective: 500px; /* btns are far away */
+}
+
+button:hover {
+    background-color: green;
+    color: red;
+    transition: background-color 1000ms linear, color 1000ms linear, transform 1000ms;
+    transform: rotateY(360deg);
+}

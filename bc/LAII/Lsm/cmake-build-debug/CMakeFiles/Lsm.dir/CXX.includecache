@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jakub/CLionProjects/Lsm/include/InputData.h
+cstdint
+-
+
+/home/jakub/CLionProjects/Lsm/include/InputParser.h
+string
+-
+vector
+-
+InputData.h
+/home/jakub/CLionProjects/Lsm/include/InputData.h
+
+/home/jakub/CLionProjects/Lsm/include/Matrix.h
+cstddef
+-
+vector
+-
+ostream
+-
+numeric
+-
+
+/home/jakub/CLionProjects/Lsm/src/InputParser.cpp
+fstream
+-
+../include/InputParser.h
+/home/jakub/CLionProjects/Lsm/include/InputParser.h
+
+/home/jakub/CLionProjects/Lsm/src/main.cpp
+iostream
+-
+../include/Matrix.h
+/home/jakub/CLionProjects/Lsm/include/Matrix.h
+../include/InputParser.h
+/home/jakub/CLionProjects/Lsm/include/InputParser.h
+

@@ -1,2 +1,0 @@
-^C:\USERS\JAKUB\DESKTOP\MFF-STUFF\COMPILERS\FRAMEWORK\PRIVATE-SRC\DU12L.LEX
-flex -Cf -b -p -p -odu12l.cpp "C:\Users\jakub\Desktop\mff-stuff\Compilers\framework\private-src\du12l.lex"

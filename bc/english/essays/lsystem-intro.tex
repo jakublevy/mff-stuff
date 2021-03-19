@@ -1,0 +1,116 @@
+% !TeX spellcheck = en_US
+\documentclass[12pt, a4paper]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{lindenmayersystems}
+\usepackage{float}
+\usepackage{subcaption}	
+\usepackage{enumitem}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+\newcommand{\thispageheader}[2][R]{\expandafter\def\csname header#1\endcsname{#2}}
+\captionsetup{labelformat=empty}
+\pagenumbering{gobble}
+
+\pgfdeclarelindenmayersystem{Koch curve}{
+	\rule{F -> F-F++F-F}}
+
+\linespread{1.7}
+
+\begin{document}
+\pagestyle{fancy}
+\thispageheader[L]{Final Essay}
+\thispageheader[C]{English Wed 2}
+\thispageheader[R]{Jakub Levý} 
+\noindent
+\begin{center}
+	\huge A Gentle Introduction to L-systems
+\end{center}
+\vspace{0.5cm}
+The purpose of this essay is to gain an informal understanding of fractals and \mbox{L-systems}. However, before L-systems are introduced, we need to show the reader what an actual fractal is. \\ \\
+The simplest fractal one can think of is called Koch's snowflake. It can be defined by these two following pictures:
+\begin{figure}[H]
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\draw (0,0) node{}
+		-- (2,0) node{}
+		-- (1,2) node{}
+		-- cycle;
+		\end{tikzpicture}
+		\caption*{initiator}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\draw (0,0) --(1.5,0);
+		\draw (1.5,0) --(2,1);
+		\draw (2,1) --(2.5,0);
+		\draw (2.5, 0) --(4,0);
+		\end{tikzpicture}
+		\caption*{generator}
+	\end{subfigure}%
+	\captionsetup{textformat=empty}
+	\caption{initiator and generator}
+\end{figure} 
+\vspace{-1.5cm}
+\noindent
+The initiator is sometimes called the generation $0$ fractal. In our example, it is the \mbox{generation 0} of Koch's snowflake. By applying the generator to the initiator we get the 1st generation of the fractal.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\draw [l-system={Koch curve, step=20pt, angle=60, axiom=F++F++F, order=1}]
+		lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{1st generation}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\begin{tikzpicture}
+		\draw [l-system={Koch curve, step=7pt, angle=60, axiom=F++F++F, order=2}]
+		lindenmayer system -- cycle;
+		\end{tikzpicture}
+		\caption*{2nd generation}
+	\end{subfigure}%
+	\captionsetup{textformat=empty}
+	\caption{3. a 4. generace Kochovy vločky}
+\end{figure}
+\vspace{-1.5cm}
+\noindent
+We can repeat this process and apply the generator to the 1st generation of Koch's snowflake. What we get is the 2nd generation of Koch's snowflake. \\ \\
+This is all really neat, but we would like to know which picture the fractal tends to. We cannot afford to investigate high generations on our own, which means that computers are necessary. However we have yet to find a way that describes fractals for computers. This is where L-systems come in. \\
+\newpage \noindent
+An L-system is a formal grammar that describes a fractal in such a way that computers understand it. An initiator corresponds to what is known as a axiom and a generator is known as a transcription rule. \\ \\
+The L-system for Koch's snowflake looks like this:
+\begin{itemize}
+	\item axiom = F++F++F
+	\item transcription rule = F $\rightarrow$ F--F++F--F
+\end{itemize}
+One can imagine that the fractal is drawn by a turtle as it moves. The turtle gets a series of instructions based on a generation we intend to draw.
+\begin{itemize}[label=]
+	\item \textit{F} means "turtle, move forward in your direction"
+	\item \textit{+} means "turtle, turn counter-clockwise"
+	\item \textit{--} means "turtle, turn clockwise"
+\end{itemize}
+In the case of Koch's snowflake, the angle that the turtle should turn around is 60$^\circ$. \\ \\ 
+Although it might not be clear what this is all good for, fractals are generally really good models of plants. If you sometimes see a 3D model of a plant on your computer, it might have been high generations of a fractal that correctly approximate a particular plant.
+\vspace*{-0.7cm}
+\begin{center}
+ 	\huge Glossary
+\end{center}\noindent
+a \textbf{fractal} is an geometric shape consisting of smaller copies of itself. \\[10pt]
+\textbf{Helge von Koch} was an Swedish mathematician who gave his name to one of the earliest fractal curves to be described. \\[10pt]
+a \textbf{L-system} is a formal grammar that describes fractals for computers. \\[10pt]
+If a fractal \textbf{tends} to a picture A, it means that high generations of that fractal look like picture A.
+\end{document}

@@ -1,0 +1,1 @@
+/usr/bin/clang++  -g   CMakeFiles/Lsm.dir/src/main.cpp.o CMakeFiles/Lsm.dir/src/InputParser.cpp.o  -o Lsm 

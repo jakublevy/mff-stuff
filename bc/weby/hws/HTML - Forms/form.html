@@ -1,0 +1,29 @@
+<!DOCTYPE html> 
+<html lang="cs">
+    <head>
+        <title>Simple form</title>
+    </head>
+    <body>
+        <form action="http://demo.stools.net" method="POST">
+            <!-- <form action="https://httpbin.org/post" method="POST"> -->
+            Username:<br>
+            <input type="text" name="username"><br>
+
+            Email:<br>
+            <input type="email" name="email"><br>
+
+            Age:<br>
+            <input type="number" name="age"><br>
+
+            Comment:<br>
+            <textarea name="comment"></textarea><br>
+
+            Publish:<br>
+            <select name="publish">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select><br><br>
+            <button type="submit">Send</button>
+        </form>
+    </body>
+</html>

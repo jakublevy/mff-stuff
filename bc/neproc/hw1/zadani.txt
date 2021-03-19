@@ -1,0 +1,13 @@
+Worf vs. domorodci
+
+V džungli žije kmen domorodců, jejichž vyjadřování vykazuje mimořádnou (občas nepříjemnou) výstřednost: Muži vždycky říkají pravdu; ženy nikdy neřeknou dvě nepravdivé věty za sebou, ani dvě pravdivé věty za sebou. Nepříjemnější je, že muži i ženy se oblékají a vypadají obecně stejně, takže s rozeznáváním pravdy to je občas složité.
+
+Antropolog (říkejme mu Worf) se domorodce pokouší studovat, jenže ještě pořádně neumí domorodčí jazyk. Takže když jednoho dne potká rodinu a zeptá se dítěte, jestli je chlapec, Worf odpovědi nerozumí. Proto se obrátí na rodiče, z nichž Worfovi jeden řekne “Dítě řeklo, že je chlapec” a druhý doplní “Dítě je holka. Dítě lhalo.”
+
+Worf by pro pokračování ve výzkumu lokálních tradic potřeboval vědět, jak dítě odpovědělo (případně jestli lhalo) a určit pohlaví dítěte a obou rodičů.
+
+Úkol: Napište prologový program, který problém z dodaných faktů vyřeší. Zdrojový kód by měl dokumentovat a prokazovat správnost řešení, tj. měl by obsahovat přehlednou prologovou reprezentaci všech vstupních faktů (ideálně ne částečně vyhodnocenou programátorem) a program, který z nich odvodí řešení.
+
+Při řešení se vyhněte vlastní definici pravdivosti, použijte jen tu prologovou. (Tzn. vaše řešení by nemělo pracovat s termy podobnými ano a ne jako na prvním cvičení.) Doporučený postup je nadefinovat si rika(+Pohlavi, +SeznamTvrzeni, -SeznamPravdivychTvrzeni). Vyjádření prvního rodiče pak jde pěkně vyjádřit např. jako rika(Rodic1, [rika(Dite, [Dite=muz], X)], _).
+
+Příklad, jak může vypadat interface (výsledek není správně): Prolog na dotaz reseni_worfova_problemu(PohlaviDitete,PohlaviRodice1,PohlaviRodice2) odpoví PohlaviDitete=holka, PohlaviRodice1=kluk, ...

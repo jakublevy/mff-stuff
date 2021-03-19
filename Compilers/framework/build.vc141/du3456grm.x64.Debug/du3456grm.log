@@ -1,6 +1,0 @@
-﻿  Bison
-  C:\\Users\\jakub\\Desktop\\mff-stuff\\Compilers\\framework\\private-src\\du3456g.y:4.1-43: warning: deprecated directive, use '%define api.parser.class { mlaskal_parser }' [-Wdeprecated]
-   %define parser_class_name{ mlaskal_parser }
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CUSTOMBUILD : warning : fix-its can be applied.  Rerun with option '--update'. [-Wother]
-  Flex

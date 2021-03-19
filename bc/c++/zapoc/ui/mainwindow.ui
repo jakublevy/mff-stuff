@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1116</width>
+    <height>661</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>L-system</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/resources.qrc">
+    <normaloff>:/icon.ico</normaloff>:/icon.ico</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="1" column="2">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="addRuleBtn">
+        <property name="text">
+         <string>Add rule</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addColorChangeBtn">
+        <property name="text">
+         <string>Add color 
+ change</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0,0,0,0">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>10</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>0</number>
+      </property>
+      <item row="2" column="3">
+       <widget class="QLabel" name="startingLocationValLbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>95</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>95</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Not set yet</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="lineLengthSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> px</string>
+        </property>
+        <property name="maximum">
+         <number>2000</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="startingLocationLbl">
+        <property name="text">
+         <string>Starting location:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lineLengthLbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Line length:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="rotationAngleSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="suffix">
+         <string> ˚</string>
+        </property>
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="value">
+         <number>90</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="rotationAngleLbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Rotation angle:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" colspan="2">
+       <widget class="QComboBox" name="directionComboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>50</width>
+          <height>20</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>Right</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Down</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Left</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Up</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="1" alignment="Qt::AlignVCenter">
+       <widget class="QLineEdit" name="axiomEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="drawingDirectionLbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Drawing direction:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="generationLbl">
+        <property name="text">
+         <string>Generation:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" alignment="Qt::AlignVCenter">
+       <widget class="QLabel" name="axiomLbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Axiom:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" colspan="2">
+       <widget class="QSpinBox" name="generationSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="value">
+         <number>6</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="3">
+     <widget class="QGroupBox" name="colorChangesGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Color changes:</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QScrollArea" name="colorChangesScrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>92</height>
+          </size>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="colorChangesScrollAreaContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>290</width>
+            <height>90</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5"/>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="4">
+     <widget class="DrawingWidget" name="drawingWidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: white</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGroupBox" name="rulesGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Rules:</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QScrollArea" name="rulesScrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>92</height>
+          </size>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="rulesScrollAreaContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>291</width>
+            <height>90</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6"/>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1116</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuExamples">
+    <property name="title">
+     <string>E&amp;xamples</string>
+    </property>
+    <addaction name="actionDragon_curve"/>
+    <addaction name="actionFern"/>
+    <addaction name="actionFlower"/>
+    <addaction name="actionGosper_s_curve"/>
+    <addaction name="actionIslands_and_lakes"/>
+    <addaction name="actionLevy_C_curve"/>
+    <addaction name="actionKoch_s_anti_snowflake"/>
+    <addaction name="actionKoch_s_snowflake"/>
+    <addaction name="actionQuadratic_Koch_s_island"/>
+    <addaction name="actionMap"/>
+    <addaction name="actionTree"/>
+   </widget>
+   <widget class="QMenu" name="menuDrawing">
+    <property name="title">
+     <string>D&amp;rawing</string>
+    </property>
+    <addaction name="actionRender"/>
+    <addaction name="actionClear"/>
+    <addaction name="actionCross_visibility"/>
+   </widget>
+   <addaction name="menuExamples"/>
+   <addaction name="menuDrawing"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionTree">
+   <property name="text">
+    <string>&amp;Tree</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F11">F11</string>
+   </property>
+  </action>
+  <action name="actionBinary_tree">
+   <property name="text">
+    <string>&amp;Binary tree</string>
+   </property>
+  </action>
+  <action name="actionFlower">
+   <property name="text">
+    <string>Fl&amp;ower</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F3">F3</string>
+   </property>
+  </action>
+  <action name="actionFern">
+   <property name="text">
+    <string>&amp;Fern</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F2">F2</string>
+   </property>
+  </action>
+  <action name="actionKoch_s_snowflake">
+   <property name="text">
+    <string>Koch'&amp;s snowflake</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F8">F8</string>
+   </property>
+  </action>
+  <action name="actionQuadratic_Koch_s_island">
+   <property name="text">
+    <string>&amp;Quadratic Koch's island</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F9">F9</string>
+   </property>
+  </action>
+  <action name="actionIslands_and_lakes">
+   <property name="text">
+    <string>&amp;Islands and lakes</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F5">F5</string>
+   </property>
+  </action>
+  <action name="actionMap">
+   <property name="text">
+    <string>&amp;Map</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F10">F10</string>
+   </property>
+  </action>
+  <action name="actionBroken_window">
+   <property name="text">
+    <string>Broken &amp;window</string>
+   </property>
+  </action>
+  <action name="actionLevy_C_curve">
+   <property name="text">
+    <string>&amp;Lévy C curve</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F6">F6</string>
+   </property>
+  </action>
+  <action name="actionDragon_curve">
+   <property name="text">
+    <string>&amp;Dragon curve</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F1">F1</string>
+   </property>
+  </action>
+  <action name="actionRender">
+   <property name="text">
+    <string>&amp;Render</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="Enter">Enter</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>&amp;Clear</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string extracomment="Esc">Esc</string>
+   </property>
+  </action>
+  <action name="actionCross_visibility">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Cross</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F12">F12</string>
+   </property>
+  </action>
+  <action name="actionKoch_s_anti_snowflake">
+   <property name="text">
+    <string>Koch's anti-snowflake</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F7">F7</string>
+   </property>
+  </action>
+  <action name="actionGosper_s_curve">
+   <property name="text">
+    <string>Gosper's curve</string>
+   </property>
+   <property name="shortcut">
+    <string extracomment="F4">F4</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>DrawingWidget</class>
+   <extends>QWidget</extends>
+   <header>drawingwidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>axiomEdit</tabstop>
+  <tabstop>rotationAngleSpinBox</tabstop>
+  <tabstop>lineLengthSpinBox</tabstop>
+  <tabstop>directionComboBox</tabstop>
+  <tabstop>generationSpinBox</tabstop>
+  <tabstop>rulesScrollArea</tabstop>
+  <tabstop>addRuleBtn</tabstop>
+  <tabstop>addColorChangeBtn</tabstop>
+  <tabstop>colorChangesScrollArea</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+ <slots>
+  <slot>menuRenderClicked()</slot>
+ </slots>
+</ui>

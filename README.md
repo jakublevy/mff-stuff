@@ -1,0 +1,1 @@
+#### Personal stuff from study years at MFF UK.

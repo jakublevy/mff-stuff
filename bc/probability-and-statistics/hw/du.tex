@@ -1,0 +1,479 @@
+% !TeX spellcheck = cs_CZ
+\documentclass[12pt, a4paper, twoside]{article}
+\usepackage[czech]{babel}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{diagbox}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{subfig}
+\usepackage{pgfplots}
+\usepackage{cancel}
+\usepackage{emptypage}
+\usepackage{hyperref} 
+\usepackage{tikzsymbols}
+\usepackage{amsmath, amssymb, graphics, setspace}
+\newcommand{\mathsym}[1]{{}}
+\newcommand{\unicode}[1]{{}}
+\usepgfplotslibrary{fillbetween}
+
+\lhead{\headerL}
+\chead{\headerC}
+\rhead{\headerR}
+\def\headerL{}
+\def\headerC{}
+\def\headerR{}
+%\captionsetup{labelformat=empty}
+
+\newcommand{\wideunderline}[2][2em]{%
+	\underline{\makebox[\ifdim\width>#1\width\else#1\fi]{#2}}%
+}
+
+
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+	
+\newcommand*\squared[1]{\tikz[baseline=(char.base)]{
+		\node[shape=rectangle,draw,inner sep=3pt] (char) {#1};}}	
+
+\fancypagestyle{firstpage}
+{
+	
+	\rhead{Jakub Levý}
+	\chead{Domácí úkol z NMAI059}
+	\lhead{list $1$ z $6$}
+}
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+
+	
+\fancypagestyle{otherpages}
+{
+	
+	
+	\rhead{Jakub Levý}
+	\chead{Domácí úkol z NMAI059}
+	\lhead{list $\pgfmathparse{\thepage / 2 }\pgfmathprintnumber[precision=0]{\pgfmathresult}$ z $6$}
+}
+
+\usepackage{mathtools}
+\usepackage{ragged2e}
+\newlength\ubwidth
+\newcommand\parunderbrace[2]{\settowidth\ubwidth{$f#1$}\underbrace{#1}_{\parbox{\ubwidth}{\scriptsize\RaggedRight#2}}}
+	
+\begin{document}
+	\thispagestyle{firstpage}
+	\section*{Příklad \circled{1}}
+	Mějme 3 druhy zákusků: $\square$, $\triangle$, $\heartsuit$.
+	\subsection*{\squared{a}}
+	Označme:
+	\begin{itemize}[label={}]
+		\item $A$ = ["`nemůže vybrat ze všech zákusků"]
+		\item $A^c$ = ["`může vybrat ze všech zákusků"]
+	\end{itemize}
+Bude jednodušší spočítat $P(A^c)$ a poté vyjádřit $P(A)$ jako $1 - P(A^c)$. \\ \\
+Aby si Adam mohl vybrat ze všech druhů zákusků, musí stůl se zákusky vypadat jako libovolný řádek tabulky. 
+\begin{figure}[H]
+	\centering
+\begin{tabular}{ c  c  c }
+	$\square$ & $\triangle$ & $\heartsuit \heartsuit$ \\ \hline
+    $\square$ & $\triangle \triangle$ & $\heartsuit$ \\ \hline
+    $\square \square$ & $\triangle$ & $\heartsuit$ 
+\end{tabular}
+\caption{stůl se zákusky}
+\end{figure} \noindent
+Označme $B_i$ = ["`na stole zbyly zákusky i-tého řádku tabulky"]. \\ Platí, že:
+\begin{align*}
+P(B_1) &= P(B_2) = P(B_3) = \parunderbrace{\binom{5}{2,2,1}}{\#pořadí odebírání zákusků} \quad \cdot \quad \parunderbrace{\frac{3}{9} \cdot \frac{2}{8}}{odebrání dvou zákusků 1. typu} \quad \cdot \quad \parunderbrace{\frac{3}{7} \cdot \frac{2}{6}}{odebrání dvou zákusků 2. typu} \quad \cdot \quad \parunderbrace{\frac{3}{5}}{odebrání jednoho zákusku 3. typu} = \frac{3}{14} \\
+P(A^c) &= P(B_1 \cup B_2 \cup B_3) = P(B_1) + P(B_2) + P(B_3) = \frac{9}{14} \\[8pt]
+P(A) &= 1 - P(A^c) = 1 - \frac{9}{14} = \underline{\phantom{d}\frac{5}{14}\phantom{d}}
+\end{align*} 
+\subsection*{\squared{b}}
+6 lidí si vezme náhodný zákusek, aby zůstaly na stole všechny tři druhy zákusků, musí na stole zbýt od každého druhu právě jeden kus. \\
+Označme $C$ = ["`na stole zůstaly všechny tři druhy zákusků"].
+\begin{align*}
+P(C) = \parunderbrace{\binom{6}{2,2,2}}{\#pořadí odebírání zákusků} \quad \cdot \quad \parunderbrace{\frac{3}{9} \cdot \frac{2}{8}}{odebírání dvou zákusků 1. typu} \quad \cdot \quad \parunderbrace{\frac{3}{7} \cdot \frac{2}{6}}{odebírání dvou zákusků 2. typu} \quad \cdot \quad \parunderbrace{\frac{3}{5} \cdot \frac{2}{4}}{odebírání dvou zákusků 3. typu} = \underline{\phantom{d}\frac{9}{28}\phantom{d}}
+\end{align*}
+\subsection*{\squared{c}}
+Bez újmy na obecnosti považujme $\square$ za věneček. Po odebrání 5 zákusků bude stůl vypadat jako jeden řádek tabulky.
+ \pagestyle{otherpages}
+\begin{figure}[H]
+	\centering
+\begin{tabular}{ c  c  c }
+	$\square$ & & $\heartsuit \heartsuit \heartsuit$ \\ \hline
+	$\square$ & $\triangle \triangle \triangle$ & \\ \hline
+	$\square$ & $\triangle$ & $\heartsuit \heartsuit$ \\ \hline 
+	$\square$ & $\triangle \triangle$ & $\heartsuit$ 
+\end{tabular}
+\caption{stůl se zákusky}
+\end{figure}\noindent
+Na stole vždy leží 4 zbylé zákusky z nichž 1 je věneček, aby tam věneček zůstal, tak si Adam musí vzít libovolné jiný. \\
+Označme D = ["`věneček zbyl i po Adamově výběru"], potom $P(D) = \underline{\phantom{d}\frac{3}{4}\phantom{d}}$
+\section*{Příklad \circled{2}}
+\subsection*{\squared{a}}
+$(X,Y)^T$ je diskrétní náhodný vektor. Sdružené a marginální rozdělení je popsáno tabulkou.
+
+\begin{figure}[H]
+	\centering
+	\bgroup
+	\def\arraystretch{1.3}
+\begin{tabular}{ c  c  c  c | c}
+	\backslashbox{$X$}{$Y$} & $0$ & $1$ & $2$ \\ \hline
+	$0$ & \multicolumn{1}{|c|}{$\frac{21}{32} \cdot \frac{20}{31}$}  & \multicolumn{1}{|c|}{$\binom{2}{1} \cdot \frac{3}{32} \cdot \frac{21}{31}$} & \multicolumn{1}{c|}{$\frac{3}{32} \cdot \frac{2}{31}$} & $\frac{69}{124}$ \\ \hline
+	$1$ & \multicolumn{1}{|c|}{$\binom{2}{1} \cdot \frac{7}{32} \cdot \frac{21}{31}$} & \multicolumn{1}{|c|}{$\binom{2}{1} \cdot \frac{7}{32} \cdot \frac{3}{31} + \binom{2}{1} \cdot \frac{1}{32} \cdot \frac{21}{31}$} & \multicolumn{1}{c|}{$\binom{2}{1} \cdot \frac{1}{32} \cdot \frac{3}{31}$} & $\frac{12}{31}$ \\ \hline
+	$2$ & \multicolumn{1}{|c|}{$\frac{7}{32} \cdot \frac{6}{31}$} & \multicolumn{1}{|c|}{$\binom{2}{1} \cdot \frac{1}{32} \cdot \frac{7}{31}$} & \multicolumn{1}{c|}{$0$} & $\frac{7}{124}$ \\ \hline
+	& \multicolumn{1}{|c|}{$\frac{189}{248}$} & \multicolumn{1}{c}{$\frac{7}{31}$} & \multicolumn{1}{|c|}{$\frac{3}{248}$} & $\textbf{1}$
+\end{tabular}
+	\egroup
+	\caption{rozdělení před zjednodušením výpočtů}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\bgroup
+	\def\arraystretch{1.3}
+	\begin{tabular}{ c  c  c  c | c}
+		\backslashbox{$X$}{$Y$} & $0$ & $1$ & $2$ \\ \hline
+		$0$ & \multicolumn{1}{|c}{$\frac{105}{248}$}  & \multicolumn{1}{|c|}{$\frac{63}{496}$} & \multicolumn{1}{c|}{$\frac{3}{496}$} & $\frac{69}{124}$ \\ \hline
+		$1$ & \multicolumn{1}{|c}{$\frac{147}{496}$} & \multicolumn{1}{|c|}{$\frac{21}{248}$} & \multicolumn{1}{c|}{$\frac{3}{496}$} & $\frac{12}{31}$ \\ \hline
+		$2$ & \multicolumn{1}{|c}{$\frac{21}{496}$} & \multicolumn{1}{|c|}{$\frac{7}{496}$} & \multicolumn{1}{c|}{$0$} & $\frac{7}{124}$ \\ \hline
+		& \multicolumn{1}{|c|}{$\frac{189}{248}$} & \multicolumn{1}{c}{$\frac{7}{31}$} & \multicolumn{1}{|c|}{$\frac{3}{248}$} & $\textbf{1}$
+	\end{tabular}
+	\egroup
+	\caption{rozdělení po zjednodušení výpočtů}
+\end{figure}
+\subsection*{\squared{b}}
+Náhodné veličiny $X, Y$ jsou závislé. To je hned vidět z druhého řádku tabulky. \newline $0 = P(X = 2 \ \wedge \ Y = 2) \ne P(X = 2) \cdot P(Y = 2) = \frac{7}{124} \cdot \frac{3}{248}$ \\
+O korelaci náhodných veličin z jejich závislosti nic nevíme. Bude třeba ji spočítat ručně.
+\begin{align*}
+EX &= 0 \cdot \frac{69}{124} + 1 \cdot \frac{12}{31} + 2 \cdot \frac{7}{124} = \frac{1}{2} \\[6pt]
+EY &= 0 \cdot \frac{189}{248} + 1 \cdot \frac{7}{31} + 2 \cdot \frac{3}{248} = \frac{1}{4} \\[6pt]
+EX^2 &= 0 \cdot \frac{69}{124} + 1 \cdot \frac{12}{31} + 4 \cdot \frac{7}{124} = \frac{19}{31} \\[6pt]
+EY^2 &= 0 \cdot \frac{189}{248} + 1 \cdot \frac{7}{31} + 4 \cdot \frac{3}{248} = \frac{17}{62} \\[6pt]
+EXY &= 1 \cdot 1 \cdot \frac{21}{248} + 1 \cdot 2 \cdot \frac{3}{496} + 2 \cdot 1 \cdot \frac{7}{496} = \frac{1}{8} \\[6pt]
+\mathrm{var}\, X &= \frac{19}{31} - \frac{1}{4} = \frac{45}{124} \\[6pt]
+\mathrm{var}\, Y &= \frac{17}{62} - \frac{1}{16} = \frac{105}{496} \\[6pt]
+\mathrm{cov}(X, Y) &= \frac{1}{8} - \frac{1}{2} \cdot \frac{1}{4} = 0 \\[6pt]
+\mathrm{corr}(X, Y) &= \frac{0}{\sqrt{\frac{45}{124} \cdot \frac{105}{496}}} = \underline{\phantom{d}0\phantom{d}}
+\end{align*}
+\subsection*{\squared{c}}
+Náhodná veličina $Z$ může nabývat pouze hodnot $0, 1, 2$.
+\begin{align*}
+P(Z = 0) &= \frac{24-a}{24} \cdot \frac{23 - a}{23} \\[6pt]
+P(Z = 1) &= \binom{2}{1} \cdot \frac{a}{24} \cdot \frac{24 - a}{23} \\[6pt]
+P(Z = 2) &= \frac{a}{24} \cdot \frac{a - 1}{23} \\[6pt]
+EZ &= 0 \cdot \frac{24-a}{24} \cdot \frac{23 - a}{23} + 1\cdot \binom{2}{1} \cdot \frac{a}{24} \cdot \frac{24 - a}{23} + 2\cdot \frac{a}{24} \cdot \frac{a - 1}{23} = \underline{\phantom{d}\frac{a}{12}\phantom{d}}
+\end{align*}
+\begin{figure}[H]
+\centering
+\bgroup
+\def\arraystretch{1.3}
+	\begin{tabular}{c | c c c c c c c c c}
+		$a$ & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ \\ \hline
+		$EZ$ & $0$ & $\frac{1}{12}$ & $\frac{1}{6}$ & $\frac{1}{4}$ & $\frac{1}{3}$ & $\frac{5}{12}$ & $\frac{1}{2}$ & $\frac{7}{12}$ & $\frac{2}{3}$ \\
+	\end{tabular}
+\egroup
+\caption{$EZ$ pro všechny hodnoty parametru $a$}
+\end{figure}
+\subsection*{\squared{d}}
+Známe střední hodnotu náhodné veličiny $Z$, která závisí na parametru $a$. Po provedení náhodného výběru $Z_1,\ldots, Z_n$ můžeme spočítat $\overline{Z_n}$. O výběrovém průměru víme, že je nestranný a konzistentní odhad střední hodnoty. Parametr $a$ je možné odhadnout z~následujícího vztahu:
+\begin{align*}
+EZ &= \frac{a}{12} \approx \frac{1}{n} \cdot \sum_{k=1}^{n} Z_k = \overline{Z_n}
+\end{align*}
+Jedná se tedy o odhad: $\widehat{a_n} = 12 \cdot \overline{Z_n}$
+\paragraph{Nestranost:} 
+\begin{align*}
+E\widehat{a_n} = E\left(12 \cdot \overline{Z_n}\right) = 12 \cdot E\overline{Z_n} = 12 \cdot EZ = 12 \cdot \frac{a}{12} = a
+\end{align*}
+\paragraph{Konzistence:}\mbox{}\\
+Předpoklady ZVČ jsou splněny:
+\begin{itemize}[label={}]
+	\item $Z_1,\ldots Z_n$ (iid) \checkmark
+	\item $-\infty < EZ_i = EZ < \infty$ \checkmark
+	\item $-\infty < \mathrm{var}\, EZ_i = \mathrm{var}\, EZ = \cfrac{a \cdot (22+a)}{276} - \left(\cfrac{a}{12}\right)^2 = \cfrac{264\, a - 11\, a^2}{3312} < \infty$ \checkmark
+\end{itemize}
+Ze ZVČ víme, že $\overline{Z_n} \xrightarrow[n \to \infty]{P} EZ$. \\[6pt] Využijeme věty o spojité transformaci.
+\begin{align*}
+g(t) &= 12 \,t \quad \text{(spojitá na } \mathbb{R}\text{)} \\
+g(\overline{Z_n}) &= 12 \cdot \overline{Z_n}\,\, = \widehat{a_n} \\
+g(EZ) &= 12 \cdot EZ = a \\[12pt]
+\widehat{a_n} &\xrightarrow[n \to \infty]{P} a
+\end{align*}
+$\widehat{a_n}$ je nestranný a konzistentní odhad $a$.
+\subsection*{\squared{e}}
+Řešeno ve Wolfram Mathematice 11.3.
+\begin{figure}[H]
+	\begin{doublespace}
+		\noindent\(\pmb{\text{(* } K - \text{kule}}\\
+		\pmb{ L - \text{listy}}\\
+		\pmb{ S - \text{srdce}}\\
+		\pmb{ Z - \text{zaludy} }\\
+		\pmb{\text{*)}}\\
+		\pmb{\text{deck}=\text{RandomSample}[\text{Join}[\text{ConstantArray}[\text{\lq \lq S\rq \rq},8],\text{ConstantArray}[\text{\lq \lq Z\rq \rq},8],}\\
+		\pmb{\text{\quad \quad \, \, \! \! \text{ConstantArray}[\text{\lq \lq L\rq \rq},8]}, \text{ConstantArray}[\text{\lq \lq K\rq \rq},8]]]}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{\text{(*} \text{ na } \text{n{\' a}hodn{\' y}ch } \text{indexech } \text{smazeme } \text{karty } \text{z } \text{bal{\' \i}{\v c}ku} }\\
+		\pmb{\text{*)}}\\
+		\pmb{\text{For}[i=1,i\leq 8,i\text{++},\text{deck}=\text{Delete}[\text{deck},\text{RandomInteger}[\{1,\text{Length}[\text{deck}]\}]]]}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{\text{(*} \text{ skute{\v c}n{\' y} } \text{po{\v c}et } \text{zb{\' y}vaj{\' \i}c{\' \i}ch } \text{srdcov{\' y}ch } \text{karet}}\\
+		\pmb{\text{*)}}\\
+		\pmb{\text{srdcovych}=\text{Count}[\text{deck}, \text{\lq \lq S\rq \rq}];}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{n=20;}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{Z=\text{Table}[\text{Count}[\text{Table}[\text{deck}[[\text{RandomInteger}[\{1,\text{Length}[\text{deck}]\}]]],\{i,1,2\}],\text{\lq \lq S\rq\rq}],\{k,1,n\}]}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{\text{EZ}=\frac{a}{12};}\\
+		\pmb{\text{Average}=\frac{1}{n}*\sum _{k=1}^n Z[[k]];}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{\text{NSolve}[\text{EZ}==\text{Average},a]\text{ //}N}\)
+	\end{doublespace}
+	
+	\begin{doublespace}
+		\noindent\(\pmb{\text{srdcovych}}\)
+	\end{doublespace}
+	\caption{zdrojový kód}
+\end{figure}	
+\begin{figure}[H]
+	\centering
+	\bgroup
+	\def\arraystretch{1.3}
+	\begin{tabular}{c | c || c | c}
+		\multicolumn{2}{c||}{$n = 20$} & \multicolumn{2}{c}{$n = 2000$} \\ \hline
+		$a$ & $\hat{a}$ & $a$ & $\hat{a}$ \\ \hline
+		$6$ & $5.4$ & $7$ & $6.918$ \\
+		$7$ & $6$ & $6$ & $5.682$ \\
+     	$6$ & $4.2$ & $6$ & $6.078$ \\
+     	$7$ & $5.4$ & $7$ & $6.924$ \\
+     	$5$ & $4.2$ & $6$ & $6.204$ \\
+		$6$ & $7.2$ & $5$ & $4.968$ \\
+		$5$ & $3.6$ & $6$ & $6.132$ \\
+		$6$ & $4.2$ & $6$ & $6.048$ \\
+		$5$ & $3$ & $7$ & $6.738$ \\
+		$8$ & $6$ & $7$ & $7.164$
+	\end{tabular}
+	\egroup
+	\caption{realizace pokusů}
+\end{figure}\noindent 
+S rostoucí velikostí náhodného výběru se přesnost odhadu zlepšuje. Pro $n=2000$ se jedná už o solidní odhad.
+\section*{Příklad \circled{3}}
+Označme $X$ = ["`doba výpočtu úlohy s náhodným vstupem"].
+\[f_X(x) =  \begin{cases} 
+\frac{2}{x^3} & x\ge 1 \\
+0 & x < 1
+\end{cases}
+\]
+\subsection*{\squared{a}}
+$\displaystyle P(X < 5) = P(X > 1 \ \wedge \ X < 5) = \int_{1}^{5} f_X(x)\,dx = \int_{1}^{5} \frac{2}{x^3}\,dx = 2 \cdot \left[ \frac{1}{-2x^2} \right]_1^5 = \newline= 2 \cdot \left(\frac{1}{-50} + \frac{1}{2}\right) = \underline{\phantom{d}\frac{24}{25}\phantom{d}}$
+\begin{figure}[H]
+	\centering
+\begin{tikzpicture}
+\begin{axis}[xmax=6,ymax=2.25,ymin=-0,xmin=-1, samples=50, axis y line=middle,axis x line=bottom,xlabel={$X$}, ylabel={$f_X(X)$}, xlabel style={below right}]
+\addplot[blue, name path=f, ultra thick, domain=1:6] (x,2/x^3);
+\addplot[blue,  ultra thick, domain=-1:1] (x,0);
+\node[label={180:{}},circle,fill,inner sep=2pt, color=blue] at (axis cs:1,2) {};
+\node[label={180:{}},circle,draw,inner sep=2pt, color=blue] at (axis cs:1,0) {};
+
+\path[name path=axis] (axis cs:0,0) -- (axis cs:6,0);
+
+
+\addplot [
+thick,
+color=blue,
+fill=blue, 
+fill opacity=0.15
+]
+fill between[
+of=f and axis,
+soft clip={domain=1:6},
+];
+\end{axis}
+\end{tikzpicture}
+\caption{Graf PDF náhodné veličiny X}
+\end{figure}\noindent
+$P(X < 5)$ není nic jiného než pouze plocha mezi funkcemi $f_X$ a osou $X$ na \mbox{intervalu $\left(1,5\right)$.}
+\subsection*{\squared{b}}
+$\displaystyle EX = \int_{-\infty}^{\infty} x \cdot f_X(x)\,dx = \int_{1}^{\infty} x \cdot \frac{2}{x^3}\,dx = \lim\limits_{b\to\infty} \int_{1}^{b} \frac{2}{x^2}\,dx = \lim\limits_{b\to\infty} 2\cdot \left[ -\frac{1}{x} \right]_1^b =\\[6pt]= \lim\limits_{b\to\infty} 2\cdot \left(-\frac{1}{b} + 1\right) = \underline{\phantom{d}2\phantom{d}}$
+\subsection*{\squared{c}}
+$\displaystyle EX^2 = \int_{-\infty}^{\infty} x^2 \cdot f_X(x)\,dx = \int_{1}^{\infty} x^2 \cdot \frac{2}{x^3}\,dx = \lim\limits_{b\to\infty} \int_{1}^{b} \frac{2}{x}\,dx = \lim\limits_{b\to\infty} 2 \cdot \left[ 2\ln{x} \right]_1^b =\\[6pt]= \lim\limits_{b\to\infty} 2 \cdot \left( 2\ln{b} - 2 \ln{1} \right) = \infty$ \\ \\ \\
+$\displaystyle \mathrm{var}\,X = EX^2 - \left(EX\right)^2 = \infty - 4 = \underline{\phantom{d}\infty\phantom{d}}$
+\paragraph{Poznámka:} Všiml jsem si, že PDF $f_X$ je speciální případ \texttt{\href{https://en.wikipedia.org/wiki/Pareto_distribution}{Paretova rozdělení}}.
+\[
+g(x) = 
+\begin{cases}
+\cfrac{\alpha \cdot x_0^\alpha}{x^{\alpha + 1}} & x \ge x_0 \\[8pt]
+0 & x < x_0
+\end{cases}
+\]
+pro parametry $\alpha = 2$, $x_0 = 1$. Nechť $Y$ je náhodná veličina, která je rozdělena Paretovým rozdělením. Platí:
+\[ E(Y) = 
+\begin{cases}
+\infty & \alpha \le 1 \\[8pt]
+\cfrac{\alpha \cdot x_0}{\alpha - 1} & \alpha > 1
+\end{cases}
+\]
+\[ \mathrm{var}\,(Y) = 
+\begin{cases}
+\infty & \quad \alpha \in (1,2] \\[14pt]
+\left(\cfrac{x_0}{\alpha - 1}\right)^2 \cdot \cfrac{\alpha}{\alpha - 2} & \quad \alpha > 2
+\end{cases}
+\]
+Což odpovídá předchozím výpočtům $EX$ a $\mathrm{var}\,X$.
+\subsection*{\squared{d}}
+Nejprve spočítáme $F_X$.
+\[
+F_X(t) =  
+\begin{cases}
+\int_{1}^{t} 2/x^3\,dx & \quad t \ge 1 \\[6pt]
+\int_{-\infty}^t 0\,dt = 0 & \quad t < 1
+\end{cases}
+\] \\ \\
+$\displaystyle \int_{1}^{t} \frac{2}{x^3} = 2 \cdot \left[ - \frac{1}{2x^2} \right]_1^t = 2 \cdot \left(- \frac{1}{2t^2} + \frac{1}{2} \right) = 1 - \frac{1}{t^2}$\\ \\
+\[
+F_X(x) = 
+\begin{cases}
+1 - \cfrac{1}{x^2} & \quad x \ge 1 \\[8pt]
+0 & \quad x < 1
+\end{cases}
+\]
+Teď bychom ze znalosti distribuční funkce chtěli generovat náhodné veličiny. Nechť:
+\begin{itemize}
+	\item $U \sim R[0,1]$
+	\item $H\colon [0,1] \to \mathbb{R}$
+	\begin{itemize}[label={}]
+          \item $H(U) = X$
+          \item $H$ je neklesající a invertovatelná funkce
+	\end{itemize}
+\end{itemize}
+\begin{align*}
+\forall x \in \mathbb{R}\colon F_X(x) = P(X \le x) = P(H(U) \le x) &= P\left[H^{-1}(H(U)) \le H^{-1}(x)\right] \\ &= P(U \le H^{-1}(x)) = H^{-1}(x)
+\end{align*}
+Dostáváme, že $\forall y \in [0,1]\colon H(y) = F_X^{-1}(y)$. Stačí tedy dostat $U$, spočítat $F_X^{-1}(U) = X$ a~je hotovo. Chybí nám však zatím ta inverzní distribuční funkce \Winkey. \\
+Z distribuční funkce víme, že $X \ge 1$. Budeme hledat inverzí funkci k $\displaystyle 1 - \frac{1}{x^2}$
+\begin{align*}
+y &=1-\cfrac{1}{\left(F_X^{-1}(y) \right)^2} \\[6pt]
+1-y &= \cfrac{1}{\left(F_X^{-1}(y) \right)^2} \\[6pt]
+\cfrac{1}{1-y} &= \left(F_X^{-1}(y) \right)^2 \\[6pt]
+F_X^{-1}(y) &= \cfrac{1}{\sqrt{1-y}} \quad \quad y \in [0,1) \\[6pt]
+\end{align*}
+\paragraph{Poznámka:}
+Případ $\cancel{F_X^{-1}(y) = - \cfrac{1}{\sqrt{1-y}} \quad \quad y \in [0,1)}$ \quad nás nezajímá. $F_X^{-1}$ vrací náhodné veličiny, o kterých víme, že jsou alespoň $1$. \\ \\
+Pro $y = 1$ dodefinujeme $F_X^{-1}(y) = \infty$. Což dává logický smysl, vzhledem k tomu, že $F_X^{-1}(y)$ vrací takové $x$, že $P(-\infty < X < x) \le y$. \\ \\
+Finálně:
+\[ F_X^{-1}(y) =
+\begin{cases}
+\cfrac{1}{\sqrt{1-y}} & y \in [0,1) \\[12pt]
+\infty & y = 1
+\end{cases}
+\]
+\subsection*{\squared{e}}
+Řešeno ve Wolfram Mathematice 11.3.
+\begin{figure}[H]
+\begin{doublespace}
+	\noindent\(\pmb{\text{Indicator}[\text{Condition$\_$}]\text{:=}\text{If}[\text{Condition},1,0];}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{F[\text{x$\_$}]\text{:=}\text{Piecewise}\left[\left\{\left\{1-\frac{1}{x^2},x\geq 1\right\},\{0,x<1\}\right\}\right];}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{f[\text{x$\_$}]\text{:=}\text{Piecewise}\left[\left\{\left\{\frac{2}{x^3},x\geq 1\right\},\{0,x<1\}\right\}\right];}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{\text{FInv}[\text{y$\_$}]\text{:=}\text{Piecewise}\left[\left\{\left\{\frac{1}{\sqrt{1-y}},y\geq 0\land y<1\right\},\{\infty ,y==1\}\right\}\right];}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{n=1000; \text{(*} \text{ nastavit } 20, 100, 1000\text{ }\text{ *)}}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{X=\text{Table}[\text{FInv}[\text{RandomReal}[]],\{i,1,n\}];}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{\text{FEmpirical}[\text{x$\_$}]\text{:=}\frac{1}{n}*\sum _{k=1}^n \text{Indicator}[X[[k]]\leq x]}\)
+\end{doublespace}
+
+\begin{doublespace}
+	\shorthandoff{"}
+	\noindent\(\pmb{\text{Plot}[\{F[x],\text{FEmpirical}[x]\},\{x,0,5\},\text{AxesLabel}\to \{\text{Style}[x,18],\text{None}\},}\\
+	\pmb{\text{           }\text{BaseStyle}\to \{\text{FontSize}\to 20\},\text{PlotLegends}\to \left\{\text{Style}\left[\texttt{"}F_X\text{(x)$\texttt{"}$},18\right],\right.}\\
+	\pmb{\left.\text{      }\text{Style}\left[\text{OverHat}\left[\texttt{"}F_X\texttt{"}\right]\text{{``}(x){''}},18\right]\right\},}\\
+	\pmb{\text{           }\text{PlotLabel}\to \text{StringForm}[\text{{``}Porovnání CDF a ECDF (n = \`{}\`{}){''}},n]]}\)
+	\shorthandon{"}
+\end{doublespace}
+
+\begin{doublespace}
+	\noindent\(\pmb{\text{Average}=\frac{1}{n}*\sum _{k=1}^n X[[k]]}\)
+\end{doublespace}
+\caption{zdrojový kód}
+\end{figure}\noindent
+\begin{figure}[H]
+\centering
+\bgroup
+\def\arraystretch{1.3}
+\begin{tabular}{c |  c | c | c |}
+	& \multicolumn{3}{c|}{$\overline{X_n}$} \\ \hline
+	$n $ & $20$ & $100$ & $1000$ \\ \hline
+	& 1.53243 & 1.8398  & 2.15269 \\ \hline		
+	& 1.59385 & 2.11342 & 1.98973 \\ \hline
+	& 1.88965 & 2.4047 & 2.106 \\ \hline
+	& 3.07 & 2.2107 & 1.97948 \\ \hline
+	& 1.69749 & 2.13945 & 2.26897 \\ \hline
+	& 1.7707 & 1.88066 & 1.89993 \\ \hline
+	& 2.05292 & 1.98504 & 1.9335 \\ \hline
+	& 1.66008 & 1.64479 & 1.93232 \\ \hline
+	& 1.9351 & 1.98355 & 1.88608 \\ \hline
+	& 2.13355 & 1.88512 & 1.91333 
+\end{tabular}
+\egroup
+\caption{realizace výběrových průměrů $X_1,\ldots,X_n$}
+\end{figure}\noindent
+Považujme jednotlivé výběrové průměry za náhodné veličiny $Y_{i,j}$ (indexujme jako matici).
+\begin{figure}[H]
+	\centering
+	\bgroup
+	\def\arraystretch{1.3}
+	\begin{tabular}{c | c | c}
+		$\overline{Y_{*,1}}$ & $\overline{Y_{*,2}}$ & $\overline{Y_{*,3}}$ \\ \hline
+		2.12161 & 2.00872 & 2.00620
+	\end{tabular}
+	\egroup	
+\end{figure}\noindent
+Pozorujeme, že s rostoucí velikostí náhodného výběru se výběrový průměr náhodných veličin blíží ke střední hodnotě náhodné veličiny, ta je $2$.
+\newpage
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{n=20.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{n=100.png}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{n=1000.png}
+\end{figure}\noindent
+Na obrázcích porovnávající CDF a ECDF je patrná kvalita (nestranost a konzistence) odhadu CDF pomocí ECDF. S dostanečně velkým náhodným výběrem ($n$ = 1000) se už jedná o velmi přesný odhad.
+\end{document}	

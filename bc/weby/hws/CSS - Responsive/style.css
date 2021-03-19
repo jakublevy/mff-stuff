@@ -1,0 +1,81 @@
+/* Společné styly pro úzké i široké zobrazení */
+img {
+    max-width: 400px;
+}
+
+#sidebar {
+    box-shadow: 0.1em 0.1em gray;
+    border: 0.1em solid gray;
+}
+
+/* široké zobrazení >= 1000px */
+@media (min-width: 1000px) {
+    #sidebar {
+        width: 200px;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        bottom: 0;
+        left: 0; 
+    }
+    body {
+        /*
+         Pokud bychom chtěli výšku #sidebar přes celou stránku až k #footer
+
+         position: relative; 
+        */
+    }
+    #content {
+        margin-left: 200px;
+    }
+    article {
+        width: 800px;
+        margin: 0 auto;
+    }
+    img.floatleft {
+        float: left;
+    }
+    img.floatright {
+        float: right;
+    }
+    img {
+        /* Aby obrázky nebyli nalepené k textu */
+        padding: 0 10px;
+    }
+    footer {
+        width: 800px;
+        margin: 0 auto;
+    }
+}
+
+/* úzké zobrazení < 1000px */
+@media (max-width: 999px) {
+    #sidebar {
+        width: 100%;
+        top: 0;
+        left: 0;
+        height: 130px;
+        text-align: center;
+        position: fixed;
+        background-color: white;
+        min-width: inherit;
+    }
+    #sidebar li {
+        list-style-type: none;
+        display: inline-block;
+        margin: 0.7em;
+        text-align: center;
+    }
+    body {
+        min-width: 400px;
+    }
+    #content {
+        margin-top: 140px;
+        min-width: inherit;
+    }
+
+    img {
+        display: block;
+        margin: 0 auto;
+    }
+}
